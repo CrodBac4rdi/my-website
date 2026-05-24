@@ -7,9 +7,9 @@ import { useRouter } from 'next/navigation';
 
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+// Wir greifen jetzt den Key ab, den Vercel automatisch generiert hat!
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!; 
 const supabase = createClient(supabaseUrl, supabaseKey);
-
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState('');

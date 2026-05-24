@@ -13,8 +13,13 @@ async function getAnimeDetails(id: string) {
   }
 }
 
-export default async function MediaDetail({ params }: { params: { id: string } }) {
-  const anime = await getAnimeDetails(params.id);
+// FIX: params ist in Next.js 15 ein Promise, das wir erwarten (await) müssen!
+export default async function MediaDetail({ params }: { params: Promise<{ id: string }> }) {
+  // Wir warten, bis die URL entschlüsselt ist
+  const resolvedParams = await params;
+  
+  // Dann laden wir die Daten
+  const anime = await getAnimeDetails(resolvedParams.id);
 
   if (!anime) {
     return <div className="text-center py-20 text-slate-400">Anime nicht gefunden.</div>;
@@ -24,7 +29,7 @@ export default async function MediaDetail({ params }: { params: { id: string } }
     <div className="relative">
       
       {/* Hintergrund-Banner */}
-      <div className="absolute top-0 left-0 w-full h-[50vh] overflow-hidden -z-10 rounded-3xl opacity-30">
+      <div className="absolute top-0 left-0 w-full h-[50vh] overflow-hidden -z-10 rounded-3xl opacity-30 mask-image-gradient">
         <img 
           src={anime.trailer?.images?.maximum_image_url || anime.images.jpg.large_image_url} 
           alt="Background" 
@@ -80,7 +85,7 @@ export default async function MediaDetail({ params }: { params: { id: string } }
           </div>
 
           <div className="flex flex-wrap gap-2 pt-2">
-            {anime.genres.map((genre: any) => (
+            {anime.genres?.map((genre: any) => (
               <span key={genre.mal_id} className="bg-slate-800/50 border border-slate-700 text-slate-300 px-3 py-1 rounded-lg text-sm">
                 {genre.name}
               </span>

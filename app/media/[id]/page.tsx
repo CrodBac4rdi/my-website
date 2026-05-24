@@ -1,5 +1,6 @@
 import { Star, Plus, Calendar, MonitorPlay, Info } from "lucide-react";
-
+import WatchlistButton from "@/components/WatchListButton";
+// Falls das @ bei dir Fehler wirft, nutze: import WatchlistButton from "../../../components/WatchlistButton";
 async function getAnimeDetails(id: string) {
   try {
     const res = await fetch(`https://api.jikan.moe/v4/anime/${id}`, {
@@ -51,10 +52,7 @@ export default async function MediaDetail({ params }: { params: Promise<{ id: st
             />
           </div>
           
-          <button className="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition shadow-lg shadow-blue-500/20">
-            <Plus size={20} />
-            Zur Watchlist hinzufügen
-          </button>
+          <WatchlistButton anime={anime} />
         </div>
 
         {/* Rechte Spalte */}

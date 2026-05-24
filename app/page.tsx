@@ -1,11 +1,11 @@
 import { Play, Star, Plus, Flame } from "lucide-react";
+import Link from "next/link";
 
-// Diese Funktion läuft auf dem Server und holt echte Daten!
+// Diese Funktion läuft auf dem Server und holt echte Daten
 async function getTopAnime() {
   try {
-    // Wir fragen die Top 8 Animes ab
     const res = await fetch("https://api.jikan.moe/v4/top/anime?limit=8", {
-      next: { revalidate: 3600 } // Caching: Nur alle 1 Stunde neu laden (spart API-Aufrufe)
+      next: { revalidate: 3600 } 
     });
     const data = await res.json();
     return data.data;
@@ -16,7 +16,6 @@ async function getTopAnime() {
 }
 
 export default async function LandingPage() {
-  // Echte Daten abrufen
   const topAnime = await getTopAnime();
 
   return (
@@ -51,7 +50,11 @@ export default async function LandingPage() {
         
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
           {topAnime.map((anime: any) => (
-            <div key={anime.mal_id} className="group relative bg-slate-900 rounded-xl overflow-hidden border border-slate-800 hover:border-slate-600 transition cursor-pointer">
+            <Link 
+              href={`/media/${anime.mal_id}`} 
+              key={anime.mal_id} 
+              className="group relative bg-slate-900 rounded-xl overflow-hidden border border-slate-800 hover:border-slate-600 transition cursor-pointer block"
+            >
               
               {/* Cover Bild */}
               <div className="aspect-[2/3] w-full bg-slate-800 relative">
@@ -82,7 +85,7 @@ export default async function LandingPage() {
                 </h3>
               </div>
 
-            </div>
+            </Link>
           ))}
         </div>
       </section>

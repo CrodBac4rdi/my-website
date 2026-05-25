@@ -1,26 +1,56 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #020205;
+  --foreground: #ffffff;
+  --accent-blue: #2563eb;
+  --accent-green: #22c55e;
+  --accent-yellow: #facc15;
+  --accent-pink: #db2777;
+  --accent-purple: #9333ea;
+  --accent-orange: #ea580c;
+  --brutalist-border: 4px;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-accent-blue: var(--accent-blue);
+  --color-accent-green: var(--accent-green);
+  --color-accent-yellow: var(--accent-yellow);
+  --color-accent-pink: var(--accent-pink);
+  --color-accent-purple: var(--accent-purple);
+  --color-accent-orange: var(--accent-orange);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), system-ui, sans-serif;
+  overflow-x: hidden;
+}
+
+@layer components {
+  .bento-box {
+    @apply border-[var(--brutalist-border)] border-white bg-black/40 backdrop-blur-md rounded-none shadow-[8px_8px_0px_0px_rgba(255,255,255,1)] transition-all duration-300;
+  }
+  
+  .bento-box:hover {
+    @apply -translate-x-1 -translate-y-1 shadow-[12px_12px_0px_0px_rgba(255,255,255,1)] bg-black/60;
+  }
+
+  .btn-brutalist {
+    @apply border-[var(--brutalist-border)] border-black px-8 py-4 font-black uppercase italic tracking-tighter transition-all duration-150 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-1 active:translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed text-center;
+  }
+
+  .btn-blue { @apply bg-accent-blue text-white shadow-[8px_8px_0px_0px_rgba(255,255,255,1)] border-white hover:bg-blue-500 hover:shadow-[12px_12px_0px_0px_rgba(255,255,255,1)]; }
+  .btn-yellow { @apply bg-accent-yellow text-black border-black hover:bg-yellow-300 hover:shadow-[10px_10px_0px_0px_rgba(0,0,0,1)]; }
+  .btn-green { @apply bg-accent-green text-black border-black hover:bg-green-400 hover:shadow-[10px_10px_0px_0px_rgba(0,0,0,1)]; }
+  .btn-pink { @apply bg-accent-pink text-white border-white shadow-[8px_8px_0px_0px_rgba(255,255,255,1)] hover:bg-pink-500 hover:shadow-[12px_12px_0px_0px_rgba(255,255,255,1)]; }
+
+  .nav-block {
+    @apply border-white border-r-4 h-full flex items-center px-6 font-black uppercase italic tracking-tighter hover:bg-white hover:text-black transition-all cursor-pointer bg-black/20 backdrop-blur-sm;
+  }
 }

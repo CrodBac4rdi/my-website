@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { Plus, Check, Loader2 } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Plus, Trash2, Loader2, Check } from 'lucide-react';
 import { createClient } from '@supabase/supabase-js';
 
 const supabase = createClient(
@@ -10,77 +10,113 @@ const supabase = createClient(
 );
 
 export default function WatchlistButton({ anime }: { anime: any }) {
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [isOnWatchlist, setIsOnWatchlist] = useState(false);
+  const [actionLoading, setActionLoading] = useState(false);
 
-  const handleAdd = async () => {
-    setLoading(true);
+  useEffect(() => {
+    async function checkStatus() {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        setLoading(false);
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from('user_watchlist')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('media_id', anime.mal_id)
+        .maybeSingle();
+
+      if (!error && data) {
+        setIsOnWatchlist(true);
+      }
+      setLoading(false);
+    }
+
+    checkStatus();
+  }, [anime.mal_id]);
+
+  const handleToggle = async () => {
+    setActionLoading(true);
     
-    // 1. Prüfen, ob der User eingeloggt ist
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
-      alert("Bitte logge dich zuerst ein, um Animes zu speichern!");
-      setLoading(false);
+      alert("Bitte logge dich zuerst ein!");
+      setActionLoading(false);
       return;
     }
 
-    // 2. Den Anime in die `media` Tabelle eintragen (falls noch nicht existent)
-    const { error: mediaError } = await supabase
-      .from('media')
-      .upsert({
-        id: anime.mal_id, // Die ID von MyAnimeList als unsere Datenbank-ID
+    if (isOnWatchlist) {
+      const { error } = await supabase
+        .from('user_watchlist')
+        .delete()
+        .eq('user_id', user.id)
+        .eq('media_id', anime.mal_id);
+
+      if (!error) {
+        setIsOnWatchlist(false);
+      } else {
+        console.error("Delete error:", error);
+      }
+    } else {
+      await supabase.from('media').upsert({
+        id: anime.mal_id,
         title: anime.title_english || anime.title,
         type: anime.type,
         cover_url: anime.images?.jpg?.large_image_url
       });
 
-    if (mediaError) {
-      console.error("Media Error:", mediaError);
-      alert("Fehler beim Speichern der Basisdaten.");
-      setLoading(false);
-      return;
-    }
+      const { error } = await supabase
+        .from('user_watchlist')
+        .insert({
+          user_id: user.id,
+          media_id: anime.mal_id,
+          status: 'plan_to_watch'
+        });
 
-    // 3. Den Eintrag in die persönliche Watchlist des Users packen
-    const { error: watchlistError } = await supabase
-      .from('user_watchlist')
-      .insert({
-        user_id: user.id,
-        media_id: anime.mal_id,
-        status: 'plan_to_watch'
-      });
-
-    if (watchlistError) {
-      if (watchlistError.code === '23505') {
-        alert("Dieser Anime ist bereits auf deiner Watchlist!");
+      if (!error) {
+        setIsOnWatchlist(true);
       } else {
-        console.error("Watchlist Error:", watchlistError);
-        alert("Fehler beim Hinzufügen zur Watchlist.");
+        console.error("Insert error:", error);
       }
-    } else {
-      setSuccess(true);
     }
     
-    setLoading(false);
+    setActionLoading(false);
   };
 
-  // Wenn erfolgreich gespeichert wurde, zeigen wir einen grünen Haken
-  if (success) {
+  if (loading) {
     return (
-      <button className="w-full bg-green-600 text-white font-semibold py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition shadow-lg shadow-green-500/20 cursor-default">
-        <Check size={20} /> Auf der Watchlist
-      </button>
+      <div className="w-full h-14 bg-white/10 border-2 border-white animate-pulse flex items-center justify-center">
+        <Loader2 className="animate-spin text-white" size={24} />
+      </div>
     );
   }
 
   return (
     <button 
-      onClick={handleAdd}
-      disabled={loading}
-      className="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition shadow-lg shadow-blue-500/20 disabled:opacity-50"
+      onClick={handleToggle}
+      disabled={actionLoading}
+      className={`w-full font-black py-4 px-6 border-4 border-black uppercase italic tracking-tighter transition-all duration-100 flex items-center justify-center gap-3 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-1 active:translate-y-1 disabled:opacity-50 ${
+        isOnWatchlist 
+          ? "bg-accent-pink text-white" 
+          : "bg-accent-green text-black"
+      }`}
     >
-      {loading ? <Loader2 className="animate-spin" size={20} /> : <Plus size={20} />}
-      {loading ? "Wird gespeichert..." : "Zur Watchlist hinzufügen"}
+      {actionLoading ? (
+        <Loader2 className="animate-spin" size={24} />
+      ) : isOnWatchlist ? (
+        <>
+          <Trash2 size={24} />
+          <span>VON WATCHLIST ENTFERNEN</span>
+        </>
+      ) : (
+        <>
+          <Plus size={24} />
+          <span>ZUR WATCHLIST HINZUFÜGEN</span>
+        </>
+      )}
     </button>
   );
 }

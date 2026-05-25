@@ -1,0 +1,21 @@
+{
+  "name": "HORIZON Anime Tracker",
+  "short_name": "HORIZON",
+  "description": "Dein persönliches Logbuch für Animes, Serien und Filme.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#020617",
+  "theme_color": "#2563eb",
+  "icons": [
+    {
+      "src": "/file.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "/file.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    }
+  ]
+}

@@ -6,8 +6,9 @@ const ANIME_KEYWORD = '210024';
 const ANIMATION_GENRE = '16';
 
 async function fetchTMDB(endpoint: string, params: Record<string, string> = {}) {
+  // IMPORTANT: This now runs ONLY on the server.
   if (!TMDB_API_KEY) {
-    console.error("TMDB_API_KEY is missing");
+    console.error("TMDB_API_KEY is missing in environment variables");
     return null;
   }
 
@@ -24,7 +25,7 @@ async function fetchTMDB(endpoint: string, params: Record<string, string> = {}) 
     if (!res.ok) throw new Error(`TMDB API Error: ${res.status}`);
     const data = await res.json();
 
-    // Fallback logic for missing descriptions: If overview is empty, try fetching in English
+    // Fallback logic for missing descriptions
     if (endpoint.includes('/') && !data.results && data.id) {
        if (!data.overview) {
          const engRes = await fetch(`${BASE_URL}${endpoint}?api_key=${TMDB_API_KEY}&language=en-US`);
@@ -41,25 +42,19 @@ async function fetchTMDB(endpoint: string, params: Record<string, string> = {}) 
 }
 
 export async function getTrendingAnime(page = 1) {
-  // Use actual Trending endpoint for "Now" hits
-  // Then we filter manually or use discover with strict parameters
-  // Discover is often better for specific genres/keywords
   return fetchTMDB('/discover/tv', {
     sort_by: 'popularity.desc',
     with_genres: ANIMATION_GENRE,
     with_keywords: ANIME_KEYWORD,
-    'vote_count.gte': '50', // Ensure they are actually "hits"
+    'vote_count.gte': '50',
     page: page.toString()
   });
 }
 
 export async function getAiringAnime(page = 1) {
-  // To ensure ONLY Anime in the release planner, we use /discover/tv 
-  // with date filters and strict anime tags.
   const today = new Date();
   const nextWeek = new Date();
   nextWeek.setDate(today.getDate() + 7);
-
   const formatDate = (d: Date) => d.toISOString().split('T')[0];
 
   return fetchTMDB('/discover/tv', {
@@ -86,7 +81,6 @@ export async function getDiscoverMedia(page = 1, providerId?: string, genreId?: 
   }
 
   if (genreId) {
-    // Add specific genre to the existing animation genre
     params.with_genres = `${ANIMATION_GENRE},${genreId}`;
   }
 
@@ -100,7 +94,6 @@ export async function getMediaDetails(id: string, type: 'movie' | 'tv' = 'tv') {
 }
 
 export async function searchMedia(query: string) {
-  // Strict filtering for search is harder, but we can at least prioritize multi-search
   return fetchTMDB('/search/multi', { query });
 }
 

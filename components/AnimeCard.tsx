@@ -1,30 +1,29 @@
 'use client';
 
-import { Star, Plus, Info, Play, Trash2, Check, Loader2 } from "lucide-react";
-import Link from "next/link";
+import { Star, Plus, Info, Play, Trash2, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
-import { createClient } from "@supabase/supabase-js";
 import { useRouter } from "next/navigation";
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!
-);
+import { supabase } from "@/lib/supabase";
+import { getImageUrl } from "@/lib/tmdb";
 
 interface AnimeCardProps {
-  anime: any;
+  media: any;
   index: number;
 }
 
-export default function AnimeCard({ anime, index }: AnimeCardProps) {
+export default function AnimeCard({ media, index }: AnimeCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [isOnWatchlist, setIsOnWatchlist] = useState(false);
   const [isWlLoading, setIsWlLoading] = useState(false);
   const router = useRouter();
 
+  // Unified ID handling: TMDB only
+  const mediaId = media.id || media.mal_id;
+
   useEffect(() => {
     async function checkStatus() {
+      if (!supabase) return;
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
@@ -32,18 +31,19 @@ export default function AnimeCard({ anime, index }: AnimeCardProps) {
         .from('user_watchlist')
         .select('id')
         .eq('user_id', user.id)
-        .eq('media_id', anime.mal_id)
+        .eq('media_id', mediaId)
         .maybeSingle();
 
       if (data) setIsOnWatchlist(true);
     }
     checkStatus();
-  }, [anime.mal_id]);
+  }, [mediaId]);
 
   const toggleWatchlist = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     
+    if (!supabase) return;
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
       router.push('/login');
@@ -51,96 +51,91 @@ export default function AnimeCard({ anime, index }: AnimeCardProps) {
     }
 
     setIsWlLoading(true);
-    if (isOnWatchlist) {
-      await supabase.from('user_watchlist').delete().eq('user_id', user.id).eq('media_id', anime.mal_id);
-      setIsOnWatchlist(false);
-    } else {
-      await supabase.from('media').upsert({
-        id: anime.mal_id,
-        title: anime.title_english || anime.title,
-        type: anime.type,
-        cover_url: anime.images?.jpg?.large_image_url
-      });
-      await supabase.from('user_watchlist').insert({ user_id: user.id, media_id: anime.mal_id, status: 'plan_to_watch' });
-      setIsOnWatchlist(true);
+    try {
+      if (isOnWatchlist) {
+        await supabase.from('user_watchlist').delete().eq('user_id', user.id).eq('media_id', mediaId);
+        setIsOnWatchlist(false);
+      } else {
+        await supabase.from('media').upsert({
+          id: mediaId,
+          title: media.name || media.title || media.original_name,
+          type: media.media_type || 'tv',
+          cover_url: getImageUrl(media.poster_path)
+        });
+        await supabase.from('user_watchlist').insert({ user_id: user.id, media_id: mediaId, status: 'plan_to_watch' });
+        setIsOnWatchlist(true);
+      }
+    } catch (err) {
+      console.error("Watchlist error:", err);
+    } finally {
+      setIsWlLoading(false);
     }
-    setIsWlLoading(false);
   };
 
   const handleCardClick = () => {
-    router.push(`/media/${anime.mal_id}`);
+    router.push(`/media/${mediaId}`);
   };
 
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.3, delay: (index % 10) * 0.05 }}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, delay: (index % 10) * 0.05 }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={handleCardClick}
-      className="bento-box cursor-pointer group flex flex-col h-full bg-black relative"
+      className="group relative cursor-pointer bg-slate-900/50 rounded-2xl overflow-hidden border border-slate-800 hover:border-blue-500/50 transition-all duration-300"
     >
       {/* IMAGE AREA */}
-      <div className="aspect-[2/3] w-full relative overflow-hidden border-b-4 border-white">
+      <div className="aspect-[2/3] w-full relative overflow-hidden">
         <img 
-          src={anime.images?.jpg?.large_image_url || "/file.svg"} 
-          alt={anime.title} 
-          className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110"
+          src={getImageUrl(media.poster_path)} 
+          alt={media.name || media.title} 
+          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
         />
         
-        {/* OVERLAY TAGS */}
-        <div className="absolute top-2 left-2 flex flex-col gap-1 z-10">
-          <span className="bg-accent-yellow text-black text-[10px] font-black px-2 py-1 border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] uppercase tracking-tighter">
-            {anime.type}
-          </span>
-        </div>
-
-        {anime.score && (
-          <div className="absolute top-2 right-2 z-10">
-            <div className="bg-white text-black text-[10px] font-black px-2 py-1 border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] flex items-center gap-1">
-              <Star size={10} fill="currentColor" />
-              {anime.score}
+        {/* RATING TAG */}
+        {media.vote_average > 0 && (
+          <div className="absolute top-3 right-3 z-10">
+            <div className="bg-black/60 backdrop-blur-md text-white text-[11px] font-bold px-2 py-1 rounded-lg border border-white/10 flex items-center gap-1">
+              <Star size={12} className="text-yellow-400 fill-yellow-400" />
+              {media.vote_average.toFixed(1)}
             </div>
           </div>
         )}
 
-        {/* HOVER CONTENT */}
+        {/* HOVER OVERLAY */}
         <AnimatePresence>
           {isHovered && (
             <motion.div 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-accent-blue/90 p-4 flex flex-col justify-between z-20"
+              className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent p-4 flex flex-col justify-end z-20"
             >
-              <div className="space-y-2">
-                <div className="flex flex-wrap gap-1">
-                  {anime.genres?.slice(0, 2).map((g: any) => (
-                    <span key={g.name} className="text-[8px] font-black text-white uppercase tracking-widest bg-black px-1.5 py-0.5 border border-white">
-                      {g.name}
-                    </span>
-                  ))}
-                </div>
-                <p className="text-[10px] text-white font-black uppercase leading-tight line-clamp-6 italic">
-                  {anime.synopsis || "KEINE BESCHREIBUNG VERFÜGBAR."}
+              <div className="space-y-3">
+                <p className="text-xs text-slate-300 line-clamp-3 leading-relaxed">
+                  {media.overview || "Keine Beschreibung verfügbar."}
                 </p>
-              </div>
-
-              <div className="flex gap-2">
-                <button 
-                  onClick={(e) => { e.stopPropagation(); router.push(`/media/${anime.mal_id}`); }}
-                  className="flex-1 btn-brutalist bg-white text-black text-[10px] flex items-center justify-center gap-1"
-                >
-                  <Play size={12} fill="currentColor" /> ANSEHEN
-                </button>
-                <button 
-                  onClick={toggleWatchlist}
-                  disabled={isWlLoading}
-                  className={`w-10 h-10 btn-brutalist flex items-center justify-center ${isOnWatchlist ? 'bg-accent-pink' : 'bg-accent-green'}`}
-                >
-                  {isWlLoading ? <Loader2 size={16} className="animate-spin" /> : isOnWatchlist ? <Trash2 size={16} /> : <Plus size={16} />}
-                </button>
+                <div className="flex gap-2">
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); handleCardClick(); }}
+                    className="flex-1 bg-blue-600 hover:bg-blue-500 text-white text-[11px] font-bold py-2 rounded-lg flex items-center justify-center gap-1.5 transition-colors"
+                  >
+                    <Play size={14} fill="currentColor" /> DETAILS
+                  </button>
+                  <button 
+                    onClick={toggleWatchlist}
+                    disabled={isWlLoading}
+                    className={`w-9 h-9 flex items-center justify-center rounded-lg border transition-all ${
+                      isOnWatchlist 
+                      ? 'bg-red-500/10 border-red-500/50 text-red-500 hover:bg-red-500/20' 
+                      : 'bg-white/10 border-white/20 text-white hover:bg-white/20'
+                    }`}
+                  >
+                    {isWlLoading ? <Loader2 size={16} className="animate-spin" /> : isOnWatchlist ? <Trash2 size={16} /> : <Plus size={16} />}
+                  </button>
+                </div>
               </div>
             </motion.div>
           )}
@@ -148,17 +143,14 @@ export default function AnimeCard({ anime, index }: AnimeCardProps) {
       </div>
       
       {/* INFO AREA */}
-      <div className="p-4 flex-1 flex flex-col justify-between bg-black group-hover:bg-accent-yellow transition-colors duration-200">
-        <h3 className="font-black text-white group-hover:text-black uppercase italic leading-none text-sm line-clamp-2">
-          {anime.title_english || anime.title}
+      <div className="p-4 bg-slate-900/80 backdrop-blur-sm">
+        <h3 className="font-bold text-slate-100 text-sm line-clamp-1 group-hover:text-blue-400 transition-colors">
+          {media.name || media.title || media.original_name}
         </h3>
-        <div className="mt-4 flex items-center justify-between">
-          <p className="text-[10px] text-white group-hover:text-black font-black uppercase tracking-widest">
-            {anime.status?.replace('Finished Airing', 'END') || 'TBA'}
+        <div className="mt-1 flex items-center justify-between opacity-60">
+          <p className="text-[10px] font-medium uppercase tracking-wider text-slate-400">
+            {media.first_air_date?.split('-')[0] || media.release_date?.split('-')[0] || 'TBA'} • {media.media_type === 'movie' ? 'FILM' : 'TV'}
           </p>
-          <div className="w-6 h-6 border-2 border-white group-hover:border-black flex items-center justify-center">
-            <Info size={12} className="text-white group-hover:text-black" />
-          </div>
         </div>
       </div>
     </motion.div>

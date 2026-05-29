@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import AnimeCard from "./AnimeCard";
 import { Sparkles } from "lucide-react";
+import { getMediaDetails } from "@/lib/tmdb";
 
 export default function Recommendations({ animeId }: { animeId: string }) {
   const [recommendations, setRecommendations] = useState<any[]>([]);
@@ -11,9 +12,9 @@ export default function Recommendations({ animeId }: { animeId: string }) {
   useEffect(() => {
     async function fetchRecs() {
       try {
-        const res = await fetch(`https://api.jikan.moe/v4/anime/${animeId}/recommendations`);
-        const data = await res.json();
-        setRecommendations(data.data?.slice(0, 6) || []);
+        // Fetch recommendations from TMDB
+        const data = await getMediaDetails(animeId, 'tv');
+        setRecommendations(data?.recommendations?.results?.slice(0, 6) || []);
       } catch (error) {
         console.error("Failed to fetch recommendations:", error);
       } finally {
@@ -26,27 +27,22 @@ export default function Recommendations({ animeId }: { animeId: string }) {
   if (loading || recommendations.length === 0) return null;
 
   return (
-    <section className="space-y-10">
-      <div className="flex items-center gap-6">
-        <div className="bento-box bg-accent-purple px-8 py-4 border-white shadow-[8px_8px_0px_0px_rgba(255,255,255,1)] rotate-1">
-          <h2 className="text-4xl md:text-6xl font-black uppercase italic tracking-tighter text-white flex items-center gap-4">
-            <Sparkles size={48} /> NEXT UP
-          </h2>
+    <section className="space-y-8 container mx-auto">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-blue-500/10 rounded-xl border border-blue-500/20">
+            <Sparkles className="text-blue-400" size={24} />
+          </div>
+          <h2 className="text-3xl font-bold tracking-tight">Vorschläge</h2>
         </div>
-        <div className="h-2 flex-1 bg-white shadow-[4px_4px_0px_0px_rgba(255,255,255,0.2)]"></div>
+        <div className="h-px flex-1 bg-gradient-to-r from-slate-800 to-transparent ml-8 hidden md:block"></div>
       </div>
       
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8">
-        {recommendations.map((rec, index) => (
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+        {recommendations.map((media, index) => (
           <AnimeCard 
-            key={rec.entry.mal_id} 
-            anime={{
-              mal_id: rec.entry.mal_id,
-              title: rec.entry.title,
-              images: rec.entry.images,
-              type: "Anime",
-              score: ""
-            }} 
+            key={media.id} 
+            media={media} 
             index={index} 
           />
         ))}

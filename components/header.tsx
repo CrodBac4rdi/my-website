@@ -1,180 +1,88 @@
 'use client';
 
+import { LogIn, LogOut, Bookmark, User, Search } from "lucide-react";
 import Link from "next/link";
-import { Film, Search, User, LogOut, Loader2, Sparkles } from "lucide-react";
-import { useEffect, useState, useRef } from "react";
-import { createClient } from "@supabase/supabase-js";
-import { useRouter, usePathname } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!
-);
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase";
+import { useRouter } from "next/navigation";
 
 export default function Header() {
   const [user, setUser] = useState<any>(null);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [results, setResults] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [showResults, setShowResults] = useState(false);
   const router = useRouter();
-  const pathname = usePathname();
-  const searchRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      setUser(data.user);
+    if (!supabase) return;
+    
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
     });
 
-    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
-      setUser(session?.user || null);
-    });
-
-    const handleClickOutside = (event: MouseEvent) => {
-      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
-        setShowResults(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-
-    return () => {
-      authListener.subscription.unsubscribe();
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => subscription.unsubscribe();
   }, []);
 
-  useEffect(() => {
-    const timer = setTimeout(async () => {
-      if (searchQuery.length > 2) {
-        setIsLoading(true);
-        setShowResults(true);
-        try {
-          const res = await fetch(`https://api.jikan.moe/v4/anime?q=${searchQuery}&limit=5`);
-          const data = await res.json();
-          setResults(data.data || []);
-        } catch (error) {
-          console.error("Search error:", error);
-        } finally {
-          setIsLoading(false);
-        }
-      } else {
-        setResults([]);
-        setShowResults(false);
-      }
-    }, 500);
-
-    return () => clearTimeout(timer);
-  }, [searchQuery]);
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
-      setSearchQuery("");
-      setShowResults(false);
-    }
-  };
-
-  const NavLink = ({ href, children, color }: { href: string, children: React.ReactNode, color: string }) => {
-    const active = pathname === href;
-    return (
-      <Link href={href} className={`h-full px-6 flex items-center font-black uppercase italic tracking-tighter border-r-4 border-white transition-all ${active ? color : 'hover:bg-white hover:text-black'}`}>
-        {children}
-      </Link>
-    );
+  const handleLogout = async () => {
+    if (!supabase) return;
+    await supabase.auth.signOut();
+    router.push('/');
   };
 
   return (
-    <header className="h-20 bg-black/40 backdrop-blur-xl border-b-4 border-white sticky top-0 z-50 overflow-hidden">
-      <div className="max-w-7xl mx-auto h-full flex items-center justify-between">
+    <header className="sticky top-0 z-50 w-full px-4 pt-6 pointer-events-none">
+      <nav className="max-w-7xl mx-auto flex items-center justify-between pointer-events-auto bg-slate-900/50 backdrop-blur-xl border border-slate-800 p-3 rounded-[2rem] shadow-2xl shadow-black/50">
         
-        {/* BRAND BLOCK */}
-        <Link href="/" className="h-full px-8 flex items-center gap-3 border-r-4 border-white bg-accent-yellow text-black hover:bg-white transition-colors group">
-          <Film size={28} className="group-hover:rotate-12 transition-transform" />
-          <span className="text-3xl font-black italic tracking-tighter">HORIZON</span>
+        {/* LOGO */}
+        <Link href="/" className="flex items-center gap-2 group px-4">
+          <div className="w-10 h-10 bg-blue-600 rounded-2xl flex items-center justify-center group-hover:rotate-12 transition-transform shadow-lg shadow-blue-500/20">
+             <span className="font-black text-white text-xl">H</span>
+          </div>
+          <span className="text-xl font-black tracking-tighter text-white hidden sm:block">HORIZON</span>
         </Link>
 
-        {/* NAV BLOCKS */}
-        <nav className="hidden lg:flex h-full flex-1">
-          <NavLink href="/" color="bg-accent-blue text-white">Discover</NavLink>
-          {user && <NavLink href="/watchlist" color="bg-accent-green text-black">Watchlist</NavLink>}
-          <NavLink href="/calendar" color="bg-accent-pink text-white">Kalender</NavLink>
-        </nav>
-
-        {/* SEARCH BLOCK */}
-        <div className="flex-1 max-w-xl h-full relative" ref={searchRef}>
-          <form onSubmit={handleSearch} className="h-full flex items-center px-6 gap-4">
-            <div className="flex-1 relative group">
-              <input 
-                type="text" 
-                placeholder="ANIME SUCHEN..." 
-                value={searchQuery}
-                onFocus={() => searchQuery.length > 2 && setShowResults(true)}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-transparent text-white font-black uppercase italic tracking-widest placeholder:text-white/30 focus:outline-none py-2"
-              />
-              <div className="absolute bottom-0 left-0 w-0 h-1 bg-accent-blue group-focus-within:w-full transition-all duration-300"></div>
-            </div>
-            {isLoading ? <Loader2 size={24} className="text-accent-blue animate-spin" /> : <Search size={24} className="text-white" />}
-          </form>
-
-          <AnimatePresence>
-            {showResults && (
-              <motion.div 
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 10 }}
-                className="absolute top-full left-0 right-0 bg-white border-x-4 border-b-4 border-black shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] z-50 overflow-hidden"
-              >
-                {results.length > 0 ? (
-                  <div className="p-2 space-y-2">
-                    {results.map((anime) => (
-                      <Link 
-                        key={anime.mal_id}
-                        href={`/media/${anime.mal_id}`}
-                        onClick={() => setShowResults(false)}
-                        className="flex items-center gap-4 p-3 hover:bg-accent-blue hover:text-white transition-all group border-2 border-transparent hover:border-black"
-                      >
-                        <img src={anime.images.jpg.small_image_url} alt="" className="w-12 h-16 object-cover border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]" />
-                        <div className="flex-1 min-w-0 font-black">
-                          <h4 className="text-lg uppercase truncate italic leading-none mb-1">
-                            {anime.title_english || anime.title}
-                          </h4>
-                          <div className="flex items-center gap-2">
-                            <span className="text-[10px] uppercase bg-black text-white px-1.5 py-0.5">{anime.type}</span>
-                            <span className="text-[10px] uppercase text-slate-500 group-hover:text-white/70 tracking-widest">Score: {anime.score || 'N/A'}</span>
-                          </div>
-                        </div>
-                      </Link>
-                    ))}
-                  </div>
-                ) : !isLoading && (
-                  <div className="p-8 text-center font-black uppercase italic text-black bg-accent-yellow">Keine Treffer gefunden!</div>
-                )}
-              </motion.div>
-            )}
-          </AnimatePresence>
+        {/* NAV LINKS */}
+        <div className="flex items-center gap-2 bg-slate-950/50 p-1.5 rounded-2xl border border-slate-800/50">
+          <Link href="/" className="px-5 py-2.5 rounded-xl text-sm font-bold text-slate-400 hover:text-white hover:bg-slate-800/50 transition-all">
+            Home
+          </Link>
+          <Link href="/watchlist" className="px-5 py-2.5 rounded-xl text-sm font-bold text-slate-400 hover:text-white hover:bg-slate-800/50 transition-all flex items-center gap-2">
+            <Bookmark size={16} />
+            <span className="hidden md:block">Watchlist</span>
+          </Link>
+          <Link href="/search" className="px-5 py-2.5 rounded-xl text-sm font-bold text-slate-400 hover:text-white hover:bg-slate-800/50 transition-all flex items-center gap-2">
+            <Search size={16} />
+            <span className="hidden md:block">Suche</span>
+          </Link>
         </div>
-        
-        {/* AUTH BLOCK */}
-        <div className="h-full flex items-center border-l-4 border-white px-6 gap-4 bg-black/20">
+
+        {/* AUTH */}
+        <div className="px-2">
           {user ? (
-            <button 
-              onClick={() => supabase.auth.signOut()} 
-              className="w-12 h-12 flex items-center justify-center bg-accent-pink text-white border-2 border-white shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none transition-all active:scale-95"
-              title="Logout"
-            >
-              <LogOut size={24} />
-            </button>
+            <div className="flex items-center gap-4">
+              <div className="hidden sm:flex items-center gap-3 px-4 py-2 bg-slate-950/50 border border-slate-800 rounded-xl">
+                 <div className="w-6 h-6 bg-slate-800 rounded-full flex items-center justify-center">
+                    <User size={14} className="text-slate-400" />
+                 </div>
+                 <span className="text-xs font-bold text-slate-300 truncate max-w-[100px]">{user.email}</span>
+              </div>
+              <button 
+                onClick={handleLogout}
+                className="p-3 bg-red-500/10 border border-red-500/20 text-red-400 rounded-xl hover:bg-red-500/20 transition-all group"
+                title="Logout"
+              >
+                <LogOut size={20} className="group-hover:translate-x-0.5 transition-transform" />
+              </button>
+            </div>
           ) : (
-            <Link href="/login" className="px-8 py-3 bg-accent-blue text-white font-black uppercase italic tracking-tighter border-2 border-white shadow-[6px_6px_0px_0px_rgba(255,255,255,1)] hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all">
-              Login
+            <Link 
+              href="/login" 
+              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-2xl font-bold transition-all shadow-lg shadow-blue-500/20 group"
+            >
+              <LogIn size={20} className="group-hover:-translate-x-0.5 transition-transform" />
+              <span className="hidden sm:block">Login</span>
             </Link>
           )}
         </div>
 
-      </div>
+      </nav>
     </header>
   );
 }

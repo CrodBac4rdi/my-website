@@ -1,101 +1,83 @@
-import { Calendar as CalendarIcon, Clock, ChevronRight } from "lucide-react";
+import { Calendar as CalendarIcon, Clock, ArrowRight, Sparkles, AlertCircle } from "lucide-react";
 import AnimeCard from "@/components/AnimeCard";
 import Link from "next/link";
-
-async function getSchedules() {
-  try {
-    const res = await fetch("https://api.jikan.moe/v4/schedules", {
-      next: { revalidate: 3600 }
-    });
-    const data = await res.json();
-    return data.data || [];
-  } catch (error) {
-    console.error("Failed to fetch schedule:", error);
-    return [];
-  }
-}
+import { getAiringAnime } from "@/lib/tmdb";
 
 export default async function CalendarPage() {
-  const schedule = await getSchedules();
+  // Use TMDB's "On the Air" endpoint for actual currently airing shows
+  const data = await getAiringAnime(1);
+  const anime = data?.results || [];
   
-  const days = [
-    { key: "monday", color: "bg-accent-blue" },
-    { key: "tuesday", color: "bg-accent-green" },
-    { key: "wednesday", color: "bg-accent-yellow" },
-    { key: "thursday", color: "bg-accent-pink" },
-    { key: "friday", color: "bg-accent-purple" },
-    { key: "saturday", color: "bg-accent-orange" },
-    { key: "sunday", color: "bg-white" },
-  ];
+  // Filter out shows that don't have a next episode or are likely completed
+  // TMDB doesn't give us a "day of week" directly in the list, 
+  // but we can show them as "Currently Airing this Week"
   
   return (
-    <div className="space-y-12 pb-20">
+    <div className="space-y-16 pb-20 container mx-auto px-4">
       
-      {/* HEADER BENTO */}
-      <div className="bento-box bg-accent-yellow p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-8 border-black shadow-[12px_12px_0px_0px_rgba(255,255,255,1)]">
-        <div className="space-y-4 text-center md:text-left">
-          <div className="inline-flex items-center gap-2 bg-black text-white px-4 py-1 font-black uppercase italic text-sm tracking-widest shadow-[4px_4px_0px_0px_rgba(255,255,255,1)]">
+      {/* HEADER DASHBOARD */}
+      <div className="bg-slate-900/50 border border-slate-800 p-12 rounded-[3rem] backdrop-blur-md flex flex-col md:flex-row items-center justify-between gap-12 relative overflow-hidden group shadow-2xl">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/5 blur-[120px] pointer-events-none"></div>
+        
+        <div className="space-y-6 text-center md:text-left relative z-10">
+          <div className="inline-flex items-center gap-2 bg-blue-600/10 border border-blue-500/20 text-blue-400 px-4 py-2 rounded-2xl font-bold uppercase tracking-widest text-xs">
             <CalendarIcon size={18} />
-            <span>SEASONAL SCHEDULE</span>
+            <span>Airing this Week</span>
           </div>
-          <h1 className="text-5xl md:text-8xl font-black uppercase italic tracking-tighter text-black leading-none">
-            RELEASES
+          <h1 className="text-5xl md:text-8xl font-extrabold tracking-tighter text-white leading-none">
+            SCHEDULE
           </h1>
-          <p className="text-black font-black uppercase italic tracking-tight text-lg max-w-xl">
-            Wann kommen neue Folgen? Hier ist dein unschlagbarer Wochenplan für die aktuelle Anime-Season.
+          <p className="text-slate-400 font-medium text-lg max-w-xl italic leading-relaxed">
+            Deine Übersicht für die aktuelle Woche. Hier siehst du Animes, die momentan im japanischen Fernsehen (und weltweit im Stream) ausgestrahlt werden.
           </p>
         </div>
-        <div className="hidden lg:block rotate-12">
-          <div className="w-48 h-48 border-8 border-black bg-white flex items-center justify-center shadow-[16px_16px_0px_0px_rgba(0,0,0,1)]">
-            <span className="text-8xl font-black italic">!</span>
+
+        <div className="hidden lg:block relative group">
+          <div className="w-56 h-56 bg-slate-950 border border-slate-800 rounded-[3rem] flex items-center justify-center rotate-6 group-hover:rotate-0 transition-transform duration-500 shadow-2xl relative z-10">
+            <Sparkles size={80} className="text-blue-500 opacity-50" />
           </div>
+          <div className="absolute inset-0 bg-blue-500/20 blur-2xl rounded-full scale-75 group-hover:scale-100 transition-transform duration-500"></div>
         </div>
       </div>
 
-      {/* DAYS GRID */}
-      <div className="space-y-24">
-        {days.map((day) => {
-          const dayAnime = schedule.filter((a: any) => 
-            a.broadcast?.day?.toLowerCase().includes(day.key) || 
-            a.day?.toLowerCase() === day.key
-          );
-          
-          if (dayAnime.length === 0) return null;
+      {/* AIRING GRID */}
+      <div className="space-y-12">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+             <div className="p-3 bg-slate-900 border border-slate-800 rounded-2xl text-blue-400">
+               <Clock size={24} />
+             </div>
+             <h2 className="text-3xl font-extrabold text-white tracking-tight">Aktuell im Simulcast</h2>
+          </div>
+          <div className="h-px flex-1 bg-gradient-to-r from-slate-800 to-transparent ml-8 hidden md:block"></div>
+        </div>
 
-          return (
-            <section key={day.key} className="space-y-10">
-              <div className="flex items-center gap-6">
-                <div className={`bento-box ${day.color} px-8 py-4 border-white shadow-[8px_8px_0px_0px_rgba(255,255,255,1)] -rotate-1`}>
-                  <h2 className="text-4xl md:text-6xl font-black uppercase italic tracking-tighter text-black">
-                    {day.key === 'sunday' ? day.key.toUpperCase() : day.key.toUpperCase()}
-                  </h2>
-                </div>
-                <div className="h-2 flex-1 bg-white shadow-[4px_4px_0px_0px_rgba(255,255,255,0.2)]"></div>
-              </div>
-
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 gap-8">
-                {dayAnime.map((anime: any, index: number) => (
-                  <div key={anime.mal_id} className="relative group">
-                    <AnimeCard anime={anime} index={index} />
-                    {anime.broadcast?.time && (
-                      <div className="absolute -top-3 -right-3 z-30 bg-black text-white border-2 border-white px-3 py-1 font-black italic text-[10px] shadow-[4px_4px_0px_0px_rgba(0,102,255,1)] uppercase">
-                        {anime.broadcast.time} JST
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </section>
-          );
-        })}
+        {anime.length > 0 ? (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 gap-6">
+            {anime.map((item: any, index: number) => (
+              <AnimeCard key={item.id} media={item} index={index} />
+            ))}
+          </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center py-20 bg-slate-900/20 rounded-3xl border border-slate-800 border-dashed">
+            <AlertCircle size={48} className="text-slate-700 mb-4" />
+            <p className="text-slate-500 font-medium italic text-lg">Keine laufenden Ausstrahlungen für diese Woche gefunden.</p>
+          </div>
+        )}
       </div>
 
-      {/* FOOTER BENTO */}
-      <div className="bento-box bg-accent-blue p-12 text-center border-black shadow-[12px_12px_0px_0px_rgba(255,255,255,1)]">
-        <h3 className="text-4xl font-black uppercase italic text-white mb-6 tracking-tighter">Nichts verpassen?</h3>
-        <Link href="/" className="btn-brutalist bg-accent-yellow text-black text-2xl inline-flex items-center gap-4">
-          ZURÜCK ZUR ÜBERSICHT <ChevronRight size={32} />
-        </Link>
+      {/* INFOCARD */}
+      <div className="bg-blue-600 rounded-[2.5rem] p-12 text-center relative overflow-hidden group shadow-2xl shadow-blue-500/20">
+        <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-50"></div>
+        <div className="relative z-10 space-y-6">
+          <h3 className="text-3xl md:text-4xl font-extrabold text-white tracking-tight leading-none">Immer Up-to-Date</h3>
+          <p className="text-blue-100/70 font-medium max-w-md mx-auto italic">Wusstest du? Du kannst Animes auf deine Watchlist setzen, um schnell auf neue Folgen zuzugreifen.</p>
+          <div className="pt-4">
+            <Link href="/" className="bg-white text-blue-600 hover:bg-slate-100 font-bold py-4 px-10 rounded-2xl transition-all flex items-center gap-3 mx-auto w-fit shadow-xl">
+              Zurück zur Basis <ArrowRight size={24} />
+            </Link>
+          </div>
+        </div>
       </div>
 
     </div>

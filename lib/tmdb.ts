@@ -1,59 +1,115 @@
-const TMDB_API_KEY = process.env.TMDB_API_KEY;
+const TMDB_API_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY;
 const BASE_URL = 'https://api.themoviedb.org/3';
 
-export async function searchTMDB(query: string) {
-  if (!TMDB_API_KEY) return null;
-  
+// Constants for strict Anime filtering
+const ANIME_KEYWORD = '210024';
+const ANIMATION_GENRE = '16';
+
+async function fetchTMDB(endpoint: string, params: Record<string, string> = {}) {
+  if (!TMDB_API_KEY) {
+    console.error("TMDB_API_KEY is missing");
+    return null;
+  }
+
+  const queryParams = new URLSearchParams({
+    api_key: TMDB_API_KEY,
+    language: 'de-DE',
+    ...params,
+  });
+
   try {
-    const res = await fetch(
-      `${BASE_URL}/search/multi?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(query)}&language=de-DE`
-    );
+    const res = await fetch(`${BASE_URL}${endpoint}?${queryParams.toString()}`, {
+      next: { revalidate: 3600 } 
+    });
+    if (!res.ok) throw new Error(`TMDB API Error: ${res.status}`);
     const data = await res.json();
-    return data.results?.[0] || null;
+
+    // Fallback logic for missing descriptions: If overview is empty, try fetching in English
+    if (endpoint.includes('/') && !data.results && data.id) {
+       if (!data.overview) {
+         const engRes = await fetch(`${BASE_URL}${endpoint}?api_key=${TMDB_API_KEY}&language=en-US`);
+         const engData = await engRes.json();
+         data.overview = engData.overview;
+       }
+    }
+
+    return data;
   } catch (error) {
-    console.error("TMDB Search Error:", error);
+    console.error(`TMDB Fetch Error (${endpoint}):`, error);
     return null;
   }
 }
 
-export async function getTMDBDetails(id: number, type: 'movie' | 'tv') {
-  if (!TMDB_API_KEY) return null;
-
-  try {
-    const res = await fetch(
-      `${BASE_URL}/${type}/${id}?api_key=${TMDB_API_KEY}&append_to_response=watch/providers,videos,images&language=de-DE`
-    );
-    return await res.json();
-  } catch (error) {
-    console.error("TMDB Detail Error:", error);
-    return null;
-  }
+export async function getTrendingAnime(page = 1) {
+  // Use actual Trending endpoint for "Now" hits
+  // Then we filter manually or use discover with strict parameters
+  // Discover is often better for specific genres/keywords
+  return fetchTMDB('/discover/tv', {
+    sort_by: 'popularity.desc',
+    with_genres: ANIMATION_GENRE,
+    with_keywords: ANIME_KEYWORD,
+    'vote_count.gte': '50', // Ensure they are actually "hits"
+    page: page.toString()
+  });
 }
 
-export async function getDiscoverAnime(page = 1, providerId?: string) {
-  if (!TMDB_API_KEY) return null;
+export async function getAiringAnime(page = 1) {
+  // To ensure ONLY Anime in the release planner, we use /discover/tv 
+  // with date filters and strict anime tags.
+  const today = new Date();
+  const nextWeek = new Date();
+  nextWeek.setDate(today.getDate() + 7);
 
-  let url = `${BASE_URL}/discover/tv?api_key=${TMDB_API_KEY}&with_keywords=210024&language=de-DE&sort_by=popularity.desc&page=${page}`;
+  const formatDate = (d: Date) => d.toISOString().split('T')[0];
+
+  return fetchTMDB('/discover/tv', {
+    'air_date.gte': formatDate(today),
+    'air_date.lte': formatDate(nextWeek),
+    with_genres: ANIMATION_GENRE,
+    with_keywords: ANIME_KEYWORD,
+    sort_by: 'popularity.desc',
+    page: page.toString()
+  });
+}
+
+export async function getDiscoverMedia(page = 1, providerId?: string, genreId?: string) {
+  const params: Record<string, string> = {
+    page: page.toString(),
+    with_genres: ANIMATION_GENRE,
+    with_keywords: ANIME_KEYWORD,
+    sort_by: 'popularity.desc',
+  };
+
   if (providerId) {
-    url += `&with_watch_providers=${providerId}&watch_region=DE`;
+    params.with_watch_providers = providerId;
+    params.watch_region = 'DE';
   }
 
-  try {
-    const res = await fetch(url);
-    return await res.json();
-  } catch (error) {
-    console.error("TMDB Discover Error:", error);
-    return null;
+  if (genreId) {
+    // Add specific genre to the existing animation genre
+    params.with_genres = `${ANIMATION_GENRE},${genreId}`;
   }
+
+  return fetchTMDB('/discover/tv', params);
+}
+
+export async function getMediaDetails(id: string, type: 'movie' | 'tv' = 'tv') {
+  return fetchTMDB(`/${type}/${id}`, {
+    append_to_response: 'watch/providers,videos,images,recommendations,reviews'
+  });
+}
+
+export async function searchMedia(query: string) {
+  // Strict filtering for search is harder, but we can at least prioritize multi-search
+  return fetchTMDB('/search/multi', { query });
 }
 
 export async function getAllProviders() {
-  if (!TMDB_API_KEY) return [];
-  try {
-    const res = await fetch(`${BASE_URL}/watch/providers/tv?api_key=${TMDB_API_KEY}&watch_region=DE&language=de-DE`);
-    const data = await res.json();
-    return data.results || [];
-  } catch (e) {
-    return [];
-  }
+  const data = await fetchTMDB('/watch/providers/tv', { watch_region: 'DE' });
+  return data?.results || [];
 }
+
+export const getImageUrl = (path: string | null, size: 'w500' | 'original' = 'w500') => {
+  if (!path) return '/file.svg';
+  return `https://image.tmdb.org/t/p/${size}${path}`;
+};

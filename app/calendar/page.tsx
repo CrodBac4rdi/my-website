@@ -1,4 +1,4 @@
-import { Calendar as CalendarIcon, Clock, ArrowRight, Sparkles, AlertCircle } from "lucide-react";
+import { Calendar as CalendarIcon, Clock, ArrowRight, Sparkles, AlertCircle, CalendarPlus } from "lucide-react";
 import AnimeCard from "@/components/AnimeCard";
 import Link from "next/link";
 import { getAiringAnime } from "@/lib/tmdb";
@@ -27,9 +27,18 @@ export default async function CalendarPage() {
           <h1 className="text-5xl md:text-8xl font-extrabold tracking-tighter text-white leading-none">
             SCHEDULE
           </h1>
-          <p className="text-slate-400 font-medium text-lg max-w-xl italic leading-relaxed">
+          <p className="text-slate-400 font-medium text-lg max-w-xl italic leading-relaxed mb-6">
             Deine Übersicht für die aktuelle Woche. Hier siehst du Animes, die momentan im japanischen Fernsehen (und weltweit im Stream) ausgestrahlt werden.
           </p>
+          <a 
+            href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Anime+Simulcast+Week&details=Zeit+für+neue+Episoden!" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 bg-slate-950 hover:bg-slate-900 text-white font-bold px-6 py-3 rounded-xl border border-slate-800 transition-colors shadow-lg mt-4"
+          >
+            <CalendarPlus size={20} className="text-blue-400" />
+            In Google Kalender eintragen
+          </a>
         </div>
 
         <div className="hidden lg:block relative group">

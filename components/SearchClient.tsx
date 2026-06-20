@@ -81,22 +81,19 @@ export default function SearchClient({ initialResults, initialQuery }: { initial
           </div>
         </div>
       ) : (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 gap-6">
-          {results.map((media: any, index: number) => (
-            <AnimeCard key={media.id} media={media} index={index} />
-          ))}
-        </div>
-      )}
-
-      {/* NO SEARCH STATE */}
-      {!query && !loading && (
-        <div className="flex flex-col items-center justify-center py-32 space-y-6 text-center">
-          <div className="w-24 h-24 bg-blue-600/10 border border-blue-500/20 rounded-3xl flex items-center justify-center text-blue-500">
-             <SearchIcon size={40} />
-          </div>
-          <div className="space-y-2">
-            <h3 className="text-2xl font-bold text-white">Worauf hast du Lust?</h3>
-            <p className="text-slate-500 max-w-sm mx-auto font-medium">Gib oben einen Titel ein, um unsere umfangreiche TMDB-Datenbank zu durchsuchen.</p>
+        <div className="space-y-6">
+          {!query && results.length > 0 && (
+            <div className="flex items-center gap-3 mb-8">
+              <div className="p-2 bg-blue-500/10 rounded-xl border border-blue-500/20">
+                <Sparkles className="text-blue-400" size={24} />
+              </div>
+              <h2 className="text-2xl font-bold tracking-tight text-white">Angesagte Animes</h2>
+            </div>
+          )}
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 gap-6">
+            {results.map((media: any, index: number) => (
+              <AnimeCard key={media.id} media={media} index={index} />
+            ))}
           </div>
         </div>
       )}

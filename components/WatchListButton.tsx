@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Plus, Trash2, Loader2, Check } from 'lucide-react';
 import { createClient } from '@supabase/supabase-js';
+import { getImageUrl } from '@/lib/tmdb';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -13,6 +14,8 @@ export default function WatchlistButton({ anime }: { anime: any }) {
   const [loading, setLoading] = useState(true);
   const [isOnWatchlist, setIsOnWatchlist] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
+
+  const mediaId = anime.id || anime.mal_id;
 
   useEffect(() => {
     async function checkStatus() {
@@ -26,7 +29,7 @@ export default function WatchlistButton({ anime }: { anime: any }) {
         .from('user_watchlist')
         .select('id')
         .eq('user_id', user.id)
-        .eq('media_id', anime.mal_id)
+        .eq('media_id', mediaId)
         .maybeSingle();
 
       if (!error && data) {
@@ -36,7 +39,7 @@ export default function WatchlistButton({ anime }: { anime: any }) {
     }
 
     checkStatus();
-  }, [anime.mal_id]);
+  }, [mediaId]);
 
   const handleToggle = async () => {
     setActionLoading(true);
@@ -53,7 +56,7 @@ export default function WatchlistButton({ anime }: { anime: any }) {
         .from('user_watchlist')
         .delete()
         .eq('user_id', user.id)
-        .eq('media_id', anime.mal_id);
+        .eq('media_id', mediaId);
 
       if (!error) {
         setIsOnWatchlist(false);
@@ -62,17 +65,17 @@ export default function WatchlistButton({ anime }: { anime: any }) {
       }
     } else {
       await supabase.from('media').upsert({
-        id: anime.mal_id,
-        title: anime.title_english || anime.title,
-        type: anime.type,
-        cover_url: anime.images?.jpg?.large_image_url
+        id: mediaId,
+        title: anime.name || anime.title || anime.original_name,
+        type: anime.media_type || 'tv',
+        cover_url: getImageUrl(anime.poster_path)
       });
 
       const { error } = await supabase
         .from('user_watchlist')
         .insert({
           user_id: user.id,
-          media_id: anime.mal_id,
+          media_id: mediaId,
           status: 'plan_to_watch'
         });
 

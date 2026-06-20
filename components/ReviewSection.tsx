@@ -11,6 +11,7 @@ export default function ReviewSection({ animeId }: { animeId: string }) {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [isSpoiler, setIsSpoiler] = useState(false);
 
   useEffect(() => {
     if (supabase) {
@@ -46,11 +47,13 @@ export default function ReviewSection({ animeId }: { animeId: string }) {
       user_id: user.id,
       media_id: animeId,
       rating: rating,
-      content: newReview
+      content: newReview,
+      is_spoiler: isSpoiler
     });
 
     if (!error) {
       setNewReview("");
+      setIsSpoiler(false);
       fetchReviews();
     } else {
       console.error("Error submitting review:", error);
@@ -106,7 +109,16 @@ export default function ReviewSection({ animeId }: { animeId: string }) {
             />
           </div>
 
-          <div className="flex justify-end relative z-10">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4 relative z-10">
+            <label className="flex items-center gap-2 cursor-pointer text-slate-400 hover:text-red-400 transition-colors">
+              <input 
+                type="checkbox" 
+                checked={isSpoiler} 
+                onChange={(e) => setIsSpoiler(e.target.checked)}
+                className="w-5 h-5 rounded bg-slate-900 border-slate-700 text-red-500 focus:ring-red-500"
+              />
+              <span className="font-bold text-sm">Enthält Spoiler</span>
+            </label>
             <button
               disabled={submitting}
               className="bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 px-10 rounded-2xl transition-all shadow-xl shadow-blue-500/20 flex items-center gap-2 disabled:opacity-50"
@@ -153,7 +165,25 @@ export default function ReviewSection({ animeId }: { animeId: string }) {
                     {review.rating}/10
                   </div>
                 </div>
-                <p className="text-slate-300 font-medium leading-relaxed italic">"{review.content}"</p>
+                {review.is_spoiler ? (
+                  <div className="relative group cursor-pointer">
+                     <p className="text-slate-300 font-medium leading-relaxed italic blur-md group-hover:blur-sm transition-all select-none">
+                       Spoiler-Inhalt verdeckt. (Klicken zum Lesen)
+                     </p>
+                     <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                       <span className="bg-red-500 text-white font-bold px-4 py-2 rounded-xl text-sm">Spoiler anzeigen</span>
+                     </div>
+                     <p onClick={(e) => {
+                       const target = e.currentTarget;
+                       const parent = target.parentElement;
+                       if (parent) {
+                         parent.innerHTML = `<p class="text-slate-300 font-medium leading-relaxed italic">"${review.content.replace(/"/g, '&quot;')}"</p>`;
+                       }
+                     }} className="absolute inset-0 z-10 text-transparent">.</p>
+                  </div>
+                ) : (
+                  <p className="text-slate-300 font-medium leading-relaxed italic">"{review.content}"</p>
+                )}
               </div>
             ))}
           </div>

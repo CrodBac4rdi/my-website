@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { getImageUrl } from "@/lib/tmdb";
+import { fetchTrailerKey } from "@/lib/actions";
 
 interface AnimeCardProps {
   media: any;
@@ -19,7 +20,7 @@ export default function AnimeCard({ media, index }: AnimeCardProps) {
   const router = useRouter();
 
   // Unified ID handling: TMDB only
-  const mediaId = media.id || media.mal_id;
+  const mediaId = media.id;
 
   useEffect(() => {
     async function checkStatus() {
@@ -38,6 +39,21 @@ export default function AnimeCard({ media, index }: AnimeCardProps) {
     }
     checkStatus();
   }, [mediaId]);
+
+  const [trailerKey, setTrailerKey] = useState<string | null>(null);
+  const [fetchAttempted, setFetchAttempted] = useState(false);
+
+  useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
+    if (isHovered && !fetchAttempted && media.media_type !== 'person') {
+      timeoutId = setTimeout(async () => {
+        setFetchAttempted(true);
+        const key = await fetchTrailerKey(mediaId, media.media_type || 'tv');
+        if (key) setTrailerKey(key);
+      }, 500); // 500ms hover delay
+    }
+    return () => clearTimeout(timeoutId);
+  }, [isHovered, fetchAttempted, mediaId, media.media_type]);
 
   const toggleWatchlist = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -111,30 +127,48 @@ export default function AnimeCard({ media, index }: AnimeCardProps) {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent p-4 flex flex-col justify-end z-20"
+              className="absolute inset-0 z-20 overflow-hidden"
             >
-              <div className="space-y-3">
-                <p className="text-xs text-slate-300 line-clamp-3 leading-relaxed">
-                  {media.overview || "Keine Beschreibung verfügbar."}
-                </p>
-                <div className="flex gap-2">
-                  <button 
-                    onClick={(e) => { e.stopPropagation(); handleCardClick(); }}
-                    className="flex-1 bg-blue-600 hover:bg-blue-500 text-white text-[11px] font-bold py-2 rounded-lg flex items-center justify-center gap-1.5 transition-colors"
-                  >
-                    <Play size={14} fill="currentColor" /> DETAILS
-                  </button>
-                  <button 
-                    onClick={toggleWatchlist}
-                    disabled={isWlLoading}
-                    className={`w-9 h-9 flex items-center justify-center rounded-lg border transition-all ${
-                      isOnWatchlist 
-                      ? 'bg-red-500/10 border-red-500/50 text-red-500 hover:bg-red-500/20' 
-                      : 'bg-white/10 border-white/20 text-white hover:bg-white/20'
-                    }`}
-                  >
-                    {isWlLoading ? <Loader2 size={16} className="animate-spin" /> : isOnWatchlist ? <Trash2 size={16} /> : <Plus size={16} />}
-                  </button>
+              {trailerKey ? (
+                <div className="absolute inset-0 bg-black scale-150 pointer-events-none">
+                  <iframe 
+                    width="100%" 
+                    height="100%" 
+                    src={`https://www.youtube.com/embed/${trailerKey}?autoplay=1&mute=1&controls=0&modestbranding=1&rel=0&loop=1&playlist=${trailerKey}`}
+                    title="Trailer" 
+                    frameBorder="0" 
+                    allow="autoplay"
+                    className="opacity-70 object-cover w-full h-full"
+                  ></iframe>
+                </div>
+              ) : (
+                <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-all duration-700"></div>
+              )}
+              
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent p-4 flex flex-col justify-end">
+                <div className="space-y-3">
+                  <p className="text-xs text-slate-300 line-clamp-3 leading-relaxed">
+                    {media.overview || "Keine Beschreibung verfügbar."}
+                  </p>
+                  <div className="flex gap-2">
+                    <button 
+                      onClick={(e) => { e.stopPropagation(); handleCardClick(); }}
+                      className="flex-1 bg-blue-600 hover:bg-blue-500 text-white text-[11px] font-bold py-2 rounded-lg flex items-center justify-center gap-1.5 transition-colors"
+                    >
+                      <Play size={14} fill="currentColor" /> DETAILS
+                    </button>
+                    <button 
+                      onClick={toggleWatchlist}
+                      disabled={isWlLoading}
+                      className={`w-9 h-9 flex items-center justify-center rounded-lg border transition-all ${
+                        isOnWatchlist 
+                        ? 'bg-red-500/10 border-red-500/50 text-red-500 hover:bg-red-500/20' 
+                        : 'bg-white/10 border-white/20 text-white hover:bg-white/20'
+                      }`}
+                    >
+                      {isWlLoading ? <Loader2 size={16} className="animate-spin" /> : isOnWatchlist ? <Trash2 size={16} /> : <Plus size={16} />}
+                    </button>
+                  </div>
                 </div>
               </div>
             </motion.div>

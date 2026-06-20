@@ -87,7 +87,10 @@ export default function WatchlistPage() {
   }
 
   const totalTitles = watchlist.length;
-  const avgRating = (watchlist.reduce((acc, curr) => acc + (curr.rating || 0), 0) / totalTitles || 8.5).toFixed(1);
+  const ratedItems = watchlist.filter(item => item.rating != null);
+  const avgRating = ratedItems.length > 0 
+    ? (ratedItems.reduce((acc, curr) => acc + curr.rating, 0) / ratedItems.length).toFixed(1)
+    : '-';
 
   return (
     <div className="space-y-16 pb-20 container mx-auto px-4">
@@ -152,7 +155,7 @@ export default function WatchlistPage() {
                 title: item.media?.title,
                 poster_path: item.media?.cover_url?.replace('https://image.tmdb.org/t/p/w500', ''), // Extract path
                 media_type: item.media?.type,
-                vote_average: item.rating || 8.5
+                vote_average: item.rating || 0
               }}
             />
           ))}

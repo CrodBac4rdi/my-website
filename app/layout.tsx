@@ -2,8 +2,9 @@ import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Header from "../components/header";
-import Scene3D from "../components/Scene3D";
 import { Analytics } from "@vercel/analytics/next";
+import { ThemeProvider } from "../components/ThemeProvider";
+import { I18nProvider } from "../lib/i18n";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -22,23 +23,29 @@ export const viewport: Viewport = {
   themeColor: "#020205",
 };
 
+import { BackgroundProvider } from "../components/BackgroundProvider";
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="de" className="dark">
-      <body className={`${inter.className} bg-[#020205] text-slate-50 min-h-screen flex flex-col selection:bg-accent-blue selection:text-white`}>
-        
-        <Scene3D />
-        <Header />
+    <html lang="de" suppressHydrationWarning>
+      <body className={`${inter.className} bg-white dark:bg-[#020205] text-slate-900 dark:text-slate-50 min-h-screen flex flex-col selection:bg-accent-blue selection:text-white transition-colors duration-300`}>
+        <ThemeProvider>
+        <I18nProvider>
+        <BackgroundProvider>
+          <Header />
 
-        <main className="flex-1 max-w-7xl mx-auto w-full p-4 md:p-8 relative z-10">
-          {children}
-        </main>
+          <main className="flex-1 w-full p-4 md:p-8 relative z-10">
+            {children}
+          </main>
 
-        <Analytics />
+          <Analytics />
+        </BackgroundProvider>
+        </I18nProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -1,34 +1,34 @@
 'use client';
 
-import { useState } from "react";
-import { ChevronDown, Globe, PlusCircle, Loader2 } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Globe, PlusCircle, Loader2 } from "lucide-react";
 import AnimeCard from "@/components/AnimeCard";
 
 interface DiscoverFiltersProps {
   initialDiscover: any[];
   providers: any[];
-  genres: any[];
+  initialGenre?: string;
 }
 
-export default function DiscoverFilters({ initialDiscover, providers, genres }: DiscoverFiltersProps) {
+export default function DiscoverFilters({ initialDiscover, providers, initialGenre = "" }: DiscoverFiltersProps) {
   const [discover, setDiscover] = useState<any[]>(initialDiscover);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [genre, setGenre] = useState("");
   const [provider, setProvider] = useState("");
 
-  const handleFilterChange = async (g: string, pr: string) => {
+  // Keep internal state synced if the prop changes
+  useEffect(() => {
+    setDiscover(initialDiscover);
+    setPage(1);
+  }, [initialDiscover, initialGenre]);
+
+  const handleProviderChange = async (pr: string) => {
     setLoading(true);
-    setGenre(g);
     setProvider(pr);
     setPage(1);
     
-    // Call a secure route handler or a server action to avoid leaky keys
-    // Since we're refactoring to a safe server environment, we can fetch via an internal endpoint or Server Action.
-    // For extreme simplicity and security, we pass the filtering state up via URL searchParams or call a small internal API.
-    // Let's create an internal client fetch that hits a Next.js Route Handler, keeping the key hidden on the server!
     try {
-      const res = await fetch(`/api/discover?page=1&provider=${pr}&genre=${g}`);
+      const res = await fetch(`/api/discover?page=1&provider=${pr}&genre=${initialGenre}`);
       const data = await res.json();
       setDiscover(data?.results || []);
     } catch (e) {
@@ -42,7 +42,7 @@ export default function DiscoverFilters({ initialDiscover, providers, genres }: 
     setLoading(true);
     const nextPage = page + 1;
     try {
-      const res = await fetch(`/api/discover?page=${nextPage}&provider=${provider}&genre=${genre}`);
+      const res = await fetch(`/api/discover?page=${nextPage}&provider=${provider}&genre=${initialGenre}`);
       const data = await res.json();
       if (data?.results) {
         setDiscover(prev => [...prev, ...data.results]);
@@ -67,26 +67,11 @@ export default function DiscoverFilters({ initialDiscover, providers, genres }: 
           </div>
 
           <div className="flex flex-wrap gap-4 w-full md:w-auto">
-            {/* GENRE FILTER */}
-            <div className="relative flex-1 min-w-[160px]">
-              <select 
-                value={genre}
-                onChange={(e) => handleFilterChange(e.target.value, provider)}
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl py-3 px-4 pr-10 text-sm focus:outline-none focus:border-blue-500 transition-all appearance-none cursor-pointer text-slate-200"
-              >
-                <option value="">Alle Genres</option>
-                {genres.map(g => (
-                  <option key={g.id} value={g.id}>{g.name}</option>
-                ))}
-              </select>
-              <ChevronDown size={16} className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500" />
-            </div>
-
             {/* PROVIDER FILTER */}
             <div className="relative flex-1 min-w-[160px]">
               <select 
                 value={provider}
-                onChange={(e) => handleFilterChange(genre, e.target.value)}
+                onChange={(e) => handleProviderChange(e.target.value)}
                 className="w-full bg-slate-950 border border-slate-800 rounded-xl py-3 px-4 pr-10 text-sm focus:outline-none focus:border-blue-500 transition-all appearance-none cursor-pointer text-slate-200"
               >
                 <option value="">Anbieter (DE)</option>

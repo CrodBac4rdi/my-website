@@ -1,4 +1,4 @@
-const TMDB_API_KEY = process.env.TMDB_API_KEY;
+const TMDB_API_KEY = process.env.TMDB_API_KEY || process.env.NEXT_PUBLIC_TMDB_API_KEY;
 const BASE_URL = 'https://api.themoviedb.org/3';
 
 // Constants for strict Anime filtering
@@ -89,7 +89,7 @@ export async function getDiscoverMedia(page = 1, providerId?: string, genreId?: 
 
 export async function getMediaDetails(id: string, type: 'movie' | 'tv' = 'tv') {
   return fetchTMDB(`/${type}/${id}`, {
-    append_to_response: 'watch/providers,videos,images,recommendations,reviews'
+    append_to_response: 'watch/providers,videos,images,recommendations,reviews,credits'
   });
 }
 

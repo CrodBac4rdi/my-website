@@ -4,12 +4,14 @@ import AnimeCard from "@/components/AnimeCard";
 import DiscoverFilters from "@/components/DiscoverFilters";
 import { getAllProviders, getDiscoverMedia, getTrendingAnime } from "@/lib/tmdb";
 
-export default async function LandingPage() {
+export default async function LandingPage({ searchParams }: { searchParams: { genre?: string } }) {
+  const genreId = searchParams.genre || undefined;
+
   // Fetch everything on the server
   const [trendingData, providerData, discoverData] = await Promise.all([
     getTrendingAnime(),
     getAllProviders(),
-    getDiscoverMedia(1)
+    getDiscoverMedia(1, undefined, genreId)
   ]);
   
   const trending = trendingData?.results?.slice(0, 6) || [];
@@ -18,21 +20,13 @@ export default async function LandingPage() {
   ) || [];
   const initialDiscover = discoverData?.results || [];
 
-  const genres = [
-    { id: "16", name: "Animation" }, 
-    { id: "10759", name: "Action & Adventure" }, 
-    { id: "35", name: "Comedy" },
-    { id: "18", name: "Drama" }, 
-    { id: "10765", name: "Sci-Fi & Fantasy" },
-  ];
-
   return (
-    <div className="space-y-20 pb-20 bg-[#020617] text-slate-50 min-h-screen">
+    <div className="space-y-20 pb-20 text-slate-50 min-h-screen">
       
       <Hero />
 
       {/* TRENDING SECTION */}
-      <section className="container px-4 mx-auto space-y-8">
+      <section className="w-full px-4 md:px-8 space-y-8">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-blue-500/10 rounded-xl border border-blue-500/20">
@@ -43,7 +37,7 @@ export default async function LandingPage() {
           <div className="h-px flex-1 bg-gradient-to-r from-slate-800 to-transparent ml-8 hidden md:block"></div>
         </div>
         
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 2xl:grid-cols-8 gap-6">
           {trending.map((media: any, index: number) => (
             <AnimeCard key={media.id} media={media} index={index} />
           ))}
@@ -51,11 +45,11 @@ export default async function LandingPage() {
       </section>
 
       {/* DISCOVER SECTION */}
-      <section className="container px-4 mx-auto">
+      <section className="w-full px-4 md:px-8">
          <DiscoverFilters 
            initialDiscover={initialDiscover} 
            providers={providers} 
-           genres={genres} 
+           initialGenre={genreId}
          />
       </section>
 

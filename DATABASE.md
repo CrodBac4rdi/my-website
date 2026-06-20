@@ -9,6 +9,8 @@ Speichert Benutzer-spezifische Informationen.
 - `id`: UUID (Primary Key, verknüpft mit Supabase Auth)
 - `username`: Text (Anzeigename)
 - `avatar_url`: Text (Link zum Profilbild)
+- `banner_url`: Text (Profil-Banner)
+- `bio`: Text (Kurzbiografie)
 - `updated_at`: Timestamp
 
 ### 2. `media`
@@ -35,7 +37,24 @@ Speichert Community-Feedback.
 - `media_id`: Integer (Referenz auf TMDB ID / `media.id`)
 - `rating`: Integer (Bewertung 1-10)
 - `content`: Text (Review-Text)
+- `is_spoiler`: Boolean (Gibt an, ob Spoiler enthalten sind)
 - `created_at`: Timestamp
+
+### 5. `custom_lists`
+Eigene Benutzerlisten (z.B. "Comfort Animes")
+- `id`: UUID (Primary Key)
+- `user_id`: UUID (Foreign Key auf `profiles.id`)
+- `name`: Text
+- `description`: Text
+- `is_public`: Boolean
+- `created_at`: Timestamp
+
+### 6. `custom_list_items`
+Einträge in eigenen Benutzerlisten.
+- `id`: BigInt (Primary Key)
+- `list_id`: UUID (Foreign Key auf `custom_lists.id`)
+- `media_id`: Integer (Foreign Key auf `media.id`)
+- `added_at`: Timestamp
 
 ---
 

@@ -158,14 +158,14 @@ export default function Hero() {
         animate={{ opacity: 1, x: 0 }}
         transition={{ delay: 0.1 }}
         onClick={() => router.push('/calendar')}
-        className="bg-slate-900/50 border border-slate-800 p-8 flex flex-col justify-between cursor-pointer group rounded-[2rem] hover:border-blue-500/50 transition-all backdrop-blur-sm"
+        className="bg-[#020617]/40 border border-white/10 p-8 flex flex-col justify-between cursor-pointer group rounded-[2rem] hover:border-blue-500/50 transition-all"
       >
-        <div className="p-4 bg-blue-600/10 border border-blue-500/20 text-blue-500 rounded-2xl w-fit group-hover:scale-110 transition-transform shadow-lg shadow-blue-500/5">
+        <div className="p-4 bg-blue-600/20 border border-blue-500/30 text-blue-400 rounded-2xl w-fit group-hover:scale-110 transition-transform shadow-lg shadow-blue-500/10">
           <Calendar size={32} />
         </div>
         <div>
           <h3 className="text-2xl font-extrabold text-white tracking-tight leading-none">Release <br/> Planer</h3>
-          <p className="text-slate-500 font-bold mt-2 uppercase text-[10px] tracking-widest">Wann kommen neue Folgen?</p>
+          <p className="text-slate-300 font-bold mt-2 uppercase text-[10px] tracking-widest drop-shadow-md">Wann kommen neue Folgen?</p>
         </div>
       </motion.div>
 
@@ -175,14 +175,14 @@ export default function Hero() {
         animate={{ opacity: 1, x: 0 }}
         transition={{ delay: 0.2 }}
         onClick={() => router.push('/watchlist')}
-        className="bg-slate-900/50 border border-slate-800 p-8 flex flex-col justify-between cursor-pointer group rounded-[2rem] hover:border-blue-500/50 transition-all backdrop-blur-sm"
+        className="bg-[#020617]/40 border border-white/10 p-8 flex flex-col justify-between cursor-pointer group rounded-[2rem] hover:border-purple-500/50 transition-all"
       >
-        <div className="p-4 bg-purple-600/10 border border-purple-500/20 text-purple-500 rounded-2xl w-fit group-hover:scale-110 transition-transform shadow-lg shadow-purple-500/5">
+        <div className="p-4 bg-purple-600/20 border border-purple-500/30 text-purple-400 rounded-2xl w-fit group-hover:scale-110 transition-transform shadow-lg shadow-purple-500/10">
           <Bookmark size={32} />
         </div>
         <div>
           <h3 className="text-2xl font-extrabold text-white tracking-tight leading-none">Deine <br/> Auswahl</h3>
-          <p className="text-slate-500 font-bold mt-2 uppercase text-[10px] tracking-widest">Deine markierten Favoriten</p>
+          <p className="text-slate-300 font-bold mt-2 uppercase text-[10px] tracking-widest drop-shadow-md">Deine markierten Favoriten</p>
         </div>
       </motion.div>
 

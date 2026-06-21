@@ -4,8 +4,9 @@ import AnimeCard from "@/components/AnimeCard";
 import DiscoverFilters from "@/components/DiscoverFilters";
 import { getAllProviders, getDiscoverMedia, getTrendingAnime } from "@/lib/tmdb";
 
-export default async function LandingPage({ searchParams }: { searchParams: { genre?: string } }) {
-  const genreId = searchParams.genre || undefined;
+export default async function LandingPage({ searchParams }: { searchParams: Promise<{ genre?: string }> }) {
+  const resolvedParams = await searchParams;
+  const genreId = resolvedParams.genre || undefined;
 
   // Fetch everything on the server
   const [trendingData, providerData, discoverData] = await Promise.all([
@@ -21,12 +22,12 @@ export default async function LandingPage({ searchParams }: { searchParams: { ge
   const initialDiscover = discoverData?.results || [];
 
   return (
-    <div className="space-y-20 pb-20 text-slate-50 min-h-screen">
+    <div className="space-y-32 md:space-y-40 pb-32 pt-8 text-slate-50 min-h-screen">
       
       <Hero />
 
       {/* TRENDING SECTION */}
-      <section className="w-full px-4 md:px-8 space-y-8">
+      <section className="w-full px-4 md:px-8 space-y-12">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-blue-500/10 rounded-xl border border-blue-500/20">

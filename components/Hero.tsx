@@ -70,7 +70,7 @@ export default function Hero() {
             className="absolute inset-0 flex flex-col justify-end p-8 md:p-16"
           >
             <div className="absolute inset-0 z-0">
-              <div className="absolute inset-0 bg-gradient-to-t from-[#020617] via-[#020617]/40 to-transparent z-10"></div>
+              <div className="absolute inset-0 bg-gradient-to-t from-[#020617]/80 via-[#020617]/20 to-transparent z-10"></div>
               <img 
                 src={getImageUrl(featured.backdrop_path, 'original')} 
                 alt={featured.name} 
@@ -158,7 +158,7 @@ export default function Hero() {
         animate={{ opacity: 1, x: 0 }}
         transition={{ delay: 0.1 }}
         onClick={() => router.push('/calendar')}
-        className="bg-[#020617]/40 border border-white/10 p-8 flex flex-col justify-between cursor-pointer group rounded-[2rem] hover:border-blue-500/50 transition-all"
+        className="bg-white/5 backdrop-blur-md border border-white/10 p-8 flex flex-col justify-between cursor-pointer group rounded-[2rem] hover:border-white/20 hover:bg-white/10 transition-all"
       >
         <div className="p-4 bg-blue-600/20 border border-blue-500/30 text-blue-400 rounded-2xl w-fit group-hover:scale-110 transition-transform shadow-lg shadow-blue-500/10">
           <Calendar size={32} />
@@ -175,7 +175,7 @@ export default function Hero() {
         animate={{ opacity: 1, x: 0 }}
         transition={{ delay: 0.2 }}
         onClick={() => router.push('/watchlist')}
-        className="bg-[#020617]/40 border border-white/10 p-8 flex flex-col justify-between cursor-pointer group rounded-[2rem] hover:border-purple-500/50 transition-all"
+        className="bg-white/5 backdrop-blur-md border border-white/10 p-8 flex flex-col justify-between cursor-pointer group rounded-[2rem] hover:border-white/20 hover:bg-white/10 transition-all"
       >
         <div className="p-4 bg-purple-600/20 border border-purple-500/30 text-purple-400 rounded-2xl w-fit group-hover:scale-110 transition-transform shadow-lg shadow-purple-500/10">
           <Bookmark size={32} />

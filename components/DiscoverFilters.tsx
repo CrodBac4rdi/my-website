@@ -57,7 +57,7 @@ export default function DiscoverFilters({ initialDiscover, providers, initialGen
 
   return (
     <div className="space-y-12">
-      <div className="bg-slate-900/40 border border-slate-800 p-8 rounded-3xl backdrop-blur-md">
+      <div className="bg-white/5 border border-white/10 p-6 md:p-8 rounded-[2rem] backdrop-blur-md">
         <div className="flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="space-y-2 text-center md:text-left">
             <div className="flex items-center justify-center md:justify-start gap-2 text-blue-400 font-semibold uppercase tracking-[0.2em] text-xs">

@@ -2,8 +2,8 @@ const TMDB_API_KEY = process.env.TMDB_API_KEY || process.env.NEXT_PUBLIC_TMDB_AP
 const BASE_URL = 'https://api.themoviedb.org/3';
 
 // Constants for strict Anime filtering
-const ANIME_KEYWORD = '210024';
 const ANIMATION_GENRE = '16';
+const ORIGINAL_LANGUAGE = 'ja';
 
 async function fetchTMDB(endpoint: string, params: Record<string, string> = {}) {
   // IMPORTANT: This now runs ONLY on the server.
@@ -41,14 +41,22 @@ async function fetchTMDB(endpoint: string, params: Record<string, string> = {}) 
   }
 }
 
-export async function getTrendingAnime(page = 1) {
-  return fetchTMDB('/discover/tv', {
+export async function getTrendingAnime(page = 1, genreId?: string) {
+  const params: Record<string, string> = {
     sort_by: 'popularity.desc',
-    with_genres: ANIMATION_GENRE,
-    with_keywords: ANIME_KEYWORD,
-    'vote_count.gte': '50',
+    with_original_language: ORIGINAL_LANGUAGE,
+    'vote_count.gte': '10', // Reduced from 50 to get more genre-specific trending results
     page: page.toString()
-  });
+  };
+
+  if (genreId === '10749') {
+    params.with_genres = ANIMATION_GENRE;
+    params.with_keywords = '9840|9799'; // Romance or Romantic Comedy keywords
+  } else {
+    params.with_genres = genreId ? `${ANIMATION_GENRE},${genreId}` : ANIMATION_GENRE;
+  }
+
+  return fetchTMDB('/discover/tv', params);
 }
 
 export async function getAiringAnime(page = 1) {
@@ -61,7 +69,7 @@ export async function getAiringAnime(page = 1) {
     'air_date.gte': formatDate(today),
     'air_date.lte': formatDate(nextWeek),
     with_genres: ANIMATION_GENRE,
-    with_keywords: ANIME_KEYWORD,
+    with_original_language: ORIGINAL_LANGUAGE,
     sort_by: 'popularity.desc',
     page: page.toString()
   });
@@ -70,8 +78,7 @@ export async function getAiringAnime(page = 1) {
 export async function getDiscoverMedia(page = 1, providerId?: string, genreId?: string) {
   const params: Record<string, string> = {
     page: page.toString(),
-    with_genres: ANIMATION_GENRE,
-    with_keywords: ANIME_KEYWORD,
+    with_original_language: ORIGINAL_LANGUAGE,
     sort_by: 'popularity.desc',
   };
 
@@ -80,8 +87,11 @@ export async function getDiscoverMedia(page = 1, providerId?: string, genreId?: 
     params.watch_region = 'DE';
   }
 
-  if (genreId) {
-    params.with_genres = `${ANIMATION_GENRE},${genreId}`;
+  if (genreId === '10749') {
+    params.with_genres = ANIMATION_GENRE;
+    params.with_keywords = '9840|9799'; // Romance or Romantic Comedy keywords
+  } else {
+    params.with_genres = genreId ? `${ANIMATION_GENRE},${genreId}` : ANIMATION_GENRE;
   }
 
   return fetchTMDB('/discover/tv', params);

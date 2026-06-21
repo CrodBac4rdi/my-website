@@ -1,6 +1,6 @@
 'use client';
 
-import { LogIn, LogOut, Bookmark, User, Search, Image as ImageIcon } from "lucide-react";
+import { LogIn, LogOut, Bookmark, User, Search, Image as ImageIcon, Shield } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
@@ -61,6 +61,10 @@ export default function Header() {
           <Link href="/backgrounds" className="px-5 py-2.5 rounded-xl text-sm font-bold text-slate-300 hover:text-white hover:bg-white/10 transition-all flex items-center gap-2">
             <ImageIcon size={16} />
             <span className="hidden md:block">Hintergründe</span>
+          </Link>
+          <Link href="/legal" className="px-5 py-2.5 rounded-xl text-sm font-bold text-slate-300 hover:text-white hover:bg-white/10 transition-all flex items-center gap-2">
+            <Shield size={16} />
+            <span className="hidden md:block">Legal & Privacy</span>
           </Link>
         </div>
 

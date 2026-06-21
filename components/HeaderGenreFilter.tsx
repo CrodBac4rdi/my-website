@@ -1,12 +1,14 @@
 'use client';
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { ChevronDown } from "lucide-react";
 
-export default function HeaderGenreFilter() {
+function FilterContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [isOpen, setIsOpen] = useState(false);
+  const [activeGenre, setActiveGenre] = useState("");
 
   const genres = [
     { id: "16", name: "Animation" }, 
@@ -16,6 +18,16 @@ export default function HeaderGenreFilter() {
     { id: "10765", name: "Sci-Fi & Fantasy" },
     { id: "10749", name: "Romance" },
   ];
+
+  useEffect(() => {
+    const genre = searchParams.get('genre');
+    if (genre) {
+      const found = genres.find(g => g.id === genre);
+      setActiveGenre(found ? found.name : "");
+    } else {
+      setActiveGenre("");
+    }
+  }, [searchParams]);
 
   const handleSelect = (id: string) => {
     setIsOpen(false);
@@ -32,7 +44,7 @@ export default function HeaderGenreFilter() {
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-2 px-4 py-2 bg-slate-900/40 hover:bg-slate-800/60 border border-slate-700/50 rounded-xl transition-all text-sm font-bold text-slate-300 hover:text-white"
       >
-        Genres <ChevronDown size={14} className={`transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
+        {activeGenre ? `Genre: ${activeGenre}` : "Genres"} <ChevronDown size={14} className={`transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
       </button>
 
       {isOpen && (
@@ -58,5 +70,13 @@ export default function HeaderGenreFilter() {
         </>
       )}
     </div>
+  );
+}
+
+export default function HeaderGenreFilter() {
+  return (
+    <Suspense fallback={<div className="h-9 w-24 bg-slate-800/50 rounded-xl animate-pulse"></div>}>
+      <FilterContent />
+    </Suspense>
   );
 }

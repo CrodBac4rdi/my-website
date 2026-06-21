@@ -77,7 +77,7 @@ export default function WatchlistPage() {
         </div>
         <div className="text-center space-y-4 max-w-lg">
           <h2 className="text-4xl md:text-5xl font-extrabold text-white tracking-tight">Deine Liste ist leer</h2>
-          <p className="text-slate-400 font-medium text-lg">Du hast noch keine Favoriten markiert. Entdecke neue Inhalte und füge sie deiner persönlichen Watchlist hinzu.</p>
+          <p className="text-slate-300 font-medium text-lg">Du hast noch keine Favoriten markiert. Entdecke neue Inhalte und füge sie deiner persönlichen Watchlist hinzu.</p>
         </div>
         <Link href="/" className="bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 px-12 rounded-2xl transition-all shadow-xl shadow-blue-500/20 flex items-center gap-3">
           <Plus size={20} /> Entdecken starten
@@ -95,26 +95,33 @@ export default function WatchlistPage() {
           <Bookmark className="text-blue-400" size={28} />
         </div>
         <h1 className="text-4xl md:text-5xl font-black text-white tracking-tight">Deine Watchlist</h1>
-        <p className="text-slate-400 font-medium max-w-xl mx-auto">
+        <p className="text-slate-300 font-medium max-w-xl mx-auto">
           Alle deine gemerkten Favoriten auf einen Blick. {watchlist.length} Titel gespeichert.
         </p>
       </div>
 
       {/* WATCHLIST GRID */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6 md:gap-8 pt-8">
-        {watchlist.map((item, index) => (
-          <AnimeCard 
-            key={item.id} 
-            index={index}
-            media={{
-              id: item.media?.id,
-              title: item.media?.title,
-              poster_path: item.media?.cover_url?.replace('https://image.tmdb.org/t/p/w500', ''), // Extract path
-              media_type: item.media?.type,
-              vote_average: item.rating || 0
-            }}
-          />
-        ))}
+        {watchlist.map((item, index) => {
+          // Handle Supabase returning media as an array or object
+          const mediaObj = Array.isArray(item.media) ? item.media[0] : item.media;
+          
+          if (!mediaObj) return null;
+
+          return (
+            <AnimeCard 
+              key={item.id} 
+              index={index}
+              media={{
+                id: mediaObj.id,
+                title: mediaObj.title,
+                poster_path: mediaObj.cover_url, // getImageUrl will handle full URLs
+                media_type: mediaObj.type,
+                vote_average: item.rating || 0
+              }}
+            />
+          );
+        })}
       </div>
 
     </div>

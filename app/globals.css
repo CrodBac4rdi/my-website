@@ -56,3 +56,13 @@ body {
     @apply border-white border-r-4 h-full flex items-center px-6 font-black uppercase italic tracking-tighter hover:bg-white hover:text-black transition-all cursor-pointer bg-black/20 backdrop-blur-sm;
   }
 }
+
+@layer utilities {
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}

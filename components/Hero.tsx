@@ -5,25 +5,35 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { getTrendingAnime, getImageUrl } from "@/lib/tmdb";
+import { supabase } from "@/lib/supabase";
 
-export default function Hero() {
-  const [highlights, setHighlights] = useState<any[]>([]);
+export default function Hero({ highlights = [] }: { highlights?: any[] }) {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [loading, setLoading] = useState(true);
+  const [watchlistImage, setWatchlistImage] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
-    async function fetchHero() {
-      try {
-        const data = await getTrendingAnime(1);
-        setHighlights(data?.results?.slice(0, 5) || []);
-      } catch (e) {
-        console.error(e);
-      } finally {
-        setLoading(false);
+    async function fetchWatchlistCover() {
+      if (!supabase) return;
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      
+      const { data } = await supabase
+        .from('user_watchlist')
+        .select(`media (cover_url)`)
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (data) {
+        const mediaObj = Array.isArray(data.media) ? data.media[0] : data.media;
+        if (mediaObj?.cover_url) {
+          setWatchlistImage(mediaObj.cover_url);
+        }
       }
     }
-    fetchHero();
+    fetchWatchlistCover();
   }, []);
 
   const nextSlide = useCallback(() => {
@@ -41,17 +51,17 @@ export default function Hero() {
     return () => clearInterval(interval);
   }, [highlights.length, nextSlide]);
 
-  if (loading) {
+  if (!highlights || highlights.length === 0) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-4 grid-rows-2 gap-6 h-auto md:h-[600px] animate-pulse">
-        <div className="md:col-span-3 md:row-span-2 bg-slate-900/50 rounded-[2.5rem] border border-slate-800"></div>
-        <div className="bg-slate-900/50 rounded-[2rem] border border-slate-800"></div>
-        <div className="bg-slate-900/50 rounded-[2rem] border border-slate-800"></div>
+        <div className="md:col-span-3 md:row-span-2 bg-white/5 rounded-[2.5rem] border border-white/10"></div>
+        <div className="bg-white/5 rounded-[2rem] border border-white/10"></div>
+        <div className="bg-white/5 rounded-[2rem] border border-white/10"></div>
       </div>
     );
   }
 
-  if (highlights.length === 0) return null;
+
   const featured = highlights[currentIndex];
 
   return (
@@ -158,14 +168,27 @@ export default function Hero() {
         animate={{ opacity: 1, x: 0 }}
         transition={{ delay: 0.1 }}
         onClick={() => router.push('/calendar')}
-        className="bg-white/5 backdrop-blur-md border border-white/10 p-8 flex flex-col justify-between cursor-pointer group rounded-[2rem] hover:border-white/20 hover:bg-white/10 transition-all"
+        className="relative overflow-hidden bg-slate-900 border border-white/10 p-8 flex flex-col justify-between cursor-pointer group rounded-[2rem] hover:border-white/20 transition-all"
       >
-        <div className="p-4 bg-blue-600/20 border border-blue-500/30 text-blue-400 rounded-2xl w-fit group-hover:scale-110 transition-transform shadow-lg shadow-blue-500/10">
+        {/* Background Image from Highlights[1] */}
+        {highlights[1]?.backdrop_path && (
+          <>
+            <img 
+              src={`https://image.tmdb.org/t/p/w780${highlights[1].backdrop_path}`}
+              alt="Release Planer Background"
+              className="absolute inset-0 w-full h-full object-cover opacity-50 group-hover:opacity-70 group-hover:scale-110 transition-all duration-700 ease-in-out"
+            />
+            {/* Gradient Overlay for Text Readability */}
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/80 to-transparent"></div>
+          </>
+        )}
+
+        <div className="relative z-10 p-4 bg-blue-600/20 border border-blue-500/30 text-blue-400 rounded-2xl w-fit group-hover:scale-110 transition-transform shadow-lg shadow-blue-500/10">
           <Calendar size={32} />
         </div>
-        <div>
+        <div className="relative z-10">
           <h3 className="text-2xl font-extrabold text-white tracking-tight leading-none">Release <br/> Planer</h3>
-          <p className="text-slate-300 font-bold mt-2 uppercase text-[10px] tracking-widest drop-shadow-md">Wann kommen neue Folgen?</p>
+          <p className="text-blue-300 font-bold mt-2 uppercase text-[10px] tracking-widest drop-shadow-md">Wann kommen neue Folgen?</p>
         </div>
       </motion.div>
 
@@ -175,14 +198,26 @@ export default function Hero() {
         animate={{ opacity: 1, x: 0 }}
         transition={{ delay: 0.2 }}
         onClick={() => router.push('/watchlist')}
-        className="bg-white/5 backdrop-blur-md border border-white/10 p-8 flex flex-col justify-between cursor-pointer group rounded-[2rem] hover:border-white/20 hover:bg-white/10 transition-all"
+        className="relative overflow-hidden bg-slate-900 border border-white/10 p-8 flex flex-col justify-between cursor-pointer group rounded-[2rem] hover:border-white/20 transition-all"
       >
-        <div className="p-4 bg-purple-600/20 border border-purple-500/30 text-purple-400 rounded-2xl w-fit group-hover:scale-110 transition-transform shadow-lg shadow-purple-500/10">
+        {/* Background Image from Watchlist or Highlights[2] */}
+        {(watchlistImage || highlights[2]?.backdrop_path) && (
+          <>
+            <img 
+              src={watchlistImage ? getImageUrl(watchlistImage) : `https://image.tmdb.org/t/p/w780${highlights[2].backdrop_path}`}
+              alt="Watchlist Background"
+              className="absolute inset-0 w-full h-full object-cover opacity-50 group-hover:opacity-70 group-hover:scale-110 transition-all duration-700 ease-in-out"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/80 to-transparent"></div>
+          </>
+        )}
+
+        <div className="relative z-10 p-4 bg-purple-600/20 border border-purple-500/30 text-purple-400 rounded-2xl w-fit group-hover:scale-110 transition-transform shadow-lg shadow-purple-500/10">
           <Bookmark size={32} />
         </div>
-        <div>
+        <div className="relative z-10">
           <h3 className="text-2xl font-extrabold text-white tracking-tight leading-none">Deine <br/> Auswahl</h3>
-          <p className="text-slate-300 font-bold mt-2 uppercase text-[10px] tracking-widest drop-shadow-md">Deine markierten Favoriten</p>
+          <p className="text-purple-300 font-bold mt-2 uppercase text-[10px] tracking-widest drop-shadow-md">Deine markierten Favoriten</p>
         </div>
       </motion.div>
 

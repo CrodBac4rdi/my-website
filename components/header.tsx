@@ -1,6 +1,6 @@
 'use client';
 
-import { LogIn, LogOut, Bookmark, User, Search, Image as ImageIcon, Shield } from "lucide-react";
+import { LogIn, LogOut, Bookmark, User, Search, Image as ImageIcon, Shield, Menu, X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
@@ -12,6 +12,7 @@ import HeaderGenreFilter from "./HeaderGenreFilter";
 
 export default function Header() {
   const [user, setUser] = useState<any>(null);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const router = useRouter();
   const { t } = useI18n();
 
@@ -43,8 +44,8 @@ export default function Header() {
           <span className="text-xl font-black tracking-tighter text-white hidden sm:block drop-shadow-md">HORIZON</span>
         </Link>
 
-        {/* NAV LINKS */}
-        <div className="flex items-center gap-1 bg-white/5 p-1 rounded-2xl border border-white/5">
+        {/* DESKTOP NAV LINKS */}
+        <div className="hidden lg:flex items-center gap-1 bg-white/5 p-1 rounded-2xl border border-white/5">
           <Link href="/" className="px-5 py-2.5 rounded-xl text-sm font-bold text-slate-300 hover:text-white hover:bg-white/10 transition-all">
             {t('nav.home')}
           </Link>
@@ -68,8 +69,8 @@ export default function Header() {
           </Link>
         </div>
 
-        {/* ACTIONS & AUTH */}
-        <div className="px-2 flex items-center gap-4">
+        {/* DESKTOP ACTIONS & AUTH */}
+        <div className="hidden lg:flex px-2 items-center gap-4">
           <HeaderGenreFilter />
           <div className="flex items-center gap-2 border-l border-white/10 pl-4">
             <LanguageToggle />
@@ -103,7 +104,61 @@ export default function Header() {
           )}
         </div>
 
+        {/* MOBILE BURGER */}
+        <div className="lg:hidden flex items-center gap-2 px-2">
+          <button 
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="p-2 bg-white/5 border border-white/10 rounded-xl text-white hover:bg-white/10"
+          >
+            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </div>
+
       </nav>
+
+      {/* MOBILE MENU OVERLAY */}
+      {isMobileMenuOpen && (
+        <div className="lg:hidden absolute top-[80px] left-0 w-full px-4 pointer-events-auto">
+          <div className="bg-slate-900/95 backdrop-blur-2xl border border-white/10 p-5 rounded-3xl shadow-2xl flex flex-col gap-3">
+            <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="px-4 py-3 rounded-xl text-lg font-bold text-white hover:bg-white/10 transition-colors">{t('nav.home')}</Link>
+            {user && <Link href="/watchlist" onClick={() => setIsMobileMenuOpen(false)} className="px-4 py-3 rounded-xl text-lg font-bold text-white hover:bg-white/10 flex items-center gap-3 transition-colors"><Bookmark size={20} />{t('nav.watchlist')}</Link>}
+            <Link href="/search" onClick={() => setIsMobileMenuOpen(false)} className="px-4 py-3 rounded-xl text-lg font-bold text-white hover:bg-white/10 flex items-center gap-3 transition-colors"><Search size={20} />{t('nav.search')}</Link>
+            <Link href="/backgrounds" onClick={() => setIsMobileMenuOpen(false)} className="px-4 py-3 rounded-xl text-lg font-bold text-white hover:bg-white/10 flex items-center gap-3 transition-colors"><ImageIcon size={20} />Hintergründe</Link>
+            <Link href="/legal" onClick={() => setIsMobileMenuOpen(false)} className="px-4 py-3 rounded-xl text-lg font-bold text-white hover:bg-white/10 flex items-center gap-3 transition-colors"><Shield size={20} />Legal & Privacy</Link>
+            
+            <hr className="border-white/10 my-2" />
+            
+            <div className="flex items-center justify-between px-2">
+              <HeaderGenreFilter />
+              <div className="flex items-center gap-2">
+                <LanguageToggle />
+                <ThemeToggle />
+              </div>
+            </div>
+
+            <hr className="border-white/10 my-2" />
+
+            {user ? (
+              <div className="flex items-center justify-between px-2">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                    <User size={16} className="text-white" />
+                  </div>
+                  <span className="text-sm font-bold text-slate-300 truncate max-w-[180px]">{user.email}</span>
+                </div>
+                <button onClick={() => { handleLogout(); setIsMobileMenuOpen(false); }} className="p-3 bg-red-500/10 border border-red-500/20 text-red-400 rounded-xl hover:bg-red-500/20">
+                  <LogOut size={20} />
+                </button>
+              </div>
+            ) : (
+              <Link href="/login" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center justify-center gap-2 bg-blue-600 text-white hover:bg-blue-500 py-3 rounded-2xl font-black uppercase tracking-widest text-sm transition-all shadow-xl shadow-blue-500/20">
+                <LogIn size={18} /> {t('nav.login')}
+              </Link>
+            )}
+          </div>
+        </div>
+      )}
+
     </header>
   );
 }

@@ -53,10 +53,10 @@ export default function Hero({ highlights = [] }: { highlights?: any[] }) {
 
   if (!highlights || highlights.length === 0) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-4 grid-rows-2 gap-6 h-auto md:h-[600px] animate-pulse">
-        <div className="md:col-span-3 md:row-span-2 bg-white/5 rounded-[2.5rem] border border-white/10"></div>
-        <div className="bg-white/5 rounded-[2rem] border border-white/10"></div>
-        <div className="bg-white/5 rounded-[2rem] border border-white/10"></div>
+      <div className="grid grid-cols-1 lg:grid-cols-4 lg:grid-rows-2 gap-6 h-auto lg:h-[600px] animate-pulse">
+        <div className="lg:col-span-3 lg:row-span-2 bg-white/5 rounded-[2.5rem] border border-white/10 min-h-[400px] lg:min-h-full"></div>
+        <div className="bg-white/5 rounded-[2rem] border border-white/10 min-h-[200px] lg:min-h-full"></div>
+        <div className="bg-white/5 rounded-[2rem] border border-white/10 min-h-[200px] lg:min-h-full"></div>
       </div>
     );
   }
@@ -65,10 +65,10 @@ export default function Hero({ highlights = [] }: { highlights?: any[] }) {
   const featured = highlights[currentIndex];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-4 grid-rows-2 gap-6 h-auto md:h-[600px]">
+    <div className="grid grid-cols-1 lg:grid-cols-4 lg:grid-rows-2 gap-6 h-auto lg:h-[600px]">
       
       {/* MAIN FEATURE (CAROUSEL) */}
-      <div className="md:col-span-3 md:row-span-2 relative rounded-[2.5rem] overflow-hidden border border-slate-800 shadow-2xl group">
+      <div className="lg:col-span-3 lg:row-span-2 relative rounded-[2.5rem] overflow-hidden border border-slate-800 shadow-2xl group min-h-[400px] lg:min-h-full">
         
         <AnimatePresence mode="wait">
           <motion.section 
@@ -168,7 +168,7 @@ export default function Hero({ highlights = [] }: { highlights?: any[] }) {
         animate={{ opacity: 1, x: 0 }}
         transition={{ delay: 0.1 }}
         onClick={() => router.push('/calendar')}
-        className="relative overflow-hidden bg-slate-900 border border-white/10 p-8 flex flex-col justify-between cursor-pointer group rounded-[2rem] hover:border-white/20 transition-all"
+        className="relative overflow-hidden bg-slate-900 border border-white/10 p-8 flex flex-col justify-between cursor-pointer group rounded-[2rem] hover:border-white/20 transition-all min-h-[200px] lg:min-h-full"
       >
         {/* Background Image from Highlights[1] */}
         {highlights[1]?.backdrop_path && (
@@ -198,7 +198,7 @@ export default function Hero({ highlights = [] }: { highlights?: any[] }) {
         animate={{ opacity: 1, x: 0 }}
         transition={{ delay: 0.2 }}
         onClick={() => router.push('/watchlist')}
-        className="relative overflow-hidden bg-slate-900 border border-white/10 p-8 flex flex-col justify-between cursor-pointer group rounded-[2rem] hover:border-white/20 transition-all"
+        className="relative overflow-hidden bg-slate-900 border border-white/10 p-8 flex flex-col justify-between cursor-pointer group rounded-[2rem] hover:border-white/20 transition-all min-h-[200px] lg:min-h-full"
       >
         {/* Background Image from Watchlist or Highlights[2] */}
         {(watchlistImage || highlights[2]?.backdrop_path) && (

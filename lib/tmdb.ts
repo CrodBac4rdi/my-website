@@ -114,5 +114,18 @@ export async function getAllProviders() {
 
 export const getImageUrl = (path: string | null, size: 'w500' | 'original' = 'w500') => {
   if (!path) return '/file.svg';
+  // Already a full URL (z.B. gespeicherte cover_url aus der DB)
+  if (path.startsWith('http')) return path;
   return `https://image.tmdb.org/t/p/${size}${path}`;
 };
+
+export async function getMediaDetailWithFallback(id: string, preferredType: 'tv' | 'movie' = 'tv') {
+  const data = await getMediaDetails(id, preferredType);
+  if (data?.id) return { ...data, _fetchedType: preferredType };
+
+  const fallback = preferredType === 'tv' ? 'movie' : 'tv';
+  const fallbackData = await getMediaDetails(id, fallback);
+  if (fallbackData?.id) return { ...fallbackData, _fetchedType: fallback };
+
+  return null;
+}

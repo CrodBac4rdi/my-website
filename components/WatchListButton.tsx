@@ -1,29 +1,24 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Plus, Trash2, Loader2, Check } from 'lucide-react';
-import { createClient } from '@supabase/supabase-js';
+import { useState, useEffect, useRef } from 'react';
+import { Plus, Trash2, Loader2 } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
 import { getImageUrl } from '@/lib/tmdb';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!
-);
+import { toast } from '@/lib/toast';
 
 export default function WatchlistButton({ anime }: { anime: any }) {
   const [loading, setLoading] = useState(true);
   const [isOnWatchlist, setIsOnWatchlist] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
+  const submittingRef = useRef(false); // synchroner Guard gegen Doppelklick
 
   const mediaId = anime.id || anime.mal_id;
 
   useEffect(() => {
     async function checkStatus() {
+      if (!supabase) { setLoading(false); return; }
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        setLoading(false);
-        return;
-      }
+      if (!user) { setLoading(false); return; }
 
       const { data, error } = await supabase
         .from('user_watchlist')
@@ -32,61 +27,70 @@ export default function WatchlistButton({ anime }: { anime: any }) {
         .eq('media_id', mediaId)
         .maybeSingle();
 
-      if (!error && data) {
-        setIsOnWatchlist(true);
-      }
+      if (!error && data) setIsOnWatchlist(true);
       setLoading(false);
     }
-
     checkStatus();
   }, [mediaId]);
 
   const handleToggle = async () => {
+    if (submittingRef.current) return; // verhindert Race-Condition bei Doppelklick
+    submittingRef.current = true;
     setActionLoading(true);
-    
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      alert("Bitte logge dich zuerst ein!");
-      setActionLoading(false);
-      return;
-    }
 
-    if (isOnWatchlist) {
-      const { error } = await supabase
-        .from('user_watchlist')
-        .delete()
-        .eq('user_id', user.id)
-        .eq('media_id', mediaId);
-
-      if (!error) {
-        setIsOnWatchlist(false);
-      } else {
-        console.error("Delete error:", error);
+    try {
+      if (!supabase) { toast.error('Auth nicht konfiguriert.'); return; }
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast.error('Bitte zuerst einloggen!');
+        return;
       }
-    } else {
-      await supabase.from('media').upsert({
-        id: mediaId,
-        title: anime.name || anime.title || anime.original_name,
-        type: anime.media_type || 'tv',
-        cover_url: getImageUrl(anime.poster_path)
-      });
 
-      const { error } = await supabase
-        .from('user_watchlist')
-        .insert({
-          user_id: user.id,
-          media_id: mediaId,
-          status: 'plan_to_watch'
+      if (isOnWatchlist) {
+        const { error } = await supabase
+          .from('user_watchlist')
+          .delete()
+          .eq('user_id', user.id)
+          .eq('media_id', mediaId);
+
+        if (error) {
+          toast.error('Fehler beim Entfernen.');
+          console.error('Watchlist delete error:', error);
+        } else {
+          setIsOnWatchlist(false);
+          toast.success('Von der Watchlist entfernt.');
+        }
+      } else {
+        // Erst Media in Cache-Tabelle sichern
+        const { error: mediaError } = await supabase.from('media').upsert({
+          id: mediaId,
+          title: anime.name || anime.title || anime.original_name || 'Unbekannt',
+          type: anime.media_type || 'tv',
+          cover_url: getImageUrl(anime.poster_path),
         });
 
-      if (!error) {
-        setIsOnWatchlist(true);
-      } else {
-        console.error("Insert error:", error);
+        if (mediaError) {
+          toast.error('Fehler beim Hinzufügen.');
+          console.error('Media upsert error:', mediaError);
+          return; // kein watchlist-Insert wenn media fehlschlägt
+        }
+
+        const { error } = await supabase
+          .from('user_watchlist')
+          .insert({ user_id: user.id, media_id: mediaId, status: 'plan_to_watch' });
+
+        if (error) {
+          toast.error('Fehler beim Hinzufügen.');
+          console.error('Watchlist insert error:', error);
+        } else {
+          setIsOnWatchlist(true);
+          toast.success('Zur Watchlist hinzugefügt!');
+        }
       }
+    } finally {
+      submittingRef.current = false;
+      setActionLoading(false);
     }
-    
-    setActionLoading(false);
   };
 
   if (loading) {
@@ -98,13 +102,13 @@ export default function WatchlistButton({ anime }: { anime: any }) {
   }
 
   return (
-    <button 
+    <button
       onClick={handleToggle}
       disabled={actionLoading}
-      className={`w-full font-black py-4 px-6 border-4 border-black uppercase italic tracking-tighter transition-all duration-100 flex items-center justify-center gap-3 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-1 active:translate-y-1 disabled:opacity-50 ${
-        isOnWatchlist 
-          ? "bg-accent-pink text-white" 
-          : "bg-accent-green text-black"
+      className={`w-full font-black py-4 px-6 border-4 border-black uppercase italic tracking-tighter transition-all duration-100 flex items-center justify-center gap-3 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-1 active:translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed ${
+        isOnWatchlist
+          ? 'bg-accent-pink text-white'
+          : 'bg-accent-green text-black'
       }`}
     >
       {actionLoading ? (

@@ -91,9 +91,11 @@ export default function SearchClient({ initialResults, initialQuery }: { initial
             </div>
           )}
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 gap-6">
-            {results.map((media: any, index: number) => (
-              <AnimeCard key={media.id} media={media} index={index} />
-            ))}
+            {results
+              .filter((item, i, self) => self.findIndex(x => x.id === item.id) === i)
+              .map((media: any, index: number) => (
+                <AnimeCard key={media.id} media={media} index={index} />
+              ))}
           </div>
         </div>
       )}

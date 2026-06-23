@@ -39,13 +39,11 @@ export default function Recommendations({ animeId }: { animeId: string }) {
       </div>
       
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
-        {recommendations.map((media, index) => (
-          <AnimeCard 
-            key={media.id} 
-            media={media} 
-            index={index} 
-          />
-        ))}
+        {recommendations
+          .filter((item, i, self) => self.findIndex(x => x.id === item.id) === i)
+          .map((media, index) => (
+            <AnimeCard key={media.id} media={media} index={index} />
+          ))}
       </div>
     </section>
   );

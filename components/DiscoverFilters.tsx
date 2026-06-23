@@ -17,7 +17,11 @@ export default function DiscoverFilters({ initialDiscover, initialGenre = "" }: 
   const observerTarget = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    setDiscover(initialDiscover);
+    // Deduplizieren: TMDB kann dieselbe ID mehrfach in einem Ergebnis-Array zurückgeben
+    const deduped = initialDiscover.filter(
+      (item, i, self) => self.findIndex(x => x.id === item.id) === i
+    );
+    setDiscover(deduped);
     setPage(1);
     setHasMore(true);
   }, [initialDiscover, initialGenre]);
@@ -68,7 +72,7 @@ export default function DiscoverFilters({ initialDiscover, initialGenre = "" }: 
     <div className="space-y-12">
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 md:gap-10 xl:gap-12 px-2">
         {discover.map((media: any, index: number) => (
-          <AnimeCard key={`${media.id}-${index}`} media={media} index={index} />
+          <AnimeCard key={media.id} media={media} index={index} />
         ))}
       </div>
 

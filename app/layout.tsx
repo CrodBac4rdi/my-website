@@ -24,6 +24,7 @@ export const viewport: Viewport = {
 };
 
 import { BackgroundProvider } from "../components/BackgroundProvider";
+import ToastContainer from "../components/Toast";
 
 export default function RootLayout({
   children,
@@ -42,6 +43,7 @@ export default function RootLayout({
             {children}
           </main>
 
+          <ToastContainer />
           <Analytics />
         </BackgroundProvider>
         </I18nProvider>

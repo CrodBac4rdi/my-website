@@ -119,27 +119,39 @@ Vollständige Spalten/Constraints siehe `SQL/02_tables.sql` + `lib/database.type
 - **Bilder:** `getImageUrl(path)` versteht volle URLs (DB `cover_url`) **und** TMDB-Pfade (`/abc.jpg`).
 - **Listen-Keys:** TMDB liefert teils doppelte IDs → vor dem Rendern deduplizieren (`filter findIndex`), nicht `key={id-index}` als Workaround.
 - **Supabase-Fehlercode `23505`** (Unique-Verletzung) wird überall mit klarer Meldung abgefangen.
-- **Ein Supabase-Browser-Client:** immer `@/lib/supabase` importieren, nie `createClient` in Komponenten (sonst "Multiple GoTrueClient instances").
+- **Supabase-Client:** nie `createClient` aus `@supabase/supabase-js` in Komponenten (verursacht "Multiple GoTrueClient instances"). Stattdessen die SSR-Factories (`@/lib/supabase/client` bzw. `/server`) oder den Singleton `@/lib/supabase`.
+- **media_id ist `number`:** Route-Params sind Strings → vor DB-Queries mit `Number(id)` konvertieren (der typisierte Client erzwingt das jetzt).
 
 ---
 
 ## 5. Logik-Schicht (in Arbeit)
 
-Zielstruktur (noch nicht umgesetzt):
+### Fundament steht (✅)
 ```
-lib/
-  services/        ← reine Business-Logik, DB-Zugriff gekapselt
-    watchlist.ts
-    reviews.ts
-    lists.ts
-    profile.ts
-  actions/         ← 'use server' Server Actions (Auth + zod + service call)
-  supabase/
-    server.ts      ← createServerClient (@supabase/ssr, cookies)
-    client.ts      ← createBrowserClient
-  validation/      ← zod-Schemas
+lib/supabase/
+  client.ts   ← createClient() Browser (createBrowserClient, cookie-basiert)
+  server.ts   ← createClient() Server (createServerClient + async cookies())
+lib/supabase.ts ← Backward-Compat-Singleton (nutzt jetzt SSR-Browser-Client)
+proxy.ts        ← Next.js 16 Proxy (ehem. middleware): Session-Refresh pro Request
 ```
-Voraussetzung: Umstieg auf `@supabase/ssr` + Middleware (Session-Refresh). Erst danach machen Server Actions Sinn, weil sie den server-seitigen, cookie-basierten Client brauchen.
+
+**Next.js 16 Besonderheiten (wichtig):**
+- `middleware.ts` heißt jetzt **`proxy.ts`** (Funktion `proxy`). Liegt im Root (Ebene von `app/`).
+- `cookies()` aus `next/headers` ist **async** → `await cookies()`.
+- Server Actions laufen als POST auf ihre eigene Route und können vom Proxy-Matcher übersprungen werden → **jede Action prüft Auth selbst** (`supabase.auth.getUser()`), niemals nur auf den Proxy verlassen.
+
+### Noch offen
+```
+lib/services/      ← reine Business-Logik, DB-Zugriff gekapselt (watchlist, reviews, lists, profile)
+lib/actions/       ← 'use server' Server Actions (Auth-Check + zod + service call)
+lib/validation/    ← zod-Schemas
+```
+Migrationspfad: Mutations Schritt für Schritt aus den Client-Komponenten in Services + Server Actions ziehen. Der `supabase`-Singleton aus `lib/supabase.ts` bleibt, bis alle Consumer migriert sind.
+
+**Welcher Client wann?**
+- Server Component / Server Action / Route Handler → `createClient()` aus `@/lib/supabase/server`
+- Client Component (neu) → `createClient()` aus `@/lib/supabase/client`
+- Bestehende Client Component → `supabase` aus `@/lib/supabase` (bis migriert)
 
 ---
 
@@ -157,8 +169,8 @@ Voraussetzung: Umstieg auf `@supabase/ssr` + Middleware (Session-Refresh). Erst 
 | P0 | Migrations-Workflow (MCP) | ✅ erledigt |
 | P1 | DB-Härtung (RLS-Perf, Funktionen, Geister-Tabelle, pg_trgm) | ✅ erledigt |
 | P1 | Leaked-Password-Protection | ⬜ manuell im Dashboard |
-| P0 | `@supabase/ssr` + Middleware | ⬜ als Nächstes |
-| P2 | Service-Layer + Server Actions (Watchlist, Reviews, Listen, Profil) | ⬜ |
+| P0 | `@supabase/ssr` (client/server) + `proxy.ts` (Session-Refresh) | ✅ erledigt |
+| P2 | Service-Layer + Server Actions (Watchlist, Reviews, Listen, Profil) | ⬜ als Nächstes |
 | P2 | zod-Validierung an Action-Grenze | ⬜ |
 | P3 | Shared UI-Primitives, Error/Loading-Boundaries, optimistische Updates | ⬜ |
 | P4 | MAL/AniList-Import echt umsetzen | ⬜ |

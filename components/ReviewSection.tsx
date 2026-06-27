@@ -30,7 +30,7 @@ export default function ReviewSection({ animeId }: { animeId: string }) {
       const { data, error } = await supabase
         .from('reviews')
         .select('*, profiles(username, avatar_url)')
-        .eq('media_id', animeId)
+        .eq('media_id', Number(animeId))
         .order('created_at', { ascending: false });
 
       if (!error && data) setReviews(data);
@@ -56,7 +56,7 @@ export default function ReviewSection({ animeId }: { animeId: string }) {
     try {
       const { error } = await supabase.from('reviews').insert({
         user_id: user.id,
-        media_id: animeId,
+        media_id: Number(animeId),
         rating,
         content: newReview.trim(),
         is_spoiler: isSpoiler,

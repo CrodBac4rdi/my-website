@@ -8,6 +8,7 @@ import { supabase } from '@/lib/supabase';
 import { getImageUrl } from '@/lib/tmdb';
 import { fetchTrailerKey } from '@/lib/actions';
 import { toast } from '@/lib/toast';
+import { addToWatchlistAction, removeFromWatchlistAction } from '@/lib/actions/watchlist';
 
 const STATUS_LABELS: Record<string, string> = {
   plan_to_watch: 'Geplant',
@@ -100,35 +101,25 @@ export default function AnimeCard({
     setIsWlLoading(true);
     try {
       if (isOnWatchlist) {
-        const { error } = await supabase
-          .from('user_watchlist')
-          .delete()
-          .eq('user_id', user.id)
-          .eq('media_id', mediaId);
-        if (!error) {
+        const res = await removeFromWatchlistAction(mediaId);
+        if (res.ok) {
           setIsOnWatchlist(false);
           toast.success('Entfernt.');
         } else {
-          toast.error('Fehler beim Entfernen.');
+          toast.error(res.error);
         }
       } else {
-        const { error: mediaErr } = await supabase.from('media').upsert({
-          id: mediaId,
+        const res = await addToWatchlistAction({
+          mediaId,
           title: media.name || media.title || media.original_name || 'Unbekannt',
-          type: media.media_type || 'tv',
-          cover_url: getImageUrl(media.poster_path),
+          type: media.media_type === 'movie' ? 'movie' : 'tv',
+          posterPath: media.poster_path ?? null,
         });
-        if (mediaErr) { toast.error('Fehler.'); return; }
-
-        const { error } = await supabase
-          .from('user_watchlist')
-          .insert({ user_id: user.id, media_id: mediaId, status: 'plan_to_watch' });
-
-        if (!error) {
+        if (res.ok) {
           setIsOnWatchlist(true);
           toast.success('Zur Watchlist hinzugefügt!');
         } else {
-          toast.error('Fehler beim Hinzufügen.');
+          toast.error(res.error);
         }
       }
     } catch (err) {

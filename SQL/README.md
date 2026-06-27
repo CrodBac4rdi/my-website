@@ -1,4 +1,9 @@
-# HORIZON — SQL Setup
+# HORIZON — SQL Setup (Baseline)
+
+> ⚠️ **Dies ist die initiale Baseline.** Laufende Schema-Änderungen passieren über
+> versionierte Migrationen in [`../supabase/migrations/`](../supabase/migrations/), **nicht** hier.
+> Architektur-Gesamtbild: [`../docs/ARCHITECTURE.md`](../docs/ARCHITECTURE.md).
+> Reihenfolge zum Nachbauen: erst dieser Ordner (01–07), dann die Migrationen chronologisch.
 
 Kompletter Datenbankaufbau für Supabase (PostgreSQL).  
 Alle Skripte sind **idempotent** und können wiederholt ausgeführt werden.

@@ -3,8 +3,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { Plus, Trash2, Loader2 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
-import { getImageUrl } from '@/lib/tmdb';
 import { toast } from '@/lib/toast';
+import { addToWatchlistAction, removeFromWatchlistAction } from '@/lib/actions/watchlist';
 
 export default function WatchlistButton({ anime }: { anime: any }) {
   const [loading, setLoading] = useState(true);
@@ -39,52 +39,26 @@ export default function WatchlistButton({ anime }: { anime: any }) {
     setActionLoading(true);
 
     try {
-      if (!supabase) { toast.error('Auth nicht konfiguriert.'); return; }
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        toast.error('Bitte zuerst einloggen!');
-        return;
-      }
-
       if (isOnWatchlist) {
-        const { error } = await supabase
-          .from('user_watchlist')
-          .delete()
-          .eq('user_id', user.id)
-          .eq('media_id', mediaId);
-
-        if (error) {
-          toast.error('Fehler beim Entfernen.');
-          console.error('Watchlist delete error:', error);
-        } else {
+        const res = await removeFromWatchlistAction(mediaId);
+        if (res.ok) {
           setIsOnWatchlist(false);
           toast.success('Von der Watchlist entfernt.');
+        } else {
+          toast.error(res.error);
         }
       } else {
-        // Erst Media in Cache-Tabelle sichern
-        const { error: mediaError } = await supabase.from('media').upsert({
-          id: mediaId,
+        const res = await addToWatchlistAction({
+          mediaId,
           title: anime.name || anime.title || anime.original_name || 'Unbekannt',
-          type: anime.media_type || 'tv',
-          cover_url: getImageUrl(anime.poster_path),
+          type: anime.media_type === 'movie' ? 'movie' : 'tv',
+          posterPath: anime.poster_path ?? null,
         });
-
-        if (mediaError) {
-          toast.error('Fehler beim Hinzufügen.');
-          console.error('Media upsert error:', mediaError);
-          return; // kein watchlist-Insert wenn media fehlschlägt
-        }
-
-        const { error } = await supabase
-          .from('user_watchlist')
-          .insert({ user_id: user.id, media_id: mediaId, status: 'plan_to_watch' });
-
-        if (error) {
-          toast.error('Fehler beim Hinzufügen.');
-          console.error('Watchlist insert error:', error);
-        } else {
+        if (res.ok) {
           setIsOnWatchlist(true);
           toast.success('Zur Watchlist hinzugefügt!');
+        } else {
+          toast.error(res.error);
         }
       }
     } finally {

@@ -10,6 +10,7 @@ import {
 import AnimeCard from '@/components/AnimeCard';
 import { supabase } from '@/lib/supabase';
 import { toast } from '@/lib/toast';
+import { updateWatchlistAction } from '@/lib/actions/watchlist';
 
 type WatchlistItem = {
   id: number;
@@ -65,17 +66,13 @@ export default function WatchlistPage() {
     if (updatingRef.current.has(itemId)) return;
     updatingRef.current.add(itemId);
 
-    const { error } = await supabase!
-      .from('user_watchlist')
-      .update({ status: newStatus })
-      .eq('id', itemId);
-
-    if (!error) {
+    const res = await updateWatchlistAction({ watchlistId: itemId, status: newStatus });
+    if (res.ok) {
       setWatchlist(prev =>
         prev.map(item => item.id === itemId ? { ...item, status: newStatus } : item)
       );
     } else {
-      toast.error('Status konnte nicht aktualisiert werden.');
+      toast.error(res.error);
     }
     updatingRef.current.delete(itemId);
   };
@@ -84,17 +81,13 @@ export default function WatchlistPage() {
     if (updatingRef.current.has(itemId)) return;
     updatingRef.current.add(itemId);
 
-    const { error } = await supabase!
-      .from('user_watchlist')
-      .update({ rating: newRating })
-      .eq('id', itemId);
-
-    if (!error) {
+    const res = await updateWatchlistAction({ watchlistId: itemId, rating: newRating });
+    if (res.ok) {
       setWatchlist(prev =>
         prev.map(item => item.id === itemId ? { ...item, rating: newRating } : item)
       );
     } else {
-      toast.error('Bewertung konnte nicht gespeichert werden.');
+      toast.error(res.error);
     }
     updatingRef.current.delete(itemId);
   };

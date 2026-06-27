@@ -140,13 +140,30 @@ proxy.ts        ← Next.js 16 Proxy (ehem. middleware): Session-Refresh pro Req
 - `cookies()` aus `next/headers` ist **async** → `await cookies()`.
 - Server Actions laufen als POST auf ihre eigene Route und können vom Proxy-Matcher übersprungen werden → **jede Action prüft Auth selbst** (`supabase.auth.getUser()`), niemals nur auf den Proxy verlassen.
 
+### Aufbau (etabliert mit der Watchlist-Vertikale ✅)
+```
+lib/validation/<domain>.ts  ← zod-Schemas (Eingabe-Validierung)
+lib/services/<domain>.ts    ← reine DB-Logik, nimmt Server-Client + userId, scopt auf user_id
+lib/actions/<domain>.ts     ← 'use server': validieren → Auth → Service → revalidate → ActionResult
+lib/actions/result.ts       ← ActionResult<T> + ok()/fail() Helfer
+```
+
+**Datenfluss einer Mutation (Referenz: Watchlist):**
+1. Client-Komponente ruft `xxxAction(input)` auf (onClick-Handler), behält `useRef`-Guard + lokalen optimistischen State.
+2. Action: `safeParse` (zod) → `getAuthedClient()` (`supabase.auth.getUser()`) → Service-Call.
+3. Service: gekapselte Queries mit dem typisierten Server-Client, immer `.eq('user_id', userId)` (Defense-in-Depth zur RLS).
+4. Action mappt Fehlercodes (z.B. `23505`) auf deutsche Meldungen, ruft `revalidatePath`, gibt `ActionResult` zurück.
+5. Komponente: bei `res.ok` State-Update + Toast, sonst `toast.error(res.error)`.
+
+**Regeln:**
+- Jede Action prüft Auth selbst (Server Actions sind per POST direkt erreichbar).
+- Services werfen nicht — sie geben `{ error }` im Supabase-Stil zurück, damit Actions Codes auswerten können.
+- Reads dürfen vorerst im Client über den `supabase`-Singleton bleiben; **Mutations laufen über Actions**.
+
 ### Noch offen
-```
-lib/services/      ← reine Business-Logik, DB-Zugriff gekapselt (watchlist, reviews, lists, profile)
-lib/actions/       ← 'use server' Server Actions (Auth-Check + zod + service call)
-lib/validation/    ← zod-Schemas
-```
-Migrationspfad: Mutations Schritt für Schritt aus den Client-Komponenten in Services + Server Actions ziehen. Der `supabase`-Singleton aus `lib/supabase.ts` bleibt, bis alle Consumer migriert sind.
+- Gleiches Muster für **reviews, custom_lists, profile** ausrollen (Services + Actions + Migration der Komponenten).
+- Optional: Reads in Server Components verlagern (dann greift `revalidatePath` voll).
+- Der `supabase`-Singleton aus `lib/supabase.ts` bleibt, bis alle Consumer migriert sind.
 
 **Welcher Client wann?**
 - Server Component / Server Action / Route Handler → `createClient()` aus `@/lib/supabase/server`
@@ -170,8 +187,9 @@ Migrationspfad: Mutations Schritt für Schritt aus den Client-Komponenten in Ser
 | P1 | DB-Härtung (RLS-Perf, Funktionen, Geister-Tabelle, pg_trgm) | ✅ erledigt |
 | P1 | Leaked-Password-Protection | ⬜ manuell im Dashboard |
 | P0 | `@supabase/ssr` (client/server) + `proxy.ts` (Session-Refresh) | ✅ erledigt |
-| P2 | Service-Layer + Server Actions (Watchlist, Reviews, Listen, Profil) | ⬜ als Nächstes |
-| P2 | zod-Validierung an Action-Grenze | ⬜ |
+| P2 | Service-Layer + Server Actions — **Watchlist** | ✅ erledigt |
+| P2 | Service-Layer + Server Actions — Reviews, Listen, Profil | ⬜ als Nächstes |
+| P2 | zod-Validierung an Action-Grenze | ✅ Watchlist, Rest folgt |
 | P3 | Shared UI-Primitives, Error/Loading-Boundaries, optimistische Updates | ⬜ |
 | P4 | MAL/AniList-Import echt umsetzen | ⬜ |
 | P4 | Activity-Feed (sauberes Redesign von user_activities) | ⬜ |

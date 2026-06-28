@@ -214,6 +214,18 @@ normalisierte `{ title, status }`. `lib/services/import.ts` matcht je Titel via 
 
 **Trigger-Funktionen:** alle SECURITY DEFINER + `search_path=''` + EXECUTE für anon/authenticated entzogen.
 
+**„Neue Episode"-Notifications (Edge Function + Cron):**
+- Edge Function `episode-notifier` (`supabase/functions/episode-notifier/index.ts`): scannt aktive
+  Watchlist-TV-Titel, liest TMDB `last_episode_to_air`, legt Notifications an, dedupliziert über
+  `episode_notifications`. Nutzt service_role (umgeht RLS).
+- `pg_cron`-Job `episode-notifier-daily` (täglich 06:00 UTC) ruft die Function via `pg_net` auf;
+  Anon-Key kommt aus **Vault** (`cron_anon_key`) — kein Key im Repo.
+- **Manueller Aktivierungsschritt (einmalig):** TMDB-Key als Function-Secret setzen — Dashboard →
+  Edge Functions → Manage secrets → `TMDB_API_KEY`. Ohne das gibt die Function `{ok:false}` zurück (no-op).
+- Test on demand: `POST /functions/v1/episode-notifier` mit anon-Bearer.
+- Akzeptierte Advisor-Hinweise: `episode_notifications` RLS-ohne-Policy (gewollt, nur service_role),
+  `pg_net` in public schema (pg_net-spezifisch, nicht gefahrlos verschiebbar).
+
 ---
 
 ## 7. Roadmap / offene Punkte
@@ -233,7 +245,7 @@ normalisierte `{ title, status }`. `lib/services/import.ts` matcht je Titel via 
 | P4 | MAL/AniList-Import (TMDB-Matching, chunked) | ✅ erledigt |
 | P4 | Activity-Feed (user_activities + Trigger + View) | ✅ erledigt |
 | P4 | Notifications-Frontend + Review-Trigger | ✅ erledigt |
-| P4 | Notification-Trigger für neue Episoden (Cron/Edge Function) | ⬜ braucht Deploy |
+| P4 | „Neue Episode"-Notifications (Edge Function + pg_cron) | ✅ deployed — braucht nur noch TMDB-Secret |
 
 ---
 

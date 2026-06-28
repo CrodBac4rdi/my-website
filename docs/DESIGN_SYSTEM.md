@@ -77,7 +77,10 @@ wird **vollständig entfernt**.
 ## Umsetzungs-Status
 - ✅ Fundament: Tokens (`globals.css`), `@theme`, Fonts (next/font), `.glass`, Body auf Tokens
 - ✅ Watchlist-Button (Brutalist → Primary/Danger), Toast (System-Spec)
-- ⬜ AnimeCard, Header/Nav, Inputs, Tabs/Chips, Dropdown, Empty-States, Skeletons
-- ⬜ Screen-Politur (Home, Suche, Hintergründe, Legal, Profil, Browse-Grid)
-- ⬜ Headings auf `font-display` umstellen
+- ✅ AnimeCard (Karten-Spec: rounded-lg, border-line, Hover-Lift + shadow-pop, Gold-Rating, Primary-Actions)
+- ✅ Header/Nav (Glas-Container, Primary-Logo/Login, Danger-Soft-Logout, Token-Links)
+- ⬜ Inputs, Tabs/Chips, Dropdown (HeaderGenreFilter), Empty-States, Skeletons
+- ⬜ Screen-Politur (Home/Hero, Suche, Hintergründe, Legal, Profil, Browse-Grid)
+- ⬜ Headings auf `font-display` (Space Grotesk) umstellen
+- ⬜ Mobile-Nav (Bottom-Tab-Bar laut Spec)
 - ⬜ Cleanup: Legacy-Accent-Tokens entfernen, wenn keine Komponente sie mehr nutzt

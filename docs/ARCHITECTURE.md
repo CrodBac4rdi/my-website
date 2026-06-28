@@ -181,6 +181,12 @@ Media-Detailseite), damit `createReviewAction` den media-Cache füllen kann
 - Client Component (neu) → `createClient()` aus `@/lib/supabase/client`
 - Bestehende Client Component → `supabase` aus `@/lib/supabase` (bis migriert)
 
+**Server-Component-Read-Muster (P3):** `watchlist`, `lists`, `profile` sind jetzt Server
+Components: Auth + Read server-seitig (`createClient` + `redirect('/login')` + Service-Read),
+Übergabe der Initialdaten an einen Client-Wrapper (`WatchlistClient`/`ListsClient`/`ProfileClient`)
+für die Interaktivität. Read-Funktionen liegen im jeweiligen Service (`getWatchlist`, `getLists`,
+`getProfile`/`getRecentWatchlist`). `lists/[id]` bleibt bewusst client (such-/interaktionslastig).
+
 ---
 
 ## 6. Externe Daten (TMDB)
@@ -221,7 +227,8 @@ normalisierte `{ title, status }`. `lib/services/import.ts` matcht je Titel via 
 | P2 | Service-Layer + Server Actions — Watchlist, Reviews, Listen, Profil | ✅ erledigt |
 | P2 | zod-Validierung an Action-Grenze | ✅ erledigt (alle Domains) |
 | P3 | Optimistische Updates (Watchlist-Toggle mit Rollback) | ✅ erledigt |
-| P3 | Reads in Server Components verlagern | ⬜ optional |
+| P3 | Reads in Server Components (watchlist, lists, profile) | ✅ erledigt |
+| P3 | Reads in Server Components — lists/[id] | ⬜ bleibt client (such-/interaktionslastig) |
 | P3 | Shared UI-Primitives, Error/Loading-Boundaries | ⬜ optional |
 | P4 | MAL/AniList-Import (TMDB-Matching, chunked) | ✅ erledigt |
 | P4 | Activity-Feed (user_activities + Trigger + View) | ✅ erledigt |

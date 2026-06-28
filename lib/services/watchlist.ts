@@ -13,6 +13,15 @@ import type { AddToWatchlistInput, WatchlistStatus } from '@/lib/validation/watc
  */
 type Client = SupabaseClient<Database>;
 
+/** Liest die komplette Watchlist eines Nutzers (für Server Components). */
+export async function getWatchlist(supabase: Client, userId: string) {
+  return await supabase
+    .from('user_watchlist')
+    .select('id, status, rating, media (id, title, cover_url, type)')
+    .eq('user_id', userId)
+    .order('updated_at', { ascending: false });
+}
+
 export async function addToWatchlist(
   supabase: Client,
   userId: string,

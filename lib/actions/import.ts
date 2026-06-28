@@ -1,6 +1,5 @@
 'use server';
 
-import { revalidatePath } from 'next/cache';
 import { getAuthedClient } from '@/lib/actions/auth';
 import { importChunk, type ImportResult } from '@/lib/services/import';
 import { importChunkSchema } from '@/lib/validation/import';
@@ -18,6 +17,5 @@ export async function importChunkAction(input: unknown): Promise<ActionResult<Im
   if (!user) return fail('Bitte zuerst einloggen.');
 
   const results = await importChunk(supabase, user.id, parsed.data);
-  revalidatePath('/watchlist');
   return ok(results);
 }

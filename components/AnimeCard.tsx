@@ -183,7 +183,9 @@ export default function AnimeCard({
                   />
                 </div>
               ) : (
-                <div className="absolute inset-0 bg-elev/40 backdrop-blur-sm" />
+                // Kein Trailer: Poster bleibt sichtbar (nur leicht abgedunkelt),
+                // statt es auszugrauen/zu blurren.
+                <div className="absolute inset-0 bg-black/25" />
               )}
 
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent p-3 flex flex-col justify-end">

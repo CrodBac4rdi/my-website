@@ -1,6 +1,5 @@
 'use server';
 
-import { revalidatePath } from 'next/cache';
 import { getAuthedClient } from '@/lib/actions/auth';
 import * as listsService from '@/lib/services/lists';
 import {
@@ -24,7 +23,6 @@ export async function createListAction(input: unknown): Promise<ActionResult<unk
     return fail('Liste konnte nicht erstellt werden.');
   }
 
-  revalidatePath('/lists');
   return ok(data);
 }
 
@@ -41,7 +39,6 @@ export async function deleteListAction(listId: unknown): Promise<ActionResult> {
     return fail('Liste konnte nicht gelöscht werden.');
   }
 
-  revalidatePath('/lists');
   return ok(null);
 }
 
@@ -59,7 +56,6 @@ export async function addListItemAction(input: unknown): Promise<ActionResult<un
     return fail('Fehler beim Hinzufügen.');
   }
 
-  revalidatePath(`/lists/${parsed.data.listId}`);
   return ok(data);
 }
 

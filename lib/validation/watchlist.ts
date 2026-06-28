@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { mediaMetaSchema } from '@/lib/validation/media';
 
 /** Erlaubte Watchlist-Status — Spiegel des DB-CHECK-Constraints `valid_status`. */
 export const watchlistStatusSchema = z.enum([
@@ -11,13 +12,8 @@ export const watchlistStatusSchema = z.enum([
 
 export type WatchlistStatus = z.infer<typeof watchlistStatusSchema>;
 
-/** Eingabe zum Hinzufügen eines Titels zur Watchlist. */
-export const addToWatchlistSchema = z.object({
-  mediaId: z.number().int().positive(),
-  title: z.string().min(1).max(500),
-  type: z.enum(['tv', 'movie']),
-  posterPath: z.string().nullable(),
-});
+/** Eingabe zum Hinzufügen eines Titels zur Watchlist (= Medien-Metadaten). */
+export const addToWatchlistSchema = mediaMetaSchema;
 
 export type AddToWatchlistInput = z.infer<typeof addToWatchlistSchema>;
 

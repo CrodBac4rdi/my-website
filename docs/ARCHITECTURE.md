@@ -160,10 +160,21 @@ lib/actions/result.ts       ← ActionResult<T> + ok()/fail() Helfer
 - Services werfen nicht — sie geben `{ error }` im Supabase-Stil zurück, damit Actions Codes auswerten können.
 - Reads dürfen vorerst im Client über den `supabase`-Singleton bleiben; **Mutations laufen über Actions**.
 
+### Stand: alle Mutations migriert ✅
+Service + Action + Validation existieren für **watchlist, reviews, lists, profile**.
+Geteilt: `lib/services/media.ts` (`ensureMedia`/`toCoverUrl`), `lib/validation/media.ts`
+(`mediaMetaSchema`), `lib/actions/auth.ts` (`getAuthedClient`).
+
+Migrierte Komponenten (Mutations → Actions): WatchListButton, AnimeCard, watchlist/page,
+ReviewSection, lists/page, lists/[id]/page, profile/page.
+
+`ReviewSection` bekommt `mediaTitle`/`mediaType`/`posterPath` als Props (von der
+Media-Detailseite), damit `createReviewAction` den media-Cache füllen kann
+(Reviews haben FK auf media — Reviews für noch nicht gecachte Titel funktionieren so).
+
 ### Noch offen
-- Gleiches Muster für **reviews, custom_lists, profile** ausrollen (Services + Actions + Migration der Komponenten).
-- Optional: Reads in Server Components verlagern (dann greift `revalidatePath` voll).
-- Der `supabase`-Singleton aus `lib/supabase.ts` bleibt, bis alle Consumer migriert sind.
+- Reads laufen weiter client-seitig über den `supabase`-Singleton. Optional in Server
+  Components verlagern (dann greift `revalidatePath` voll). Singleton bleibt bis dahin.
 
 **Welcher Client wann?**
 - Server Component / Server Action / Route Handler → `createClient()` aus `@/lib/supabase/server`
@@ -187,9 +198,9 @@ lib/actions/result.ts       ← ActionResult<T> + ok()/fail() Helfer
 | P1 | DB-Härtung (RLS-Perf, Funktionen, Geister-Tabelle, pg_trgm) | ✅ erledigt |
 | P1 | Leaked-Password-Protection | ⬜ manuell im Dashboard |
 | P0 | `@supabase/ssr` (client/server) + `proxy.ts` (Session-Refresh) | ✅ erledigt |
-| P2 | Service-Layer + Server Actions — **Watchlist** | ✅ erledigt |
-| P2 | Service-Layer + Server Actions — Reviews, Listen, Profil | ⬜ als Nächstes |
-| P2 | zod-Validierung an Action-Grenze | ✅ Watchlist, Rest folgt |
+| P2 | Service-Layer + Server Actions — Watchlist, Reviews, Listen, Profil | ✅ erledigt |
+| P2 | zod-Validierung an Action-Grenze | ✅ erledigt (alle Domains) |
+| P3 | Reads in Server Components + optimistische Updates | ⬜ als Nächstes |
 | P3 | Shared UI-Primitives, Error/Loading-Boundaries, optimistische Updates | ⬜ |
 | P4 | MAL/AniList-Import echt umsetzen | ⬜ |
 | P4 | Activity-Feed (sauberes Redesign von user_activities) | ⬜ |

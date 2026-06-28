@@ -6,6 +6,7 @@ import { Loader2, LogOut, CheckCircle2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import AnimeCard from '@/components/AnimeCard';
 import { toast } from '@/lib/toast';
+import { updateProfileAction } from '@/lib/actions/profile';
 
 export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
@@ -43,46 +44,22 @@ export default function ProfilePage() {
   }, [router]);
 
   const handleSave = async () => {
-    if (savingRef.current || !supabase || !profile) return;
+    if (savingRef.current || !profile) return;
     savingRef.current = true;
     setSaving(true);
 
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { router.push('/login'); return; }
-
-      // Client-seitige Validierung (DB-Constraints als Backup)
-      if (profile.username && (profile.username.length < 3 || profile.username.length > 30)) {
-        toast.error('Benutzername muss 3–30 Zeichen lang sein.');
-        return;
-      }
-      if (profile.username && !/^[a-zA-Z0-9_]+$/.test(profile.username)) {
-        toast.error('Benutzername darf nur Buchstaben, Zahlen und _ enthalten.');
-        return;
-      }
-      if (profile.bio && profile.bio.length > 500) {
-        toast.error('Bio darf maximal 500 Zeichen lang sein.');
-        return;
-      }
-
-      const { error } = await supabase.from('profiles').upsert({
-        id: user.id,
+      const res = await updateProfileAction({
         username: profile.username || null,
         bio: profile.bio || null,
-        avatar_url: profile.avatar_url || null,
-        banner_url: profile.banner_url || null,
-        updated_at: new Date().toISOString(),
+        avatarUrl: profile.avatar_url || null,
+        bannerUrl: profile.banner_url || null,
       });
 
-      if (error) {
-        if (error.code === '23505') {
-          toast.error('Dieser Benutzername ist bereits vergeben.');
-        } else {
-          toast.error('Fehler beim Speichern.');
-          console.error('Profile save error:', error);
-        }
-      } else {
+      if (res.ok) {
         toast.success('Profil gespeichert!');
+      } else {
+        toast.error(res.error);
       }
     } finally {
       savingRef.current = false;

@@ -10,6 +10,7 @@ import {
 import { supabase } from '@/lib/supabase';
 import { getImageUrl } from '@/lib/tmdb';
 import { toast } from '@/lib/toast';
+import { addListItemAction, removeListItemAction } from '@/lib/actions/lists';
 import AnimeCard from '@/components/AnimeCard';
 
 type ListItem = {
@@ -128,39 +129,23 @@ export default function ListDetailPage() {
   }, []);
 
   const handleAddItem = async (result: SearchResult) => {
-    if (!supabase || addingRef.current.has(result.id)) return;
+    if (addingRef.current.has(result.id)) return;
     addingRef.current.add(result.id);
 
     try {
-      // Media in Cache-Tabelle sichern
-      const { error: mediaErr } = await supabase.from('media').upsert({
-        id: result.id,
+      const res = await addListItemAction({
+        listId,
+        mediaId: result.id,
         title: result.name || result.title || 'Unbekannt',
         type: result.media_type === 'movie' ? 'movie' : 'tv',
-        cover_url: getImageUrl(result.poster_path ?? null),
+        posterPath: result.poster_path ?? null,
       });
 
-      if (mediaErr) { toast.error('Fehler beim Hinzufügen.'); return; }
-
-      const maxOrder = items.length > 0
-        ? Math.max(...items.map(i => i.sort_order))
-        : 0;
-
-      const { data, error } = await supabase
-        .from('custom_list_items')
-        .insert({ list_id: listId, media_id: result.id, sort_order: maxOrder + 1 })
-        .select(`id, sort_order, added_at, media (id, title, cover_url, type)`)
-        .single();
-
-      if (error) {
-        if (error.code === '23505') {
-          toast.info('Dieser Titel ist bereits in der Liste.');
-        } else {
-          toast.error('Fehler beim Hinzufügen.');
-        }
-      } else {
-        setItems(prev => [...prev, data as unknown as ListItem]);
+      if (res.ok) {
+        setItems(prev => [...prev, res.data as unknown as ListItem]);
         toast.success(`„${result.name || result.title}" hinzugefügt!`);
+      } else {
+        toast.error(res.error);
       }
     } finally {
       addingRef.current.delete(result.id);
@@ -168,19 +153,15 @@ export default function ListDetailPage() {
   };
 
   const handleRemoveItem = async (itemId: number) => {
-    if (!supabase || deletingRef.current.has(itemId)) return;
+    if (deletingRef.current.has(itemId)) return;
     deletingRef.current.add(itemId);
 
-    const { error } = await supabase
-      .from('custom_list_items')
-      .delete()
-      .eq('id', itemId);
-
-    if (error) {
-      toast.error('Fehler beim Entfernen.');
-    } else {
+    const res = await removeListItemAction(itemId);
+    if (res.ok) {
       setItems(prev => prev.filter(i => i.id !== itemId));
       toast.success('Entfernt.');
+    } else {
+      toast.error(res.error);
     }
     deletingRef.current.delete(itemId);
   };

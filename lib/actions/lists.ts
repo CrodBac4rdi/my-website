@@ -1,0 +1,80 @@
+'use server';
+
+import { revalidatePath } from 'next/cache';
+import { getAuthedClient } from '@/lib/actions/auth';
+import * as listsService from '@/lib/services/lists';
+import {
+  createListSchema,
+  listIdSchema,
+  addListItemSchema,
+  listItemIdSchema,
+} from '@/lib/validation/lists';
+import { type ActionResult, ok, fail } from '@/lib/actions/result';
+
+export async function createListAction(input: unknown): Promise<ActionResult<unknown>> {
+  const parsed = createListSchema.safeParse(input);
+  if (!parsed.success) return fail('Bitte einen gültigen Namen angeben.');
+
+  const { supabase, user } = await getAuthedClient();
+  if (!user) return fail('Bitte zuerst einloggen.');
+
+  const { data, error } = await listsService.createList(supabase, user.id, parsed.data);
+  if (error) {
+    console.error('createList error:', error);
+    return fail('Liste konnte nicht erstellt werden.');
+  }
+
+  revalidatePath('/lists');
+  return ok(data);
+}
+
+export async function deleteListAction(listId: unknown): Promise<ActionResult> {
+  const parsed = listIdSchema.safeParse(listId);
+  if (!parsed.success) return fail('Ungültige Eingabe.');
+
+  const { supabase, user } = await getAuthedClient();
+  if (!user) return fail('Bitte zuerst einloggen.');
+
+  const { error } = await listsService.deleteList(supabase, user.id, parsed.data);
+  if (error) {
+    console.error('deleteList error:', error);
+    return fail('Liste konnte nicht gelöscht werden.');
+  }
+
+  revalidatePath('/lists');
+  return ok(null);
+}
+
+export async function addListItemAction(input: unknown): Promise<ActionResult<unknown>> {
+  const parsed = addListItemSchema.safeParse(input);
+  if (!parsed.success) return fail('Ungültige Eingabe.');
+
+  const { supabase, user } = await getAuthedClient();
+  if (!user) return fail('Bitte zuerst einloggen.');
+
+  const { data, error } = await listsService.addListItem(supabase, parsed.data);
+  if (error) {
+    if (error.code === '23505') return fail('Dieser Titel ist bereits in der Liste.');
+    console.error('addListItem error:', error);
+    return fail('Fehler beim Hinzufügen.');
+  }
+
+  revalidatePath(`/lists/${parsed.data.listId}`);
+  return ok(data);
+}
+
+export async function removeListItemAction(itemId: unknown): Promise<ActionResult> {
+  const parsed = listItemIdSchema.safeParse(itemId);
+  if (!parsed.success) return fail('Ungültige Eingabe.');
+
+  const { supabase, user } = await getAuthedClient();
+  if (!user) return fail('Bitte zuerst einloggen.');
+
+  const { error } = await listsService.removeListItem(supabase, parsed.data);
+  if (error) {
+    console.error('removeListItem error:', error);
+    return fail('Fehler beim Entfernen.');
+  }
+
+  return ok(null);
+}

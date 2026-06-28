@@ -1,16 +1,19 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Loader2, Plus, List, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { toast } from '@/lib/toast';
+import { createListAction, deleteListAction } from '@/lib/actions/lists';
 
 export default function CustomListsPage() {
   const [lists, setLists] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [newListName, setNewListName] = useState('');
   const [creating, setCreating] = useState(false);
+  const creatingRef = useRef(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -36,35 +39,33 @@ export default function CustomListsPage() {
 
   const handleCreateList = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newListName.trim() || !supabase) return;
-    
+    if (!newListName.trim() || creatingRef.current) return;
+
+    creatingRef.current = true;
     setCreating(true);
-    const { data: { user } } = await supabase.auth.getUser();
-    
-    if (user) {
-      const { data, error } = await supabase
-        .from('custom_lists')
-        .insert({
-          user_id: user.id,
-          name: newListName,
-          description: ''
-        })
-        .select()
-        .single();
-        
-      if (data) {
-        setLists([data, ...lists]);
+    try {
+      const res = await createListAction({ name: newListName });
+      if (res.ok) {
+        setLists([res.data, ...lists]);
         setNewListName('');
+        toast.success('Liste erstellt.');
+      } else {
+        toast.error(res.error);
       }
+    } finally {
+      creatingRef.current = false;
+      setCreating(false);
     }
-    setCreating(false);
   };
 
   const handleDelete = async (listId: string) => {
-    if (!supabase || !confirm('Möchtest du diese Liste wirklich löschen?')) return;
-    const { error } = await supabase.from('custom_lists').delete().eq('id', listId);
-    if (!error) {
+    if (!confirm('Möchtest du diese Liste wirklich löschen?')) return;
+    const res = await deleteListAction(listId);
+    if (res.ok) {
       setLists(lists.filter(l => l.id !== listId));
+      toast.success('Liste gelöscht.');
+    } else {
+      toast.error(res.error);
     }
   };
 

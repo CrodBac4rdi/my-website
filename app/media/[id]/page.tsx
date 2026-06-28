@@ -249,7 +249,12 @@ export default async function MediaDetail({
 
       <div className="space-y-16 pt-16 mt-16 border-t border-white/5">
         <Recommendations animeId={resolvedParams.id} />
-        <ReviewSection animeId={resolvedParams.id} />
+        <ReviewSection
+          animeId={resolvedParams.id}
+          mediaTitle={media.name || media.title || 'Unbekannt'}
+          mediaType={media._fetchedType}
+          posterPath={media.poster_path ?? null}
+        />
       </div>
     </div>
   );

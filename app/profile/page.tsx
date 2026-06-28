@@ -5,6 +5,8 @@ import { supabase } from '@/lib/supabase';
 import { Loader2, LogOut, CheckCircle2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import AnimeCard from '@/components/AnimeCard';
+import ActivityFeed from '@/components/ActivityFeed';
+import { Activity } from 'lucide-react';
 import { toast } from '@/lib/toast';
 import { updateProfileAction } from '@/lib/actions/profile';
 
@@ -211,6 +213,14 @@ export default function ProfilePage() {
         ) : (
           <p className="text-slate-500">Noch keine Titel vorhanden.</p>
         )}
+      </div>
+
+      {/* ACTIVITY FEED */}
+      <div className="px-4 md:px-0 space-y-6 pt-12">
+        <h3 className="text-2xl font-bold flex items-center gap-3">
+          <Activity className="text-blue-500" size={24} /> Deine Aktivität
+        </h3>
+        <ActivityFeed />
       </div>
     </div>
   );

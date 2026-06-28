@@ -190,6 +190,26 @@ Media-Detailseite), damit `createReviewAction` den media-Cache füllen kann
 
 ---
 
+## 6a. Community-Features (P4)
+
+**Activity-Feed:** `user_activities` (own-only RLS) wird per SECURITY-DEFINER-Trigger befüllt
+(watchlist add/completed, review, list created). View `activity_feed` (security_invoker) joint media.
+Anzeige: `components/ActivityFeed.tsx` auf der Profilseite.
+
+**Notifications:** Trigger `notify_watchlist_on_review` benachrichtigt Watchlist-Besitzer, wenn ihr
+Titel bewertet wird. UI: `components/NotificationBell.tsx` (Header, eingeloggt; Polling 60s).
+Mutations (mark read/all) über `lib/actions/notifications.ts`.
+**Offen:** „neue Episode"-Notifications brauchen einen Cron/Edge-Function-Job (TMDB-Polling) — separater Deploy.
+
+**MAL/AniList-Import:** `lib/import/parse.ts` (pure, client) parst MAL-XML & AniList/JSON →
+normalisierte `{ title, status }`. `lib/services/import.ts` matcht je Titel via TMDB-Suche
+(Anime bevorzugt) und upsertet media + watchlist. `importChunkAction` verarbeitet **Chunks à 10**
+(TMDB-Rate-Limit); die Seite `/import` ruft sie sequentiell mit Fortschrittsbalken + Ergebnis-Report.
+
+**Trigger-Funktionen:** alle SECURITY DEFINER + `search_path=''` + EXECUTE für anon/authenticated entzogen.
+
+---
+
 ## 7. Roadmap / offene Punkte
 
 | Prio | Thema | Status |
@@ -200,11 +220,13 @@ Media-Detailseite), damit `createReviewAction` den media-Cache füllen kann
 | P0 | `@supabase/ssr` (client/server) + `proxy.ts` (Session-Refresh) | ✅ erledigt |
 | P2 | Service-Layer + Server Actions — Watchlist, Reviews, Listen, Profil | ✅ erledigt |
 | P2 | zod-Validierung an Action-Grenze | ✅ erledigt (alle Domains) |
-| P3 | Reads in Server Components + optimistische Updates | ⬜ als Nächstes |
-| P3 | Shared UI-Primitives, Error/Loading-Boundaries, optimistische Updates | ⬜ |
-| P4 | MAL/AniList-Import echt umsetzen | ⬜ |
-| P4 | Activity-Feed (sauberes Redesign von user_activities) | ⬜ |
-| P4 | Notifications-Frontend (+ Trigger für neue Episoden) | ⬜ |
+| P3 | Optimistische Updates (Watchlist-Toggle mit Rollback) | ✅ erledigt |
+| P3 | Reads in Server Components verlagern | ⬜ optional |
+| P3 | Shared UI-Primitives, Error/Loading-Boundaries | ⬜ optional |
+| P4 | MAL/AniList-Import (TMDB-Matching, chunked) | ✅ erledigt |
+| P4 | Activity-Feed (user_activities + Trigger + View) | ✅ erledigt |
+| P4 | Notifications-Frontend + Review-Trigger | ✅ erledigt |
+| P4 | Notification-Trigger für neue Episoden (Cron/Edge Function) | ⬜ braucht Deploy |
 
 ---
 

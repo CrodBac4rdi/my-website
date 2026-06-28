@@ -9,6 +9,7 @@ import ThemeToggle from "./ThemeToggle";
 import LanguageToggle from "./LanguageToggle";
 import { useI18n } from "@/lib/i18n";
 import HeaderGenreFilter from "./HeaderGenreFilter";
+import NotificationBell from "./NotificationBell";
 
 export default function Header() {
   const [user, setUser] = useState<any>(null);
@@ -79,6 +80,7 @@ export default function Header() {
 
           {user ? (
             <div className="flex items-center gap-3 pl-2">
+              <NotificationBell />
               <Link href="/profile" className="hidden sm:flex items-center gap-3 px-4 py-2 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-colors group">
                  <div className="w-6 h-6 bg-slate-800 group-hover:bg-blue-500 rounded-full flex items-center justify-center transition-colors">
                     <User size={14} className="text-slate-400 group-hover:text-white" />

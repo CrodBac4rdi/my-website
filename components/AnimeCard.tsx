@@ -98,32 +98,29 @@ export default function AnimeCard({
       return;
     }
 
+    // Optimistisches Update: UI sofort umschalten, bei Fehler zurückrollen.
+    const wasOnWatchlist = isOnWatchlist;
+    setIsOnWatchlist(!wasOnWatchlist);
     setIsWlLoading(true);
     try {
-      if (isOnWatchlist) {
-        const res = await removeFromWatchlistAction(mediaId);
-        if (res.ok) {
-          setIsOnWatchlist(false);
-          toast.success('Entfernt.');
-        } else {
-          toast.error(res.error);
-        }
+      const res = wasOnWatchlist
+        ? await removeFromWatchlistAction(mediaId)
+        : await addToWatchlistAction({
+            mediaId,
+            title: media.name || media.title || media.original_name || 'Unbekannt',
+            type: media.media_type === 'movie' ? 'movie' : 'tv',
+            posterPath: media.poster_path ?? null,
+          });
+
+      if (res.ok) {
+        toast.success(wasOnWatchlist ? 'Entfernt.' : 'Zur Watchlist hinzugefügt!');
       } else {
-        const res = await addToWatchlistAction({
-          mediaId,
-          title: media.name || media.title || media.original_name || 'Unbekannt',
-          type: media.media_type === 'movie' ? 'movie' : 'tv',
-          posterPath: media.poster_path ?? null,
-        });
-        if (res.ok) {
-          setIsOnWatchlist(true);
-          toast.success('Zur Watchlist hinzugefügt!');
-        } else {
-          toast.error(res.error);
-        }
+        setIsOnWatchlist(wasOnWatchlist); // rollback
+        toast.error(res.error);
       }
     } catch (err) {
       console.error('Watchlist error:', err);
+      setIsOnWatchlist(wasOnWatchlist); // rollback
       toast.error('Unbekannter Fehler.');
     } finally {
       wlRef.current = false;

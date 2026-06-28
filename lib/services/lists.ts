@@ -5,6 +5,15 @@ import type { CreateListInput, AddListItemInput } from '@/lib/validation/lists';
 
 type Client = SupabaseClient<Database>;
 
+/** Listen eines Nutzers (für Server Components). */
+export async function getLists(supabase: Client, userId: string) {
+  return await supabase
+    .from('custom_lists')
+    .select('*')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false });
+}
+
 export async function createList(supabase: Client, userId: string, input: CreateListInput) {
   return await supabase
     .from('custom_lists')

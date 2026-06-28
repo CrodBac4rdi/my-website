@@ -3,7 +3,7 @@
 //  AUTO-GENERIERT aus dem Supabase-Schema. NICHT manuell editieren.
 //  Neu generieren via Supabase MCP `generate_typescript_types`
 //  oder: npx supabase gen types typescript --project-id phrpjjuhwvanqfzcfxxg
-//  Stand: nach Migration 20260627214604 (DB-Härtung).
+//  Stand: nach Activity-Feed + Notifications-Trigger Migrationen.
 // ============================================================
 
 export type Json =
@@ -277,6 +277,62 @@ export type Database = {
           },
         ]
       }
+      user_activities: {
+        Row: {
+          activity_type: string
+          created_at: string
+          id: string
+          media_id: number | null
+          metadata: Json | null
+          user_id: string
+        }
+        Insert: {
+          activity_type: string
+          created_at?: string
+          id?: string
+          media_id?: number | null
+          metadata?: Json | null
+          user_id: string
+        }
+        Update: {
+          activity_type?: string
+          created_at?: string
+          id?: string
+          media_id?: number | null
+          metadata?: Json | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_activities_media_id_fkey"
+            columns: ["media_id"]
+            isOneToOne: false
+            referencedRelation: "media"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_activities_media_id_fkey"
+            columns: ["media_id"]
+            isOneToOne: false
+            referencedRelation: "media_community_stats"
+            referencedColumns: ["media_id"]
+          },
+          {
+            foreignKeyName: "user_activities_media_id_fkey"
+            columns: ["media_id"]
+            isOneToOne: false
+            referencedRelation: "watchlist_with_media"
+            referencedColumns: ["media_id"]
+          },
+          {
+            foreignKeyName: "user_activities_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_watchlist: {
         Row: {
           created_at: string
@@ -341,6 +397,49 @@ export type Database = {
       }
     }
     Views: {
+      activity_feed: {
+        Row: {
+          activity_type: string | null
+          created_at: string | null
+          id: string | null
+          media_cover: string | null
+          media_id: number | null
+          media_title: string | null
+          media_type: string | null
+          metadata: Json | null
+          user_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_activities_media_id_fkey"
+            columns: ["media_id"]
+            isOneToOne: false
+            referencedRelation: "media"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_activities_media_id_fkey"
+            columns: ["media_id"]
+            isOneToOne: false
+            referencedRelation: "media_community_stats"
+            referencedColumns: ["media_id"]
+          },
+          {
+            foreignKeyName: "user_activities_media_id_fkey"
+            columns: ["media_id"]
+            isOneToOne: false
+            referencedRelation: "watchlist_with_media"
+            referencedColumns: ["media_id"]
+          },
+          {
+            foreignKeyName: "user_activities_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       media_community_stats: {
         Row: {
           avg_rating: number | null

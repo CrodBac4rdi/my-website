@@ -9,6 +9,15 @@ export async function getProfile(supabase: Client, userId: string) {
   return await supabase.from('profiles').select('*').eq('id', userId).single();
 }
 
+/** Aggregierte Watchlist-Statistiken (View user_watchlist_stats, own-only via RLS). */
+export async function getWatchlistStats(supabase: Client, userId: string) {
+  return await supabase
+    .from('user_watchlist_stats')
+    .select('*')
+    .eq('user_id', userId)
+    .maybeSingle();
+}
+
 /** Letzte N Watchlist-Einträge für die Profil-Vorschau. */
 export async function getRecentWatchlist(supabase: Client, userId: string, limit = 6) {
   return await supabase

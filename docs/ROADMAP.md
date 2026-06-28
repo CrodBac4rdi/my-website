@@ -9,14 +9,15 @@ Status: ⬜ offen · 🟡 in Arbeit · ✅ fertig
 
 ---
 
-## Meilenstein 1 — Quick Wins (sofort spürbar, kleiner Aufwand)
+## Meilenstein 1 — Quick Wins ✅ ERLEDIGT
 
-| # | Feature | Aufwand | AI? | Notiz |
-|---|---------|---------|-----|-------|
-| 1.1 | **Loading-Skeletons statt Spinner** | S | nein | `SkeletonCard`/`SkeletonRow`; in Grid, Detail, Listen, Reviews, Watchlist. War im Design-System vorgesehen. |
-| 1.2 | **Banner-Picker** (Anime-Backdrops) | S | nein | Gleiche TMDB-Backdrops wie die App-Hintergründe als Banner-Auswahl. `image.tmdb.org` ist schon in der Allowlist. Reuse von `BackgroundGallery`-Logik. |
-| 1.3 | **Trending-diese-Woche-Rail** | S | nein | TMDB `/trending/tv/week` (+ Anime-Filter `with_genres=16`, `original_language=ja`). Rail auf der Startseite. |
-| 1.4 | **Watchlist-Stats im Profil** | S | nein | DB-View `user_watchlist_stats` + `get_user_watchlist_stats` existieren bereits → nur anzeigen (Counts pro Status, Ø-Rating, Mini-Balken/Donut). |
+| # | Feature | Status | Notiz |
+|---|---------|--------|-------|
+| 1.1 | **Loading-Skeletons statt Spinner** | ✅ | `components/Skeletons.tsx` + route-`loading.tsx` (watchlist/lists/profile/media). |
+| 1.2 | **Banner-Picker** (Anime-Backdrops) | ✅ | `BannerPicker` zieht Backdrops via `/api/discover`, setzt TMDB-Original-URL. |
+| 1.3 | **Trending-diese-Woche-Rail** | ✅ | `getTrendingWeek()` (`/trending/tv/week`, Anime-gefiltert) → Rail auf der Home. |
+| 1.4 | **Watchlist-Stats im Profil** | ✅ | View `user_watchlist_stats` → Stat-Tiles (Gesamt, Abgeschlossen, Schaut, Geplant, Ø-Rating). |
+| 3.1 | **Profil-Layout neu arrangiert** | ✅ | Identität → Stats → Bearbeiten (ausklappbar) → Watchlist → Aktivität → Danger Zone. |
 
 ---
 
@@ -34,8 +35,8 @@ Status: ⬜ offen · 🟡 in Arbeit · ✅ fertig
 
 | # | Feature | Aufwand | AI? | Notiz |
 |---|---------|---------|-----|-------|
-| 3.1 | **Profil-Layout neu arrangieren** | M | nein | Reihenfolge: Header (Banner+Avatar) → **Stats** → Watchlist-Vorschau → Aktivität → Edit-Form → Danger Zone. Damit Stats (M1.4) nicht „käse" wirken. |
-| 3.2 | **Chibi-Anime-Avatare** | M | nein | ⚠️ **Quellen-Entscheidung nötig:** (a) SFW-Anime-PFP-API (z.B. `nekos.best` — echte Anime-Artworks, Host in Allowlist aufnehmen, **nur SFW-Endpunkte**) oder (b) kuratiertes Set mitgelieferter Chibi-Illustrationen. Beides ohne AI. **Empfehlung:** (a) für Vielfalt, mit SFW-Filter. |
+| 3.1 | **Profil-Layout neu arrangieren** | ✅ erledigt (siehe M1) | — |
+| 3.2 | **Chibi-Anime-Avatare** | M | nein | **Entschieden:** `nekos.best` als Quelle, **alle SFW-Kategorien** anbieten, nach Kategorie sortiert. Host `nekos.best`/CDN in die Bild-Allowlist aufnehmen. (Ergänzt/ersetzt den DiceBear-Picker.) |
 
 ---
 
@@ -43,8 +44,8 @@ Status: ⬜ offen · 🟡 in Arbeit · ✅ fertig
 
 | # | Feature | Aufwand | AI? | Notiz |
 |---|---------|---------|-----|-------|
-| 4.1 | **Profil-Sichtbarkeit (privat/öffentlich)** | S–M | nein | Neue Spalte `profiles.is_public` (Default **false** = privat) + RLS-Anpassung. UX wie GitHub-Repos: klar sichtbarer Status + leichter Toggle, **ohne** schweres „bist du sicher?". |
-| 4.2 | **Öffentliche Profile `/u/[username]`** | M | nein | Zeigt öffentliche Listen + Stats (+ optional Watchlist). Greift auf `is_public`. |
+| 4.1 | **Profil-Sichtbarkeit (privat/öffentlich)** | S–M | nein | Neue Spalte `profiles.is_public` (Default **false** = privat) + RLS. UX wie GitHub-Repos: klar sichtbarer Status + leichter Toggle, **ohne** schweres „bist du sicher?". **Entschieden:** ist das Profil öffentlich, sind **Username + Profilbild + Watchlist immer sichtbar** (Pflicht); alles andere (Stats, Bio, Listen, Aktivität) **pro Feld optional** umschaltbar → braucht Sichtbarkeits-Flags (z.B. `profiles.public_fields jsonb`). |
+| 4.2 | **Öffentliche Profile `/u/[username]`** | M | nein | Gäste-Ansicht; zeigt Pflicht-Felder + die optional freigegebenen. Greift auf `is_public` + `public_fields`. |
 | 4.3 | **Listen öffentlich teilen** | S–M | nein | `custom_lists.is_public` + `public_lists_view` existieren schon, RLS erlaubt öffentliche Listen bereits. Fehlt: Sichtbarkeits-Toggle in der Liste + Teilen-Button + Gäste-Ansicht von `/lists/[id]`. |
 | 4.4 | **Follower + Social-Activity-Feed** | L | nein | `follows`-Tabelle (follower_id, following_id). Feed der Gefolgten — `user_activities` existiert (aktuell own-only), bräuchte Policy für Follower-Sichtbarkeit. Größtes Stück. |
 

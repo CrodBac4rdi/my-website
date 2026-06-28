@@ -59,6 +59,18 @@ export async function getTrendingAnime(page = 1, genreId?: string) {
   return fetchTMDB('/discover/tv', params);
 }
 
+/** Diese Woche angesagte Anime (TMDB /trending/tv/week, gefiltert auf Anime). */
+export async function getTrendingWeek() {
+  const data = await fetchTMDB('/trending/tv/week', {});
+  return (data?.results ?? []).filter(
+    (r: any) =>
+      r.original_language === 'ja' &&
+      Array.isArray(r.genre_ids) &&
+      r.genre_ids.includes(16) &&
+      r.poster_path
+  );
+}
+
 export async function getAiringAnime(page = 1) {
   const today = new Date();
   const nextWeek = new Date();

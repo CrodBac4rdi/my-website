@@ -57,7 +57,7 @@ export function BackgroundProvider({ children }: { children: React.ReactNode }) 
         ) : shouldRenderBackground ? (
           /* FALLBACK DEFAULT BACKGROUND */
           <>
-            <div className="absolute left-0 right-0 top-[-10%] m-auto h-[500px] w-full max-w-[1500px] rounded-full bg-blue-600/20 opacity-50 blur-[120px]"></div>
+            <div className="absolute left-0 right-0 top-[-10%] m-auto h-[500px] w-full max-w-[1500px] rounded-full bg-primary-600/20 opacity-50 blur-[120px]"></div>
             <div className="absolute -left-40 bottom-[-10%] h-[600px] w-[800px] rounded-full bg-purple-600/20 opacity-50 blur-[150px]"></div>
           </>
         ) : null}

@@ -121,7 +121,7 @@ export default function Header() {
       {/* MOBILE MENU OVERLAY */}
       {isMobileMenuOpen && (
         <div className="lg:hidden absolute top-[80px] left-0 w-full px-4 pointer-events-auto">
-          <div className="bg-slate-900/95 backdrop-blur-2xl border border-white/10 p-5 rounded-3xl shadow-2xl flex flex-col gap-3">
+          <div className="bg-elev/95 backdrop-blur-2xl border border-white/10 p-5 rounded-3xl shadow-2xl flex flex-col gap-3">
             <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="px-4 py-3 rounded-xl text-lg font-bold text-white hover:bg-white/10 transition-colors">{t('nav.home')}</Link>
             {user && <Link href="/watchlist" onClick={() => setIsMobileMenuOpen(false)} className="px-4 py-3 rounded-xl text-lg font-bold text-white hover:bg-white/10 flex items-center gap-3 transition-colors"><Bookmark size={20} />{t('nav.watchlist')}</Link>}
             <Link href="/search" onClick={() => setIsMobileMenuOpen(false)} className="px-4 py-3 rounded-xl text-lg font-bold text-white hover:bg-white/10 flex items-center gap-3 transition-colors"><Search size={20} />{t('nav.search')}</Link>
@@ -143,17 +143,17 @@ export default function Header() {
             {user ? (
               <div className="flex items-center justify-between px-2">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                  <div className="w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center">
                     <User size={16} className="text-white" />
                   </div>
-                  <span className="text-sm font-bold text-slate-300 truncate max-w-[180px]">{user.email}</span>
+                  <span className="text-sm font-bold text-muted truncate max-w-[180px]">{user.email}</span>
                 </div>
                 <button onClick={() => { handleLogout(); setIsMobileMenuOpen(false); }} className="p-3 bg-red-500/10 border border-red-500/20 text-red-400 rounded-xl hover:bg-red-500/20">
                   <LogOut size={20} />
                 </button>
               </div>
             ) : (
-              <Link href="/login" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center justify-center gap-2 bg-blue-600 text-white hover:bg-blue-500 py-3 rounded-2xl font-black uppercase tracking-widest text-sm transition-all shadow-xl shadow-blue-500/20">
+              <Link href="/login" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center justify-center gap-2 bg-primary-600 text-white hover:bg-primary-500 py-3 rounded-2xl font-black uppercase tracking-widest text-sm transition-all shadow-glow">
                 <LogIn size={18} /> {t('nav.login')}
               </Link>
             )}

@@ -53,26 +53,26 @@ export default function ListsClient({ initialLists }: { initialLists: CustomList
   return (
     <div className="max-w-5xl mx-auto pb-20 space-y-12 pt-8">
       <div className="flex items-center justify-between">
-        <h1 className="text-4xl font-black flex items-center gap-4">
-          <List className="text-blue-500" size={40} /> Meine Listen
+        <h1 className="font-display text-4xl font-bold flex items-center gap-4">
+          <List className="text-primary-500" size={40} /> Meine Listen
         </h1>
       </div>
 
-      <div className="bg-slate-900/50 border border-slate-800 p-8 rounded-3xl">
-        <h3 className="text-lg font-bold mb-4 text-slate-300">Neue Liste erstellen</h3>
+      <div className="bg-elev/50 border border-line p-8 rounded-3xl">
+        <h3 className="text-lg font-bold mb-4 text-muted">Neue Liste erstellen</h3>
         <form onSubmit={handleCreateList} className="flex gap-4">
           <input
             type="text"
             value={newListName}
             onChange={e => setNewListName(e.target.value)}
             placeholder="Name der Liste (z.B. Comfort-Animes)"
-            className="flex-1 bg-black border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500"
+            className="flex-1 bg-black border border-line rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary-500"
             required
           />
           <button
             type="submit"
             disabled={creating}
-            className="bg-blue-600 hover:bg-blue-500 text-white font-bold px-6 py-3 rounded-xl flex items-center gap-2 transition-colors disabled:opacity-50"
+            className="bg-primary-600 hover:bg-primary-500 text-white font-bold px-6 py-3 rounded-xl flex items-center gap-2 transition-colors disabled:opacity-50"
           >
             {creating ? <Loader2 className="animate-spin" size={20} /> : <Plus size={20} />}
             Erstellen
@@ -81,7 +81,7 @@ export default function ListsClient({ initialLists }: { initialLists: CustomList
       </div>
 
       {lists.length === 0 ? (
-        <p className="text-slate-500 text-center py-10">
+        <p className="text-faint text-center py-10">
           Noch keine Listen. Erstelle deine erste oben.
         </p>
       ) : (
@@ -89,24 +89,24 @@ export default function ListsClient({ initialLists }: { initialLists: CustomList
           {lists.map(list => (
             <div
               key={list.id}
-              className="bg-slate-900 border border-slate-800 rounded-3xl p-6 group hover:border-blue-500/50 transition-colors flex flex-col justify-between h-48"
+              className="bg-elev border border-line rounded-3xl p-6 group hover:border-primary-500/50 transition-colors flex flex-col justify-between h-48"
             >
               <div>
                 <h3 className="text-xl font-bold mb-2">{list.name}</h3>
-                <p className="text-slate-500 text-sm line-clamp-2">
+                <p className="text-faint text-sm line-clamp-2">
                   {list.description || 'Keine Beschreibung'}
                 </p>
               </div>
               <div className="flex items-center justify-between mt-4">
                 <button
                   onClick={() => handleDelete(list.id)}
-                  className="text-slate-600 hover:text-red-400 p-2 transition-colors"
+                  className="text-faint hover:text-danger p-2 transition-colors"
                 >
                   <Trash2 size={18} />
                 </button>
                 <Link
                   href={`/lists/${list.id}`}
-                  className="text-blue-400 font-bold text-sm hover:underline"
+                  className="text-primary-400 font-bold text-sm hover:underline"
                 >
                   Ansehen &rarr;
                 </Link>

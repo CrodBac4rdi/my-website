@@ -56,33 +56,33 @@ export default function ProfileClient({
   return (
     <div className="space-y-8 pb-20 max-w-5xl mx-auto">
       {/* BANNER */}
-      <div className="relative h-64 md:h-80 rounded-3xl overflow-hidden border border-slate-800 bg-slate-900">
+      <div className="relative h-64 md:h-80 rounded-3xl overflow-hidden border border-line bg-elev">
         {profile?.banner_url ? (
           <img src={profile.banner_url} alt="Banner" className="w-full h-full object-cover" />
         ) : (
-          <div className="w-full h-full bg-gradient-to-tr from-blue-900 to-purple-900 opacity-50" />
+          <div className="w-full h-full bg-gradient-to-tr from-primary-700 to-purple-900 opacity-50" />
         )}
       </div>
 
       <div className="px-4 md:px-12 flex flex-col md:flex-row gap-8 relative -mt-20 z-10">
         {/* AVATAR */}
-        <div className="relative w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-[#060711] bg-slate-800 overflow-hidden shrink-0 shadow-2xl">
+        <div className="relative w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-[#060711] bg-surface-3 overflow-hidden shrink-0 shadow-2xl">
           {profile?.avatar_url ? (
             <img src={profile.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-slate-500 text-4xl font-black uppercase">
+            <div className="w-full h-full flex items-center justify-center text-faint text-4xl font-black uppercase">
               {profile?.username?.charAt(0) || '?'}
             </div>
           )}
         </div>
 
         {/* FORM */}
-        <div className="flex-1 space-y-6 pt-4 md:pt-24 bg-slate-900/50 p-8 rounded-3xl border border-slate-800 backdrop-blur-md">
+        <div className="flex-1 space-y-6 pt-4 md:pt-24 bg-elev/50 p-8 rounded-3xl border border-line backdrop-blur-md">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-bold">Profil bearbeiten</h2>
             <button
               onClick={handleLogout}
-              className="text-red-400 hover:text-red-300 flex items-center gap-2 text-sm font-bold bg-red-500/10 px-4 py-2 rounded-xl"
+              className="text-danger hover:text-danger flex items-center gap-2 text-sm font-bold bg-danger/10 px-4 py-2 rounded-xl"
             >
               <LogOut size={16} /> Logout
             </button>
@@ -90,52 +90,52 @@ export default function ProfileClient({
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
-              <label className="text-xs font-bold text-slate-500 uppercase">
+              <label className="text-xs font-bold text-faint uppercase">
                 Benutzername
-                <span className="ml-2 text-slate-600 normal-case font-normal">3–30 Zeichen, a-z 0-9 _</span>
+                <span className="ml-2 text-faint normal-case font-normal">3–30 Zeichen, a-z 0-9 _</span>
               </label>
               <input
                 value={profile?.username || ''}
                 onChange={e => setProfile({ ...profile, username: e.target.value })}
-                className="w-full bg-black border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500"
+                className="w-full bg-black border border-line rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary-500"
                 placeholder="Dein Name"
                 maxLength={30}
               />
             </div>
 
             <div className="space-y-2">
-              <label className="text-xs font-bold text-slate-500 uppercase">Avatar URL</label>
+              <label className="text-xs font-bold text-faint uppercase">Avatar URL</label>
               <input
                 value={profile?.avatar_url || ''}
                 onChange={e => setProfile({ ...profile, avatar_url: e.target.value })}
-                className="w-full bg-black border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500"
+                className="w-full bg-black border border-line rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary-500"
                 placeholder="https://..."
                 type="url"
               />
             </div>
 
             <div className="space-y-2 md:col-span-2">
-              <label className="text-xs font-bold text-slate-500 uppercase">Banner URL</label>
+              <label className="text-xs font-bold text-faint uppercase">Banner URL</label>
               <input
                 value={profile?.banner_url || ''}
                 onChange={e => setProfile({ ...profile, banner_url: e.target.value })}
-                className="w-full bg-black border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500"
+                className="w-full bg-black border border-line rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary-500"
                 placeholder="https://..."
                 type="url"
               />
             </div>
 
             <div className="space-y-2 md:col-span-2">
-              <label className="text-xs font-bold text-slate-500 uppercase">
+              <label className="text-xs font-bold text-faint uppercase">
                 Bio
-                <span className="ml-2 text-slate-600 normal-case font-normal">
+                <span className="ml-2 text-faint normal-case font-normal">
                   {(profile?.bio || '').length}/500
                 </span>
               </label>
               <textarea
                 value={profile?.bio || ''}
                 onChange={e => setProfile({ ...profile, bio: e.target.value })}
-                className="w-full bg-black border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 min-h-[100px] resize-none"
+                className="w-full bg-black border border-line rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary-500 min-h-[100px] resize-none"
                 placeholder="Erzähl etwas über dich..."
                 maxLength={500}
               />
@@ -146,7 +146,7 @@ export default function ProfileClient({
             <button
               onClick={handleSave}
               disabled={saving}
-              className="bg-blue-600 hover:bg-blue-500 text-white font-bold px-8 py-3 rounded-xl flex items-center gap-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="bg-primary-600 hover:bg-primary-500 text-white font-bold px-8 py-3 rounded-xl flex items-center gap-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {saving ? <Loader2 className="animate-spin" size={20} /> : <CheckCircle2 size={20} />}
               Profil speichern
@@ -179,14 +179,14 @@ export default function ProfileClient({
             })}
           </div>
         ) : (
-          <p className="text-slate-500">Noch keine Titel vorhanden.</p>
+          <p className="text-faint">Noch keine Titel vorhanden.</p>
         )}
       </div>
 
       {/* ACTIVITY FEED */}
       <div className="px-4 md:px-0 space-y-6 pt-12">
         <h3 className="text-2xl font-bold flex items-center gap-3">
-          <Activity className="text-blue-500" size={24} /> Deine Aktivität
+          <Activity className="text-primary-500" size={24} /> Deine Aktivität
         </h3>
         <ActivityFeed />
       </div>

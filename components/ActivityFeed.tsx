@@ -26,11 +26,11 @@ const VERBS: Record<string, string> = {
 
 function iconFor(type: string) {
   switch (type) {
-    case 'added_to_watchlist': return <Bookmark size={16} className="text-blue-400" />;
+    case 'added_to_watchlist': return <Bookmark size={16} className="text-primary-400" />;
     case 'completed':          return <CheckCircle2 size={16} className="text-purple-400" />;
     case 'reviewed':           return <Star size={16} className="text-yellow-400" />;
     case 'created_list':       return <ListPlus size={16} className="text-green-400" />;
-    default:                   return <Activity size={16} className="text-slate-400" />;
+    default:                   return <Activity size={16} className="text-muted" />;
   }
 }
 
@@ -55,13 +55,13 @@ export default function ActivityFeed() {
   if (loading) {
     return (
       <div className="flex justify-center py-10">
-        <Loader2 className="animate-spin text-blue-500" size={28} />
+        <Loader2 className="animate-spin text-primary-500" size={28} />
       </div>
     );
   }
 
   if (items.length === 0) {
-    return <p className="text-slate-500 text-sm">Noch keine Aktivität.</p>;
+    return <p className="text-faint text-sm">Noch keine Aktivität.</p>;
   }
 
   return (
@@ -74,8 +74,8 @@ export default function ActivityFeed() {
             : a.media_title ?? 'Titel';
 
         const inner = (
-          <div className="flex items-center gap-4 bg-slate-900/40 border border-slate-800 rounded-2xl p-3 hover:border-slate-700 transition-colors">
-            <div className="w-9 h-9 rounded-xl bg-slate-800/80 flex items-center justify-center shrink-0">
+          <div className="flex items-center gap-4 bg-elev/40 border border-line rounded-2xl p-3 hover:border-line-strong transition-colors">
+            <div className="w-9 h-9 rounded-xl bg-surface-3/80 flex items-center justify-center shrink-0">
               {iconFor(a.activity_type)}
             </div>
             {a.media_cover && (
@@ -86,10 +86,10 @@ export default function ActivityFeed() {
               />
             )}
             <div className="min-w-0 flex-1">
-              <p className="text-sm text-slate-300 leading-tight">
+              <p className="text-sm text-muted leading-tight">
                 <span className="font-bold text-white">{title}</span> {label}
               </p>
-              <p className="text-[10px] text-slate-600 uppercase tracking-wider mt-0.5">
+              <p className="text-[10px] text-faint uppercase tracking-wider mt-0.5">
                 {new Date(a.created_at).toLocaleDateString('de-DE')}
               </p>
             </div>

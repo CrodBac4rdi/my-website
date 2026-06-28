@@ -22,7 +22,7 @@ export default async function MediaDetail({
     return (
       <div className="flex flex-col items-center justify-center py-40 gap-4">
         <h2 className="text-3xl font-bold">Inhalt nicht gefunden</h2>
-        <Link href="/" className="text-blue-400 hover:underline">
+        <Link href="/" className="text-primary-400 hover:underline">
           Zurück zur Übersicht
         </Link>
       </div>
@@ -38,7 +38,7 @@ export default async function MediaDetail({
   const nextEpisode = media.next_episode_to_air;
 
   return (
-    <div className="space-y-16 pb-32 text-slate-200 relative min-h-screen">
+    <div className="space-y-16 pb-32 text-fg relative min-h-screen">
 
       {/* IMMERSIVE FULLSCREEN BACKGROUND */}
       <div className="fixed inset-0 z-[-1] pointer-events-none">
@@ -79,7 +79,7 @@ export default async function MediaDetail({
 
           {providers && (
             <div className="space-y-4 pt-4 border-t border-white/10">
-              <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+              <h3 className="text-sm font-bold text-muted uppercase tracking-widest flex items-center gap-2">
                 <Globe size={16} className="text-green-400" /> Streaming (DE)
               </h3>
               {providers.flatrate ? (
@@ -99,7 +99,7 @@ export default async function MediaDetail({
                   ))}
                 </div>
               ) : (
-                <p className="text-sm font-medium text-slate-500">
+                <p className="text-sm font-medium text-faint">
                   Kein Flatrate-Streaming in DE verfügbar.
                 </p>
               )}
@@ -116,14 +116,14 @@ export default async function MediaDetail({
               {media.genres?.map((genre: any) => (
                 <span
                   key={genre.id}
-                  className="text-slate-300 font-bold text-xs uppercase tracking-widest bg-white/5 px-3 py-1 rounded-full border border-white/10 backdrop-blur-sm"
+                  className="text-muted font-bold text-xs uppercase tracking-widest bg-white/5 px-3 py-1 rounded-full border border-white/10 backdrop-blur-sm"
                 >
                   {genre.name}
                 </span>
               ))}
             </div>
 
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-black uppercase tracking-tight text-white leading-none drop-shadow-2xl">
+            <h1 className="font-display text-5xl md:text-7xl lg:text-8xl font-bold uppercase tracking-tight text-white leading-none drop-shadow-2xl">
               {media.name || media.title}
             </h1>
 
@@ -138,7 +138,7 @@ export default async function MediaDetail({
             )}
 
             {media.tagline && (
-              <p className="text-blue-400/80 font-medium text-xl md:text-2xl italic max-w-3xl leading-relaxed">
+              <p className="text-primary-400/80 font-medium text-xl md:text-2xl italic max-w-3xl leading-relaxed">
                 &ldquo;{media.tagline}&rdquo;
               </p>
             )}
@@ -151,12 +151,12 @@ export default async function MediaDetail({
                   {media.vote_average?.toFixed(1) || 'N/A'}
                 </span>
               </div>
-              <div className="flex items-center gap-2 text-slate-300">
-                <MonitorPlay size={20} className="text-slate-400" />
+              <div className="flex items-center gap-2 text-muted">
+                <MonitorPlay size={20} className="text-muted" />
                 <span className="font-medium text-lg">{media.status}</span>
               </div>
-              <div className="flex items-center gap-2 text-slate-300">
-                <Calendar size={20} className="text-slate-400" />
+              <div className="flex items-center gap-2 text-muted">
+                <Calendar size={20} className="text-muted" />
                 <span className="font-medium text-lg">
                   {media.first_air_date?.split('-')[0] ||
                     media.release_date?.split('-')[0] ||
@@ -164,14 +164,14 @@ export default async function MediaDetail({
                 </span>
               </div>
               {media.number_of_episodes && (
-                <div className="flex items-center gap-2 text-slate-300">
-                  <Clock size={20} className="text-slate-400" />
+                <div className="flex items-center gap-2 text-muted">
+                  <Clock size={20} className="text-muted" />
                   <span className="font-medium text-lg">{media.number_of_episodes} Eps.</span>
                 </div>
               )}
               {media.runtime && (
-                <div className="flex items-center gap-2 text-slate-300">
-                  <Clock size={20} className="text-slate-400" />
+                <div className="flex items-center gap-2 text-muted">
+                  <Clock size={20} className="text-muted" />
                   <span className="font-medium text-lg">{media.runtime} Min.</span>
                 </div>
               )}
@@ -182,10 +182,10 @@ export default async function MediaDetail({
 
             {/* STORY */}
             <div className="lg:col-span-2 space-y-4">
-              <h3 className="text-lg font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+              <h3 className="text-lg font-bold text-muted uppercase tracking-widest flex items-center gap-2">
                 <Info size={18} /> Handlung
               </h3>
-              <p className="text-slate-300 font-medium text-lg leading-relaxed max-w-4xl">
+              <p className="text-muted font-medium text-lg leading-relaxed max-w-4xl">
                 {media.overview || 'Keine Beschreibung verfügbar.'}
               </p>
             </div>
@@ -193,7 +193,7 @@ export default async function MediaDetail({
             {/* TRAILER */}
             {trailer && (
               <div className="space-y-4">
-                <h3 className="text-lg font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                <h3 className="text-lg font-bold text-muted uppercase tracking-widest flex items-center gap-2">
                   <PlayCircle size={18} /> Trailer
                 </h3>
                 <div className="rounded-2xl overflow-hidden ring-1 ring-white/10 aspect-video bg-black/50 shadow-2xl">
@@ -213,13 +213,13 @@ export default async function MediaDetail({
             {/* CAST */}
             {cast && cast.length > 0 && (
               <div className="space-y-4">
-                <h3 className="text-lg font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                <h3 className="text-lg font-bold text-muted uppercase tracking-widest flex items-center gap-2">
                   <Users size={18} /> Besetzung
                 </h3>
                 <div className="flex flex-col gap-3">
                   {cast.slice(0, 5).map((person: any) => (
                     <div key={person.id} className="flex items-center gap-4 group">
-                      <div className="w-12 h-12 rounded-full overflow-hidden bg-slate-800 shrink-0 ring-1 ring-white/10">
+                      <div className="w-12 h-12 rounded-full overflow-hidden bg-surface-3 shrink-0 ring-1 ring-white/10">
                         {person.profile_path ? (
                           <img
                             src={getImageUrl(person.profile_path, 'w500')}
@@ -227,14 +227,14 @@ export default async function MediaDetail({
                             className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
                           />
                         ) : (
-                          <Users size={20} className="text-slate-500 m-auto h-full" />
+                          <Users size={20} className="text-faint m-auto h-full" />
                         )}
                       </div>
                       <div>
-                        <p className="font-bold text-white text-base leading-tight group-hover:text-blue-400 transition-colors">
+                        <p className="font-bold text-white text-base leading-tight group-hover:text-primary-400 transition-colors">
                           {person.name}
                         </p>
-                        <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">
+                        <p className="text-xs font-medium text-faint uppercase tracking-wider">
                           {person.character}
                         </p>
                       </div>

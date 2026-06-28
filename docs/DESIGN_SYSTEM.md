@@ -78,9 +78,12 @@ wird **vollständig entfernt**.
 - ✅ Fundament: Tokens (`globals.css`), `@theme`, Fonts (next/font), `.glass`, Body auf Tokens
 - ✅ Watchlist-Button (Brutalist → Primary/Danger), Toast (System-Spec)
 - ✅ AnimeCard (Karten-Spec: rounded-lg, border-line, Hover-Lift + shadow-pop, Gold-Rating, Primary-Actions)
-- ✅ Header/Nav (Glas-Container, Primary-Logo/Login, Danger-Soft-Logout, Token-Links)
-- ⬜ Inputs, Tabs/Chips, Dropdown (HeaderGenreFilter), Empty-States, Skeletons
-- ⬜ Screen-Politur (Home/Hero, Suche, Hintergründe, Legal, Profil, Browse-Grid)
-- ⬜ Headings auf `font-display` (Space Grotesk) umstellen
-- ⬜ Mobile-Nav (Bottom-Tab-Bar laut Spec)
-- ⬜ Cleanup: Legacy-Accent-Tokens entfernen, wenn keine Komponente sie mehr nutzt
+- ✅ Header/Nav (Glas-Container, Primary-Logo/Login, Danger-Soft-Logout, Token-Links; Desktop + Mobile)
+- ✅ App-weiter Token-Sweep: alle Screens/Komponenten auf bg/elev/surface, border-line, primary, success/danger, faint/muted/fg umgestellt; Brutalism + Neon (pink/accent) entfernt
+- ✅ Login + Suche: Inputs nach Spec, Primary-Buttons, font-display-Titel
+- ✅ Große Titel (H1/H2/Sektionen) auf `font-display` (Space Grotesk)
+- ⬜ Feinschliff optional: Segmented-Tabs-Pille, Skeletons, Mobile-Bottom-Tab-Bar, Light-Mode-Politur der Bild-Overlays
+- ⬜ Cleanup: Legacy-Accent-Tokens (`--accent-*`) aus globals entfernen (aktuell ungenutzt, schaden aber nicht)
+
+> Status-Coding der Watchlist (blau/grün/lila/rot/gelb in `AnimeCard`) bleibt bewusst mehrfarbig
+> für schnelles Scannen — das ist kein Brutalism-Relikt, sondern Status-Semantik (immer mit Label).

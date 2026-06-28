@@ -10,15 +10,15 @@ export default function BackgroundGallery({ backgrounds }: { backgrounds: any[] 
   return (
     <div className="space-y-8">
       {/* Action Bar */}
-      <div className="flex items-center justify-between bg-slate-900/50 backdrop-blur-xl border border-white/10 p-4 rounded-3xl">
-        <div className="flex items-center gap-3 text-slate-300 font-medium px-2">
-           <ImageIcon size={20} className="text-blue-500" />
+      <div className="flex items-center justify-between bg-elev/50 backdrop-blur-xl border border-white/10 p-4 rounded-3xl">
+        <div className="flex items-center gap-3 text-muted font-medium px-2">
+           <ImageIcon size={20} className="text-primary-500" />
            {backgroundUrl ? "Ein Hintergrund ist aktiv." : "Standard-Hintergrund ist aktiv."}
         </div>
         {backgroundUrl && (
           <button 
             onClick={() => setBackgroundUrl(null)}
-            className="flex items-center gap-2 bg-red-500/10 text-red-400 hover:bg-red-500/20 hover:text-red-300 px-4 py-2 rounded-xl font-bold transition-all"
+            className="flex items-center gap-2 bg-danger/10 text-danger hover:bg-danger/20 hover:text-danger px-4 py-2 rounded-xl font-bold transition-all"
           >
             <XCircle size={18} /> Zurücksetzen
           </button>
@@ -37,7 +37,7 @@ export default function BackgroundGallery({ backgrounds }: { backgrounds: any[] 
               onClick={() => setBackgroundUrl(url)}
               className={`relative aspect-video rounded-3xl overflow-hidden group border-4 transition-all duration-300 ${
                 isActive 
-                  ? 'border-blue-500 shadow-[0_0_30px_rgba(59,130,246,0.5)] scale-105 z-10' 
+                  ? 'border-primary-500 shadow-[0_0_30px_rgba(59,130,246,0.5)] scale-105 z-10' 
                   : 'border-white/5 hover:border-white/30 hover:scale-105'
               }`}
             >
@@ -53,7 +53,7 @@ export default function BackgroundGallery({ backgrounds }: { backgrounds: any[] 
               </div>
               
               {isActive && (
-                <div className="absolute top-3 right-3 bg-blue-500 rounded-full p-1 shadow-lg animate-in fade-in zoom-in">
+                <div className="absolute top-3 right-3 bg-primary-500 rounded-full p-1 shadow-lg animate-in fade-in zoom-in">
                   <CheckCircle2 size={24} className="text-white" />
                 </div>
               )}

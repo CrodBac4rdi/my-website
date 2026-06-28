@@ -12,10 +12,10 @@ export default async function BackgroundsPage() {
   return (
     <div className="space-y-8 pt-12 pb-32">
       <div className="text-center space-y-4 max-w-2xl mx-auto mb-16">
-        <h1 className="text-4xl md:text-6xl font-black uppercase tracking-tight text-white drop-shadow-lg">
+        <h1 className="font-display text-4xl md:text-6xl font-bold uppercase tracking-tight text-white drop-shadow-lg">
           Hintergründe
         </h1>
-        <p className="text-slate-400 font-medium text-lg">
+        <p className="text-muted font-medium text-lg">
           Wähle einen Anime aus, um sein episches Backdrop als globalen Hintergrund für die gesamte App zu setzen.
         </p>
       </div>

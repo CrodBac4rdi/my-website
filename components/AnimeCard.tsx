@@ -183,7 +183,7 @@ export default function AnimeCard({
                   />
                 </div>
               ) : (
-                <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" />
+                <div className="absolute inset-0 bg-elev/40 backdrop-blur-sm" />
               )}
 
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent p-3 flex flex-col justify-end">

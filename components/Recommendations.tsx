@@ -30,12 +30,12 @@ export default function Recommendations({ animeId }: { animeId: string }) {
     <section className="space-y-8 container mx-auto">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-blue-500/10 rounded-xl border border-blue-500/20">
-            <Sparkles className="text-blue-400" size={24} />
+          <div className="p-2 bg-primary-500/10 rounded-xl border border-primary-500/20">
+            <Sparkles className="text-primary-400" size={24} />
           </div>
-          <h2 className="text-3xl font-bold tracking-tight">Vorschläge</h2>
+          <h2 className="font-display text-3xl font-bold tracking-tight">Vorschläge</h2>
         </div>
-        <div className="h-px flex-1 bg-gradient-to-r from-slate-800 to-transparent ml-8 hidden md:block"></div>
+        <div className="h-px flex-1 bg-gradient-to-r from-line to-transparent ml-8 hidden md:block"></div>
       </div>
       
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">

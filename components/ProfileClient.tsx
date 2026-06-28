@@ -2,12 +2,15 @@
 
 import { useState, useRef } from 'react';
 import { supabase } from '@/lib/supabase';
-import { Loader2, LogOut, CheckCircle2, Activity } from 'lucide-react';
+import { Loader2, LogOut, CheckCircle2, Activity, Trash2, AlertTriangle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import AnimeCard from '@/components/AnimeCard';
 import ActivityFeed from '@/components/ActivityFeed';
+import AvatarPicker from '@/components/AvatarPicker';
+import ConfirmModal from '@/components/ConfirmModal';
 import { toast } from '@/lib/toast';
 import { updateProfileAction } from '@/lib/actions/profile';
+import { deleteAccountAction } from '@/lib/actions/account';
 
 type Profile = {
   username: string | null;
@@ -25,8 +28,23 @@ export default function ProfileClient({
 }) {
   const [profile, setProfile] = useState<Profile>(initialProfile);
   const [saving, setSaving] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const savingRef = useRef(false);
   const router = useRouter();
+
+  const handleDeleteAccount = async () => {
+    setDeleting(true);
+    const res = await deleteAccountAction();
+    if (res.ok) {
+      if (supabase) await supabase.auth.signOut();
+      toast.success('Account gelöscht.');
+      router.push('/');
+    } else {
+      toast.error(res.error);
+      setDeleting(false);
+    }
+  };
 
   const handleSave = async () => {
     if (savingRef.current) return;
@@ -103,13 +121,17 @@ export default function ProfileClient({
               />
             </div>
 
-            <div className="space-y-2">
-              <label className="text-xs font-bold text-faint uppercase">Avatar URL</label>
+            <div className="space-y-3 md:col-span-2">
+              <label className="text-xs font-bold text-faint uppercase">Profilbild</label>
+              <AvatarPicker
+                value={profile?.avatar_url || null}
+                onSelect={url => setProfile({ ...profile, avatar_url: url })}
+              />
               <input
                 value={profile?.avatar_url || ''}
                 onChange={e => setProfile({ ...profile, avatar_url: e.target.value })}
-                className="w-full bg-black border border-line rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary-500"
-                placeholder="https://..."
+                className="w-full bg-black border border-line rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-primary-500"
+                placeholder="oder eigene Bild-URL (DiceBear, TMDB, Gravatar, GitHub)"
                 type="url"
               />
             </div>
@@ -120,7 +142,7 @@ export default function ProfileClient({
                 value={profile?.banner_url || ''}
                 onChange={e => setProfile({ ...profile, banner_url: e.target.value })}
                 className="w-full bg-black border border-line rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary-500"
-                placeholder="https://..."
+                placeholder="Bild-URL (z.B. von TMDB)"
                 type="url"
               />
             </div>
@@ -185,11 +207,42 @@ export default function ProfileClient({
 
       {/* ACTIVITY FEED */}
       <div className="px-4 md:px-0 space-y-6 pt-12">
-        <h3 className="text-2xl font-bold flex items-center gap-3">
+        <h3 className="font-display text-2xl font-bold flex items-center gap-3">
           <Activity className="text-primary-500" size={24} /> Deine Aktivität
         </h3>
         <ActivityFeed />
       </div>
+
+      {/* DANGER ZONE */}
+      <div className="px-4 md:px-0 pt-12">
+        <div className="border border-danger/30 bg-danger/[.04] rounded-2xl p-6 md:p-8 space-y-4">
+          <h3 className="font-display text-xl font-bold text-danger flex items-center gap-3">
+            <AlertTriangle size={22} /> Danger Zone
+          </h3>
+          <p className="text-muted text-sm leading-relaxed max-w-xl">
+            Account löschen entfernt dein Profil, deine Watchlist, Listen, Reviews und
+            Benachrichtigungen <strong className="text-fg font-semibold">unwiderruflich</strong>.
+          </p>
+          <button
+            onClick={() => setConfirmDelete(true)}
+            className="inline-flex items-center gap-2 h-11 px-5 rounded-md text-sm font-semibold bg-danger/15 text-danger border border-danger/40 hover:bg-danger/25 transition active:scale-[.98]"
+          >
+            <Trash2 size={16} /> Account löschen
+          </button>
+        </div>
+      </div>
+
+      <ConfirmModal
+        open={confirmDelete}
+        danger
+        title="Account endgültig löschen?"
+        message="Alle deine Daten (Profil, Watchlist, Listen, Reviews, Benachrichtigungen) werden unwiderruflich gelöscht. Das kann nicht rückgängig gemacht werden."
+        confirmLabel="Account löschen"
+        requireText="LÖSCHEN"
+        loading={deleting}
+        onConfirm={handleDeleteAccount}
+        onCancel={() => setConfirmDelete(false)}
+      />
     </div>
   );
 }

@@ -49,6 +49,12 @@ export async function removeFromWatchlist(supabase: Client, userId: string, medi
   return { error };
 }
 
+/** Leert die komplette Watchlist eines Nutzers. */
+export async function clearWatchlist(supabase: Client, userId: string) {
+  const { error } = await supabase.from('user_watchlist').delete().eq('user_id', userId);
+  return { error };
+}
+
 export async function updateWatchlistEntry(
   supabase: Client,
   userId: string,

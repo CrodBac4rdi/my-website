@@ -47,7 +47,7 @@ export default async function MediaDetail({
           className="w-full h-full object-cover opacity-30 md:opacity-40"
           alt="backdrop"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#020205]/10 via-[#020205]/80 to-[#020205]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#060711]/10 via-[#060711]/80 to-[#060711]" />
       </div>
 
       {/* BACK NAVIGATION */}

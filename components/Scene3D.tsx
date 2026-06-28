@@ -51,14 +51,14 @@ function FloatingShapes() {
 
 export default function Scene3D() {
   return (
-    <div className="fixed inset-0 -z-10 bg-[#020205] overflow-hidden">
+    <div className="fixed inset-0 -z-10 bg-[#060711] overflow-hidden">
       <Canvas camera={{ position: [0, 0, 10], fov: 50 }}>
         <ambientLight intensity={0.5} />
         <pointLight position={[10, 10, 10]} />
         <spotLight position={[-10, 10, 10]} angle={0.15} penumbra={1} />
         <FloatingShapes />
       </Canvas>
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#020205]/80 pointer-events-none"></div>
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#060711]/80 pointer-events-none"></div>
     </div>
   );
 }

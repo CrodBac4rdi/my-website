@@ -43,7 +43,7 @@ export function BackgroundProvider({ children }: { children: React.ReactNode }) 
   return (
     <BackgroundContext.Provider value={{ backgroundUrl, setBackgroundUrl }}>
       {/* GLOBAL DYNAMIC BACKGROUND */}
-      <div className="fixed inset-0 z-[-2] pointer-events-none bg-[#020205] overflow-hidden transition-all duration-1000">
+      <div className="fixed inset-0 z-[-2] pointer-events-none bg-[#060711] overflow-hidden transition-all duration-1000">
         {shouldRenderBackground && backgroundUrl ? (
           <>
             <img 
@@ -52,7 +52,7 @@ export function BackgroundProvider({ children }: { children: React.ReactNode }) 
               alt="Global Backdrop" 
             />
             {/* Soft gradient to blend with content */}
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#020205]/60 to-[#020205]/95"></div>
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#060711]/60 to-[#060711]/95"></div>
           </>
         ) : shouldRenderBackground ? (
           /* FALLBACK DEFAULT BACKGROUND */

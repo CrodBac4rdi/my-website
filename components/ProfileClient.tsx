@@ -66,7 +66,7 @@ export default function ProfileClient({
 
       <div className="px-4 md:px-12 flex flex-col md:flex-row gap-8 relative -mt-20 z-10">
         {/* AVATAR */}
-        <div className="relative w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-[#020205] bg-slate-800 overflow-hidden shrink-0 shadow-2xl">
+        <div className="relative w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-[#060711] bg-slate-800 overflow-hidden shrink-0 shadow-2xl">
           {profile?.avatar_url ? (
             <img src={profile.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
           ) : (

@@ -4,8 +4,21 @@ import { useState, useEffect, useRef } from 'react';
 import { MessageSquare, Star, Send, Loader2, User, Trash2 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { toast } from '@/lib/toast';
+import { createReviewAction, deleteReviewAction } from '@/lib/actions/reviews';
 
-export default function ReviewSection({ animeId }: { animeId: string }) {
+interface ReviewSectionProps {
+  animeId: string;
+  mediaTitle: string;
+  mediaType: 'tv' | 'movie';
+  posterPath: string | null;
+}
+
+export default function ReviewSection({
+  animeId,
+  mediaTitle,
+  mediaType,
+  posterPath,
+}: ReviewSectionProps) {
   const [reviews, setReviews] = useState<any[]>([]);
   const [newReview, setNewReview] = useState('');
   const [rating, setRating] = useState(8);
@@ -54,27 +67,24 @@ export default function ReviewSection({ animeId }: { animeId: string }) {
     setSubmitting(true);
 
     try {
-      const { error } = await supabase.from('reviews').insert({
-        user_id: user.id,
-        media_id: Number(animeId),
+      const res = await createReviewAction({
+        mediaId: Number(animeId),
+        title: mediaTitle,
+        type: mediaType,
+        posterPath,
         rating,
         content: newReview.trim(),
-        is_spoiler: isSpoiler,
+        isSpoiler,
       });
 
-      if (error) {
-        if (error.code === '23505') {
-          toast.error('Du hast diesen Titel bereits bewertet.');
-        } else {
-          toast.error('Fehler beim Abschicken.');
-          console.error('Review insert error:', error);
-        }
-      } else {
+      if (res.ok) {
         toast.success('Review veröffentlicht!');
         setNewReview('');
         setIsSpoiler(false);
         setRating(8);
         await fetchReviews();
+      } else {
+        toast.error(res.error);
       }
     } finally {
       submittingRef.current = false;
@@ -83,18 +93,12 @@ export default function ReviewSection({ animeId }: { animeId: string }) {
   }
 
   async function handleDelete(reviewId: string) {
-    if (!supabase || !user) return;
-    const { error } = await supabase
-      .from('reviews')
-      .delete()
-      .eq('id', reviewId)
-      .eq('user_id', user.id);
-
-    if (error) {
-      toast.error('Fehler beim Löschen.');
-    } else {
+    const res = await deleteReviewAction(reviewId);
+    if (res.ok) {
       toast.success('Review gelöscht.');
       setReviews(prev => prev.filter(r => r.id !== reviewId));
+    } else {
+      toast.error(res.error);
     }
   }
 

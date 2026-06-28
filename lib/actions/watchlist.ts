@@ -1,7 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { createClient } from '@/lib/supabase/server';
+import { getAuthedClient } from '@/lib/actions/auth';
 import * as watchlistService from '@/lib/services/watchlist';
 import {
   addToWatchlistSchema,
@@ -17,14 +17,6 @@ import { type ActionResult, ok, fail } from '@/lib/actions/result';
  * (nicht auf den Proxy verlassen, siehe docs/ARCHITECTURE.md). Ablauf:
  * validieren (zod) → Auth (getUser) → Service → revalidate → ActionResult.
  */
-
-async function getAuthedClient() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  return { supabase, user };
-}
 
 function refreshWatchlistViews() {
   revalidatePath('/watchlist');

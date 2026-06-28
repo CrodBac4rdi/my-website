@@ -1,6 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Database } from '@/lib/database.types';
-import { getImageUrl } from '@/lib/tmdb';
+import { ensureMedia } from '@/lib/services/media';
 import type { AddToWatchlistInput, WatchlistStatus } from '@/lib/validation/watchlist';
 
 /**
@@ -13,25 +13,13 @@ import type { AddToWatchlistInput, WatchlistStatus } from '@/lib/validation/watc
  */
 type Client = SupabaseClient<Database>;
 
-/** Wandelt einen TMDB-Pfad/URL in eine DB-taugliche cover_url (http(s) oder null). */
-function toCoverUrl(posterPath: string | null): string | null {
-  if (!posterPath) return null;
-  const url = getImageUrl(posterPath);
-  return url.startsWith('http') ? url : null;
-}
-
 export async function addToWatchlist(
   supabase: Client,
   userId: string,
   input: AddToWatchlistInput
 ) {
   // 1. Media in den Cache schreiben (FK-Ziel für user_watchlist).
-  const { error: mediaError } = await supabase.from('media').upsert({
-    id: input.mediaId,
-    title: input.title,
-    type: input.type,
-    cover_url: toCoverUrl(input.posterPath),
-  });
+  const { error: mediaError } = await ensureMedia(supabase, input);
   if (mediaError) return { error: mediaError };
 
   // 2. Watchlist-Eintrag anlegen.

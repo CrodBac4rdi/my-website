@@ -5,6 +5,40 @@ import SetBackgroundButton from '@/components/SetBackgroundButton';
 import Recommendations from '@/components/Recommendations';
 import ReviewSection from '@/components/ReviewSection';
 import { getMediaDetailWithFallback, getImageUrl } from '@/lib/tmdb';
+import type { Metadata } from 'next';
+
+// Dynamische Share-Previews pro Anime (Title, Description, Backdrop als OG-Image).
+// fetch wird innerhalb desselben Requests von Next dedupliziert → kein Doppel-Call.
+export async function generateMetadata({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ type?: string }>;
+}): Promise<Metadata> {
+  const [{ id }, { type }] = await Promise.all([params, searchParams]);
+  const media = await getMediaDetailWithFallback(id, type === 'movie' ? 'movie' : 'tv');
+
+  if (!media) return { title: 'Inhalt nicht gefunden' };
+
+  const title: string = media.name || media.title || 'Anime';
+  const description: string = (media.overview || `${title} auf HORIZON entdecken und tracken.`)
+    .slice(0, 180);
+  const backdrop = getImageUrl(media.backdrop_path, 'original');
+  const images = backdrop.startsWith('http') ? [backdrop] : undefined;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title: `${title} · HORIZON`,
+      description,
+      type: 'video.tv_show',
+      images,
+    },
+    twitter: { card: 'summary_large_image', title, description, images },
+  };
+}
 
 export default async function MediaDetail({
   params,

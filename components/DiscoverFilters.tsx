@@ -9,22 +9,27 @@ interface DiscoverFiltersProps {
   initialGenre?: string;
 }
 
+const dedupe = (arr: any[]) =>
+  arr.filter((item, i, self) => self.findIndex(x => x.id === item.id) === i);
+
 export default function DiscoverFilters({ initialDiscover, initialGenre = "" }: DiscoverFiltersProps) {
-  const [discover, setDiscover] = useState<any[]>(initialDiscover);
+  const [discover, setDiscover] = useState<any[]>(() => dedupe(initialDiscover));
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const observerTarget = useRef<HTMLDivElement>(null);
+  const prevGenre = useRef(initialGenre);
 
+  // Nur bei echtem Genre-Wechsel zurücksetzen — NICHT bei einem beiläufigen
+  // Parent-Re-Render (sonst springt das Grid + verliert nachgeladene Seiten).
   useEffect(() => {
-    // Deduplizieren: TMDB kann dieselbe ID mehrfach in einem Ergebnis-Array zurückgeben
-    const deduped = initialDiscover.filter(
-      (item, i, self) => self.findIndex(x => x.id === item.id) === i
-    );
-    setDiscover(deduped);
-    setPage(1);
-    setHasMore(true);
-  }, [initialDiscover, initialGenre]);
+    if (prevGenre.current !== initialGenre) {
+      prevGenre.current = initialGenre;
+      setDiscover(dedupe(initialDiscover));
+      setPage(1);
+      setHasMore(true);
+    }
+  }, [initialGenre, initialDiscover]);
 
   const loadMore = useCallback(async () => {
     if (loading || !hasMore) return;

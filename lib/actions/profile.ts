@@ -1,6 +1,5 @@
 'use server';
 
-import { revalidatePath } from 'next/cache';
 import { getAuthedClient } from '@/lib/actions/auth';
 import * as profileService from '@/lib/services/profile';
 import { updateProfileSchema } from '@/lib/validation/profile';
@@ -24,6 +23,5 @@ export async function updateProfileAction(input: unknown): Promise<ActionResult>
     return fail('Fehler beim Speichern.');
   }
 
-  revalidatePath('/profile');
   return ok(null);
 }

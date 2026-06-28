@@ -1,6 +1,5 @@
 'use server';
 
-import { revalidatePath } from 'next/cache';
 import { getAuthedClient } from '@/lib/actions/auth';
 import * as watchlistService from '@/lib/services/watchlist';
 import {
@@ -15,13 +14,14 @@ import { type ActionResult, ok, fail } from '@/lib/actions/result';
  *
  * Jede Action ist über POST direkt erreichbar → prüft Auth selbst
  * (nicht auf den Proxy verlassen, siehe docs/ARCHITECTURE.md). Ablauf:
- * validieren (zod) → Auth (getUser) → Service → revalidate → ActionResult.
+ * validieren (zod) → Auth (getUser) → Service → ActionResult.
+ *
+ * KEIN revalidatePath: alle betroffenen Seiten (/watchlist, /profile) sind
+ * dynamisch (Cookie-Session) und re-fetchen bei Navigation ohnehin. Ein
+ * revalidatePath würde nur ein RSC-Refresh der aktuellen Seite auslösen
+ * (sichtbares Neu-Laden/Flicker beim Hinzufügen aus dem Grid). Die UI wird
+ * stattdessen optimistisch im Client aktualisiert.
  */
-
-function refreshWatchlistViews() {
-  revalidatePath('/watchlist');
-  revalidatePath('/profile');
-}
 
 export async function addToWatchlistAction(input: unknown): Promise<ActionResult> {
   const parsed = addToWatchlistSchema.safeParse(input);
@@ -37,7 +37,6 @@ export async function addToWatchlistAction(input: unknown): Promise<ActionResult
     return fail('Fehler beim Hinzufügen.');
   }
 
-  refreshWatchlistViews();
   return ok(null);
 }
 
@@ -54,7 +53,6 @@ export async function removeFromWatchlistAction(mediaId: unknown): Promise<Actio
     return fail('Fehler beim Entfernen.');
   }
 
-  refreshWatchlistViews();
   return ok(null);
 }
 
@@ -77,6 +75,5 @@ export async function updateWatchlistAction(input: unknown): Promise<ActionResul
     return fail('Aktualisierung fehlgeschlagen.');
   }
 
-  refreshWatchlistViews();
   return ok(null);
 }

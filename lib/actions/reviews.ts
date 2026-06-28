@@ -1,6 +1,5 @@
 'use server';
 
-import { revalidatePath } from 'next/cache';
 import { getAuthedClient } from '@/lib/actions/auth';
 import * as reviewsService from '@/lib/services/reviews';
 import { createReviewSchema, reviewIdSchema } from '@/lib/validation/reviews';
@@ -20,7 +19,6 @@ export async function createReviewAction(input: unknown): Promise<ActionResult> 
     return fail('Fehler beim Abschicken.');
   }
 
-  revalidatePath(`/media/${parsed.data.mediaId}`);
   return ok(null);
 }
 

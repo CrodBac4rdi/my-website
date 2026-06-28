@@ -16,14 +16,48 @@ const grotesk = Space_Grotesk({
 });
 const jbmono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-jbmono", display: "swap" });
 
+const SITE_URL = "https://imaginaryops.com";
+const SITE_DESCRIPTION =
+  "HORIZON ist dein Anime-Tracker: entdecke Serien & Filme, führe deine Watchlist mit Status und Rating, erstelle Listen und teile Reviews mit der Community.";
+
 export const metadata: Metadata = {
-  title: "HORIZON | 3D Anime Tracker",
-  description: "Die Zukunft des Anime-Trackings. Bento Brutalism trifft auf 3D.",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: "HORIZON — Anime Tracker",
+    template: "%s · HORIZON",
+  },
+  description: SITE_DESCRIPTION,
+  applicationName: "HORIZON",
+  keywords: [
+    "Anime", "Anime Tracker", "Watchlist", "Anime Liste", "Simulcast",
+    "Anime Kalender", "Reviews", "TMDB", "Serien tracken", "HORIZON",
+  ],
+  authors: [{ name: "CrodBac4rdi" }],
+  creator: "CrodBac4rdi",
   manifest: "/manifest.json",
+  alternates: { canonical: "/" },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
     title: "HORIZON",
+  },
+  openGraph: {
+    type: "website",
+    siteName: "HORIZON",
+    locale: "de_DE",
+    url: SITE_URL,
+    title: "HORIZON — Anime Tracker",
+    description: SITE_DESCRIPTION,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "HORIZON — Anime Tracker",
+    description: SITE_DESCRIPTION,
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, "max-image-preview": "large" },
   },
 };
 

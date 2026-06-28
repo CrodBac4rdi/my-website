@@ -565,6 +565,10 @@ export type Database = {
       }
     }
     Functions: {
+      delete_user: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       get_media_stats: {
         Args: { p_media_id: number }
         Returns: {

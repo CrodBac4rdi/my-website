@@ -77,3 +77,15 @@ export async function updateWatchlistAction(input: unknown): Promise<ActionResul
 
   return ok(null);
 }
+
+export async function clearWatchlistAction(): Promise<ActionResult> {
+  const { supabase, user } = await getAuthedClient();
+  if (!user) return fail('Bitte zuerst einloggen.');
+
+  const { error } = await watchlistService.clearWatchlist(supabase, user.id);
+  if (error) {
+    console.error('clearWatchlist error:', error);
+    return fail('Watchlist konnte nicht geleert werden.');
+  }
+  return ok(null);
+}

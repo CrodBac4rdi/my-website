@@ -3,11 +3,12 @@
 import { useState, useRef } from 'react';
 import Link from 'next/link';
 import {
-  Bookmark, Plus, LayoutGrid, Play, Check, X, Clock, PauseCircle,
+  Bookmark, Plus, LayoutGrid, Play, Check, X, Clock, PauseCircle, Trash2,
 } from 'lucide-react';
 import AnimeCard from '@/components/AnimeCard';
+import ConfirmModal from '@/components/ConfirmModal';
 import { toast } from '@/lib/toast';
-import { updateWatchlistAction } from '@/lib/actions/watchlist';
+import { updateWatchlistAction, clearWatchlistAction } from '@/lib/actions/watchlist';
 
 export type WatchlistItem = {
   id: number;
@@ -33,7 +34,22 @@ const STATUS_TABS = [
 export default function WatchlistClient({ initialItems }: { initialItems: WatchlistItem[] }) {
   const [watchlist, setWatchlist] = useState<WatchlistItem[]>(initialItems);
   const [activeTab, setActiveTab] = useState('all');
+  const [confirmClear, setConfirmClear] = useState(false);
+  const [clearing, setClearing] = useState(false);
   const updatingRef = useRef<Set<number>>(new Set()); // verhindert parallele Updates pro Item
+
+  const handleClearAll = async () => {
+    setClearing(true);
+    const res = await clearWatchlistAction();
+    if (res.ok) {
+      setWatchlist([]);
+      toast.success('Watchlist geleert.');
+      setConfirmClear(false);
+    } else {
+      toast.error(res.error);
+    }
+    setClearing(false);
+  };
 
   const handleStatusChange = async (itemId: number, newStatus: string) => {
     if (updatingRef.current.has(itemId)) return;
@@ -112,6 +128,12 @@ export default function WatchlistClient({ initialItems }: { initialItems: Watchl
         <p className="text-muted font-medium max-w-xl mx-auto">
           {watchlist.length} Titel gespeichert.
         </p>
+        <button
+          onClick={() => setConfirmClear(true)}
+          className="inline-flex items-center gap-2 text-sm font-medium text-faint hover:text-danger transition"
+        >
+          <Trash2 size={15} /> Watchlist leeren
+        </button>
       </div>
 
       {/* STATUS FILTER TABS */}
@@ -176,6 +198,17 @@ export default function WatchlistClient({ initialItems }: { initialItems: Watchl
           })}
         </div>
       )}
+
+      <ConfirmModal
+        open={confirmClear}
+        danger
+        title="Gesamte Watchlist leeren?"
+        message="Das entfernt alle Titel von deiner Watchlist. Diese Aktion kann nicht rückgängig gemacht werden."
+        confirmLabel="Ja, alles leeren"
+        loading={clearing}
+        onConfirm={handleClearAll}
+        onCancel={() => setConfirmClear(false)}
+      />
     </div>
   );
 }

@@ -26,7 +26,7 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
   const initialDiscover = discoverData?.results || [];
 
   return (
-    <div className="space-y-16 md:space-y-32 pb-24 md:pb-32 pt-4 md:pt-8 text-slate-50 min-h-screen max-w-[1800px] mx-auto">
+    <div className="space-y-16 md:space-y-32 pb-24 md:pb-32 pt-4 md:pt-8 text-fg min-h-screen max-w-[1800px] mx-auto">
       
       <Hero highlights={heroHighlights} />
 

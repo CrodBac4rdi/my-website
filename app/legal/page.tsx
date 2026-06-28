@@ -8,17 +8,17 @@ export const metadata = {
 
 export default function LegalPage() {
   return (
-    <div className="min-h-screen text-slate-200 py-20 px-4 md:px-8 max-w-[1200px] mx-auto space-y-16">
+    <div className="min-h-screen text-fg py-20 px-4 md:px-8 max-w-[1200px] mx-auto space-y-16">
       
       {/* HEADER */}
       <div className="space-y-4 text-center">
-        <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-500/10 border border-blue-500/20 text-blue-400 rounded-2xl mb-4 font-bold tracking-widest uppercase text-xs">
+        <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary-500/10 border border-primary-500/20 text-primary-400 rounded-2xl mb-4 font-bold tracking-widest uppercase text-xs">
           <Shield size={14} /> Rechtliches & Sicherheit
         </div>
-        <h1 className="text-4xl md:text-6xl font-black text-white tracking-tighter">
+        <h1 className="font-display text-4xl md:text-6xl font-bold text-white tracking-tight">
           Legal & Privacy
         </h1>
-        <p className="text-slate-400 max-w-2xl mx-auto text-lg">
+        <p className="text-muted max-w-2xl mx-auto text-lg">
           Transparenz ist wichtig. Hier findest du alle rechtlichen Hinweise, Credits zu unseren Datenquellen und unsere Datenschutzrichtlinien.
         </p>
       </div>
@@ -27,18 +27,18 @@ export default function LegalPage() {
         
         {/* SIDEBAR NAVIGATION */}
         <div className="lg:col-span-1 space-y-4">
-          <div className="sticky top-32 p-6 bg-slate-900/40 backdrop-blur-xl border border-slate-700/50 rounded-3xl flex flex-col gap-2">
-            <a href="#tmdb" className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 transition-colors text-slate-300 hover:text-white font-medium">
-              <Code2 size={18} className="text-blue-400" /> API & Credits
+          <div className="sticky top-32 p-6 bg-elev/40 backdrop-blur-xl border border-line-strong/50 rounded-3xl flex flex-col gap-2">
+            <a href="#tmdb" className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 transition-colors text-muted hover:text-white font-medium">
+              <Code2 size={18} className="text-primary-400" /> API & Credits
             </a>
-            <a href="#privacy" className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 transition-colors text-slate-300 hover:text-white font-medium">
+            <a href="#privacy" className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 transition-colors text-muted hover:text-white font-medium">
               <Database size={18} className="text-green-400" /> Privacy Policy
             </a>
-            <a href="#tos" className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 transition-colors text-slate-300 hover:text-white font-medium">
+            <a href="#tos" className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 transition-colors text-muted hover:text-white font-medium">
               <FileText size={18} className="text-purple-400" /> Terms of Service
             </a>
-            <a href="#dmca" className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 transition-colors text-slate-300 hover:text-white font-medium">
-              <AlertTriangle size={18} className="text-red-400" /> DMCA Disclaimer
+            <a href="#dmca" className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 transition-colors text-muted hover:text-white font-medium">
+              <AlertTriangle size={18} className="text-danger" /> DMCA Disclaimer
             </a>
           </div>
         </div>
@@ -47,11 +47,11 @@ export default function LegalPage() {
         <div className="lg:col-span-2 space-y-12">
           
           {/* TMDB CREDITS */}
-          <section id="tmdb" className="p-8 bg-slate-900/40 backdrop-blur-xl border border-slate-700/50 rounded-3xl space-y-6 scroll-mt-32">
+          <section id="tmdb" className="p-8 bg-elev/40 backdrop-blur-xl border border-line-strong/50 rounded-3xl space-y-6 scroll-mt-32">
             <h2 className="text-2xl font-black text-white flex items-center gap-3">
-              <Code2 className="text-blue-400" /> TMDB API & Credits
+              <Code2 className="text-primary-400" /> TMDB API & Credits
             </h2>
-            <div className="flex flex-col md:flex-row items-start md:items-center gap-6 p-6 bg-blue-950/20 border border-blue-900/30 rounded-2xl">
+            <div className="flex flex-col md:flex-row items-start md:items-center gap-6 p-6 bg-blue-950/20 border border-primary-700/30 rounded-2xl">
               <div className="w-24 h-24 flex-shrink-0 relative">
                 <img 
                   src="https://www.themoviedb.org/assets/2/v4/logos/v2/blue_square_2-d537fb228cb3fd056e3f7162571d2862136e586114848f2d2249d43cc94edb2a.svg" 
@@ -61,10 +61,10 @@ export default function LegalPage() {
               </div>
               <div className="space-y-2">
                 <p className="text-lg font-bold text-white">The Movie Database (TMDB)</p>
-                <p className="text-slate-400 leading-relaxed italic">
+                <p className="text-muted leading-relaxed italic">
                   "This product uses the TMDB API but is not endorsed or certified by TMDB."
                 </p>
-                <p className="text-slate-400 text-sm">
+                <p className="text-muted text-sm">
                   Alle Metadaten, Bilder, Beschreibungen und Release-Daten der auf Horizon angezeigten Anime stammen direkt aus der Community-gepflegten Datenbank von TMDB.
                 </p>
               </div>
@@ -72,11 +72,11 @@ export default function LegalPage() {
           </section>
 
           {/* PRIVACY POLICY */}
-          <section id="privacy" className="p-8 bg-slate-900/40 backdrop-blur-xl border border-slate-700/50 rounded-3xl space-y-6 scroll-mt-32">
+          <section id="privacy" className="p-8 bg-elev/40 backdrop-blur-xl border border-line-strong/50 rounded-3xl space-y-6 scroll-mt-32">
             <h2 className="text-2xl font-black text-white flex items-center gap-3">
               <Database className="text-green-400" /> Privacy Policy (Datenschutz)
             </h2>
-            <div className="space-y-4 text-slate-300 leading-relaxed">
+            <div className="space-y-4 text-muted leading-relaxed">
               <h3 className="text-xl font-bold text-white pt-2">1. Datenspeicherung & Account</h3>
               <p>
                 Diese Website nutzt <strong>Supabase</strong> für die Nutzerverwaltung und Datenbank-Funktionalität. Wenn du einen Account erstellst, wird deine E-Mail-Adresse und ein verschlüsseltes Passwort (oder Auth-Token deines Social-Logins) sicher auf den Servern von Supabase gespeichert. Wir speichern keine weiteren persönlichen Daten.
@@ -92,11 +92,11 @@ export default function LegalPage() {
           </section>
 
           {/* TERMS OF SERVICE */}
-          <section id="tos" className="p-8 bg-slate-900/40 backdrop-blur-xl border border-slate-700/50 rounded-3xl space-y-6 scroll-mt-32">
+          <section id="tos" className="p-8 bg-elev/40 backdrop-blur-xl border border-line-strong/50 rounded-3xl space-y-6 scroll-mt-32">
             <h2 className="text-2xl font-black text-white flex items-center gap-3">
               <FileText className="text-purple-400" /> Terms of Service
             </h2>
-            <div className="space-y-4 text-slate-300 leading-relaxed">
+            <div className="space-y-4 text-muted leading-relaxed">
               <p>
                 Horizon ist ein reines Hobby- und Portfolio-Projekt, entwickelt für die Community. Mit der Nutzung der Seite stimmst du folgenden Punkten zu:
               </p>
@@ -109,11 +109,11 @@ export default function LegalPage() {
           </section>
 
           {/* DMCA */}
-          <section id="dmca" className="p-8 bg-slate-900/40 backdrop-blur-xl border border-slate-700/50 rounded-3xl space-y-6 scroll-mt-32">
+          <section id="dmca" className="p-8 bg-elev/40 backdrop-blur-xl border border-line-strong/50 rounded-3xl space-y-6 scroll-mt-32">
             <h2 className="text-2xl font-black text-white flex items-center gap-3">
-              <AlertTriangle className="text-red-400" /> DMCA Disclaimer
+              <AlertTriangle className="text-danger" /> DMCA Disclaimer
             </h2>
-            <div className="space-y-4 text-slate-300 leading-relaxed">
+            <div className="space-y-4 text-muted leading-relaxed">
               <p>
                 <strong>Horizon hostet keine eigenen Video- oder Bildinhalte.</strong>
               </p>
@@ -121,7 +121,7 @@ export default function LegalPage() {
                 Alle angezeigten Cover, Poster und Trailer werden über die öffentliche API von TMDB geladen. Die Seite agiert lediglich als Katalog und Metadaten-Tracker, um Anime-Informationen übersichtlich aufzubereiten. 
               </p>
               <p>
-                Falls Sie der Meinung sind, dass Bilder, die über die TMDB API eingebunden werden, Ihre Urheberrechte verletzen, wenden Sie sich bitte direkt an <a href="https://www.themoviedb.org" target="_blank" rel="noreferrer" className="text-blue-400 hover:underline">The Movie Database (TMDB)</a>, um die entsprechenden Inhalte von deren Servern entfernen zu lassen.
+                Falls Sie der Meinung sind, dass Bilder, die über die TMDB API eingebunden werden, Ihre Urheberrechte verletzen, wenden Sie sich bitte direkt an <a href="https://www.themoviedb.org" target="_blank" rel="noreferrer" className="text-primary-400 hover:underline">The Movie Database (TMDB)</a>, um die entsprechenden Inhalte von deren Servern entfernen zu lassen.
               </p>
             </div>
           </section>

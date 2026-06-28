@@ -1,12 +1,20 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Space_Grotesk, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import Header from "../components/header";
 import { Analytics } from "@vercel/analytics/next";
 import { ThemeProvider } from "../components/ThemeProvider";
 import { I18nProvider } from "../lib/i18n";
 
-const inter = Inter({ subsets: ["latin"] });
+// Cinematic Dark Glass: Space Grotesk (Display), Inter (UI), JetBrains Mono (Code/Tokens)
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
+const grotesk = Space_Grotesk({
+  subsets: ["latin"],
+  variable: "--font-grotesk",
+  display: "swap",
+  weight: ["500", "600", "700"],
+});
+const jbmono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-jbmono", display: "swap" });
 
 export const metadata: Metadata = {
   title: "HORIZON | 3D Anime Tracker",
@@ -20,7 +28,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#020205",
+  themeColor: "#060711",
 };
 
 import { BackgroundProvider } from "../components/BackgroundProvider";
@@ -33,7 +41,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="de" suppressHydrationWarning>
-      <body className={`${inter.className} bg-white dark:bg-[#020205] text-slate-900 dark:text-slate-50 min-h-screen flex flex-col selection:bg-accent-blue selection:text-white transition-colors duration-300`}>
+      <body className={`${inter.variable} ${grotesk.variable} ${jbmono.variable} bg-bg text-fg min-h-screen flex flex-col antialiased selection:bg-primary-600 selection:text-white transition-colors duration-300`}>
         <ThemeProvider>
         <I18nProvider>
         <BackgroundProvider>

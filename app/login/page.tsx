@@ -7,6 +7,12 @@ import { supabase } from '@/lib/supabase';
 
 type Mode = 'login' | 'reset';
 
+const inputClass =
+  'w-full bg-white/[.04] border border-line rounded-md py-3.5 pl-12 pr-4 text-sm text-fg placeholder:text-faint transition hover:border-line-strong focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/30';
+const iconClass =
+  'absolute left-4 top-1/2 -translate-y-1/2 text-faint group-focus-within:text-primary-500 transition-colors';
+const labelClass = 'block mb-2 text-[11px] font-bold text-faint uppercase tracking-wider ml-1';
+
 export default function LoginPage() {
   const router = useRouter();
   const [mode, setMode] = useState<Mode>('login');
@@ -20,10 +26,10 @@ export default function LoginPage() {
   if (!supabase) {
     return (
       <div className="min-h-[70vh] flex items-center justify-center p-4">
-        <div className="bg-red-500/10 border border-red-500/20 p-8 rounded-3xl text-center max-w-md">
-          <AlertCircle className="mx-auto text-red-500 mb-4" size={48} />
-          <h2 className="text-xl font-bold text-white mb-2">Auth nicht konfiguriert</h2>
-          <p className="text-slate-400">Bitte Supabase-Umgebungsvariablen in .env.local eintragen.</p>
+        <div className="bg-danger/10 border border-danger/30 p-8 rounded-xl text-center max-w-md">
+          <AlertCircle className="mx-auto text-danger mb-4" size={48} />
+          <h2 className="text-xl font-display font-semibold text-fg mb-2">Auth nicht konfiguriert</h2>
+          <p className="text-muted">Bitte Supabase-Umgebungsvariablen in .env.local eintragen.</p>
         </div>
       </div>
     );
@@ -73,21 +79,20 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-[80vh] flex items-center justify-center p-4">
-      <div className="w-full max-w-md bg-slate-900/50 border border-slate-800 p-10 rounded-[2.5rem] backdrop-blur-xl shadow-2xl relative overflow-hidden">
-
-        <div className="absolute -top-24 -left-24 w-48 h-48 bg-blue-500/20 blur-[100px] pointer-events-none" />
+      <div className="w-full max-w-md glass p-10 rounded-2xl relative overflow-hidden">
+        <div className="absolute -top-24 -left-24 w-48 h-48 bg-primary-500/20 blur-[100px] pointer-events-none" />
 
         <div className="flex justify-center mb-10">
-          <div className="bg-blue-600/10 p-4 rounded-2xl border border-blue-500/20 text-blue-500">
+          <div className="bg-primary-600/10 p-4 rounded-xl border border-primary-500/20 text-primary-500">
             <Film size={40} />
           </div>
         </div>
 
         <div className="text-center space-y-2 mb-10">
-          <h2 className="text-3xl font-extrabold text-white tracking-tight">
+          <h2 className="text-3xl font-display font-bold text-fg tracking-tight">
             {mode === 'reset' ? 'Passwort zurücksetzen' : 'Willkommen zurück'}
           </h2>
-          <p className="text-slate-400 font-medium">
+          <p className="text-muted font-medium">
             {mode === 'reset'
               ? 'Wir schicken dir einen Reset-Link per E-Mail.'
               : 'Logge dich ein, um deine Watchlist zu verwalten.'}
@@ -95,32 +100,29 @@ export default function LoginPage() {
         </div>
 
         {errorMsg && (
-          <div className="mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-2xl flex items-center gap-3 text-red-400 text-sm font-medium">
+          <div className="mb-6 p-4 bg-danger/10 border border-danger/30 rounded-md flex items-center gap-3 text-danger text-sm font-medium">
             <AlertCircle size={18} /> {errorMsg}
           </div>
         )}
 
         {successMsg && (
-          <div className="mb-6 p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-2xl text-emerald-400 text-sm font-medium text-center">
+          <div className="mb-6 p-4 bg-success/10 border border-success/30 rounded-md text-success text-sm font-medium text-center">
             {successMsg}
           </div>
         )}
 
-        {/* PASSWORD RESET MODE */}
         {mode === 'reset' ? (
           <form onSubmit={handlePasswordReset} className="space-y-4">
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">
-                E-Mail Adresse
-              </label>
+            <div>
+              <label className={labelClass}>E-Mail Adresse</label>
               <div className="relative group">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-blue-500 transition-colors" size={20} />
+                <Mail className={iconClass} size={20} />
                 <input
                   type="email"
                   placeholder="name@example.com"
                   value={email}
                   onChange={e => setEmail(e.target.value)}
-                  className="w-full bg-slate-950/50 border border-slate-800 rounded-2xl py-4 pl-12 pr-4 focus:outline-none focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/5 transition-all text-slate-200 placeholder:text-slate-600"
+                  className={inputClass}
                   required
                 />
               </div>
@@ -130,53 +132,46 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-blue-600 hover:bg-blue-500 text-white py-4 rounded-2xl font-bold transition-all disabled:opacity-50 shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2"
+                className="w-full bg-primary-600 hover:bg-primary-500 text-white py-3.5 rounded-md font-semibold transition disabled:opacity-50 shadow-glow flex items-center justify-center gap-2 active:scale-[.98]"
               >
-                {loading
-                  ? <Loader2 className="animate-spin" size={20} />
-                  : 'Reset-Link senden'}
+                {loading ? <Loader2 className="animate-spin" size={20} /> : 'Reset-Link senden'}
               </button>
               <button
                 type="button"
                 onClick={() => { setMode('login'); setErrorMsg(''); setSuccessMsg(''); }}
-                className="w-full text-slate-400 hover:text-slate-200 py-3 flex items-center justify-center gap-2 font-medium transition-colors"
+                className="w-full text-muted hover:text-fg py-3 flex items-center justify-center gap-2 font-medium transition-colors"
               >
                 <ArrowLeft size={16} /> Zurück zum Login
               </button>
             </div>
           </form>
         ) : (
-          /* LOGIN / SIGNUP MODE */
           <form className="space-y-4">
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">
-                E-Mail Adresse
-              </label>
+            <div>
+              <label className={labelClass}>E-Mail Adresse</label>
               <div className="relative group">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-blue-500 transition-colors" size={20} />
+                <Mail className={iconClass} size={20} />
                 <input
                   type="email"
                   placeholder="name@example.com"
                   value={email}
                   onChange={e => setEmail(e.target.value)}
-                  className="w-full bg-slate-950/50 border border-slate-800 rounded-2xl py-4 pl-12 pr-4 focus:outline-none focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/5 transition-all text-slate-200 placeholder:text-slate-600"
+                  className={inputClass}
                   required
                 />
               </div>
             </div>
 
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">
-                Passwort
-              </label>
+            <div>
+              <label className={labelClass}>Passwort</label>
               <div className="relative group">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-blue-500 transition-colors" size={20} />
+                <Lock className={iconClass} size={20} />
                 <input
                   type="password"
                   placeholder="••••••••"
                   value={password}
                   onChange={e => setPassword(e.target.value)}
-                  className="w-full bg-slate-950/50 border border-slate-800 rounded-2xl py-4 pl-12 pr-4 focus:outline-none focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/5 transition-all text-slate-200 placeholder:text-slate-600"
+                  className={inputClass}
                   required
                 />
               </div>
@@ -186,7 +181,7 @@ export default function LoginPage() {
               <button
                 type="button"
                 onClick={() => { setMode('reset'); setErrorMsg(''); setSuccessMsg(''); }}
-                className="text-xs text-slate-500 hover:text-blue-400 font-medium transition-colors"
+                className="text-xs text-faint hover:text-primary-400 font-medium transition-colors"
               >
                 Passwort vergessen?
               </button>
@@ -196,7 +191,7 @@ export default function LoginPage() {
               <button
                 onClick={handleSignIn}
                 disabled={loading}
-                className="w-full bg-blue-600 hover:bg-blue-500 text-white py-4 rounded-2xl font-bold transition-all disabled:opacity-50 shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2 group"
+                className="w-full bg-primary-600 hover:bg-primary-500 text-white py-3.5 rounded-md font-semibold transition disabled:opacity-50 shadow-glow flex items-center justify-center gap-2 group active:scale-[.98]"
               >
                 {loading
                   ? <Loader2 className="animate-spin" size={20} />
@@ -205,7 +200,7 @@ export default function LoginPage() {
               <button
                 onClick={handleSignUp}
                 disabled={loading}
-                className="w-full bg-slate-800/50 hover:bg-slate-800 text-slate-300 py-4 rounded-2xl font-bold transition-all border border-slate-700/50"
+                className="w-full bg-white/[.06] hover:bg-white/[.1] text-fg py-3.5 rounded-md font-semibold transition border border-line backdrop-blur"
               >
                 Neu hier? Registrieren
               </button>

@@ -77,8 +77,8 @@ export default function DiscoverFilters({ initialDiscover, initialGenre = "" }: 
       </div>
 
       <div ref={observerTarget} className="flex justify-center pt-8 pb-16 h-20">
-        {loading && <Loader2 className="animate-spin text-blue-500" size={40} />}
-        {!loading && !hasMore && <p className="text-slate-500 font-bold uppercase tracking-widest text-sm">Keine weiteren Ergebnisse</p>}
+        {loading && <Loader2 className="animate-spin text-primary-500" size={40} />}
+        {!loading && !hasMore && <p className="text-faint font-bold uppercase tracking-widest text-sm">Keine weiteren Ergebnisse</p>}
       </div>
     </div>
   );

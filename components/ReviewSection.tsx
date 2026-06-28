@@ -114,23 +114,23 @@ export default function ReviewSection({
     <section className="space-y-12 container mx-auto">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-pink-500/10 rounded-xl border border-pink-500/20">
-            <MessageSquare className="text-pink-500" size={24} />
+          <div className="p-2 bg-primary-500/10 rounded-xl border border-primary-500/20">
+            <MessageSquare className="text-primary-500" size={24} />
           </div>
-          <h2 className="text-3xl font-bold tracking-tight text-white">Community Feedback</h2>
+          <h2 className="font-display text-3xl font-bold tracking-tight text-fg">Community Feedback</h2>
         </div>
-        <div className="h-px flex-1 bg-gradient-to-r from-slate-800 to-transparent ml-8 hidden md:block" />
+        <div className="h-px flex-1 bg-gradient-to-r from-line to-transparent ml-8 hidden md:block" />
       </div>
 
       {/* REVIEW FORM */}
       {user ? (
-        <form onSubmit={handleSubmit} className="bg-slate-900/50 border border-slate-800 p-8 md:p-10 rounded-[2.5rem] space-y-8 backdrop-blur-md relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-64 h-64 bg-blue-600/5 blur-[100px] pointer-events-none" />
+        <form onSubmit={handleSubmit} className="bg-elev/50 border border-line p-8 md:p-10 rounded-[2.5rem] space-y-8 backdrop-blur-md relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-64 h-64 bg-primary-600/5 blur-[100px] pointer-events-none" />
 
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
             <div className="space-y-1">
-              <span className="text-xs font-bold text-slate-500 uppercase tracking-widest block">Deine Wertung</span>
-              <p className="text-slate-300 font-medium">Wie gefällt dir dieser Titel?</p>
+              <span className="text-xs font-bold text-faint uppercase tracking-widest block">Deine Wertung</span>
+              <p className="text-muted font-medium">Wie gefällt dir dieser Titel?</p>
             </div>
             <div className="flex flex-wrap gap-2">
               {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(num => (
@@ -140,8 +140,8 @@ export default function ReviewSection({
                   onClick={() => setRating(num)}
                   className={`w-10 h-10 rounded-xl font-bold transition-all border flex items-center justify-center ${
                     rating >= num
-                      ? 'bg-blue-600 border-blue-500 text-white shadow-lg shadow-blue-500/20'
-                      : 'bg-slate-950 border-slate-800 text-slate-500 hover:border-slate-600'
+                      ? 'bg-primary-600 border-primary-500 text-white shadow-lg shadow-primary-500/20'
+                      : 'bg-bg border-line text-faint hover:border-line-strong'
                   }`}
                 >
                   {num}
@@ -156,27 +156,27 @@ export default function ReviewSection({
               onChange={e => setNewReview(e.target.value)}
               placeholder="Was denkst du über diesen Anime? (mind. 10 Zeichen)"
               maxLength={5000}
-              className="w-full bg-slate-950/50 border border-slate-800 rounded-3xl p-6 text-slate-200 focus:outline-none focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/5 transition-all h-40 resize-none placeholder:text-slate-600"
+              className="w-full bg-bg/50 border border-line rounded-3xl p-6 text-fg focus:outline-none focus:border-primary-500/50 focus:ring-4 focus:ring-primary-500/5 transition-all h-40 resize-none placeholder:text-faint"
             />
-            <span className="absolute bottom-4 right-6 text-xs text-slate-600">
+            <span className="absolute bottom-4 right-6 text-xs text-faint">
               {newReview.length}/5000
             </span>
           </div>
 
           <div className="flex flex-col md:flex-row justify-between items-center gap-4 relative z-10">
-            <label className="flex items-center gap-2 cursor-pointer text-slate-400 hover:text-red-400 transition-colors">
+            <label className="flex items-center gap-2 cursor-pointer text-muted hover:text-danger transition-colors">
               <input
                 type="checkbox"
                 checked={isSpoiler}
                 onChange={e => setIsSpoiler(e.target.checked)}
-                className="w-5 h-5 rounded bg-slate-900 border-slate-700 text-red-500 focus:ring-red-500"
+                className="w-5 h-5 rounded bg-elev border-line-strong text-danger focus:ring-danger"
               />
               <span className="font-bold text-sm">Enthält Spoiler</span>
             </label>
             <button
               type="submit"
               disabled={submitting || newReview.trim().length < 10}
-              className="bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 px-10 rounded-2xl transition-all shadow-xl shadow-blue-500/20 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="bg-primary-600 hover:bg-primary-500 text-white font-bold py-4 px-10 rounded-2xl transition-all shadow-xl shadow-primary-500/20 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {submitting ? <Loader2 size={24} className="animate-spin" /> : <Send size={20} />}
               Feedback abschicken
@@ -184,8 +184,8 @@ export default function ReviewSection({
           </div>
         </form>
       ) : (
-        <div className="bg-slate-900/30 border border-slate-800 border-dashed p-12 rounded-[2.5rem] text-center">
-          <p className="text-slate-400 font-medium text-lg">Logge dich ein, um deine Meinung zu teilen!</p>
+        <div className="bg-elev/30 border border-line border-dashed p-12 rounded-[2.5rem] text-center">
+          <p className="text-muted font-medium text-lg">Logge dich ein, um deine Meinung zu teilen!</p>
         </div>
       )}
 
@@ -193,7 +193,7 @@ export default function ReviewSection({
       <div className="space-y-6">
         {loading ? (
           <div className="flex justify-center py-20">
-            <Loader2 className="animate-spin text-blue-500" size={48} />
+            <Loader2 className="animate-spin text-primary-500" size={48} />
           </div>
         ) : reviews.length > 0 ? (
           <div className="grid gap-6">
@@ -202,21 +202,21 @@ export default function ReviewSection({
               const spoilerRevealed = revealedSpoilers.has(review.id);
 
               return (
-                <div key={review.id} className="bg-slate-900/40 border border-slate-800 p-8 rounded-[2rem] space-y-6 hover:border-slate-700 transition-colors">
+                <div key={review.id} className="bg-elev/40 border border-line p-8 rounded-[2rem] space-y-6 hover:border-line-strong transition-colors">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-slate-800 rounded-2xl flex items-center justify-center border border-slate-700 overflow-hidden">
+                      <div className="w-12 h-12 bg-surface-3 rounded-2xl flex items-center justify-center border border-line-strong overflow-hidden">
                         {review.profiles?.avatar_url ? (
                           <img src={review.profiles.avatar_url} alt="User" className="w-full h-full object-cover" />
                         ) : (
-                          <User size={24} className="text-slate-500" />
+                          <User size={24} className="text-faint" />
                         )}
                       </div>
                       <div>
-                        <h4 className="font-bold text-slate-100 text-lg leading-none">
+                        <h4 className="font-bold text-fg text-lg leading-none">
                           {review.profiles?.username || 'Anonymer User'}
                         </h4>
-                        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1.5">
+                        <p className="text-[10px] font-bold text-faint uppercase tracking-widest mt-1.5">
                           {new Date(review.created_at).toLocaleDateString('de-DE')}
                           {review.updated_at !== review.created_at && ' · bearbeitet'}
                         </p>
@@ -224,14 +224,14 @@ export default function ReviewSection({
                     </div>
 
                     <div className="flex items-center gap-3">
-                      <div className="bg-blue-500/10 border border-blue-500/20 px-4 py-2 rounded-xl text-blue-400 font-bold flex items-center gap-2">
-                        <Star size={16} className="fill-blue-500" />
+                      <div className="bg-primary-500/10 border border-primary-500/20 px-4 py-2 rounded-xl text-primary-400 font-bold flex items-center gap-2">
+                        <Star size={16} className="fill-primary-500" />
                         {review.rating}/10
                       </div>
                       {isOwn && (
                         <button
                           onClick={() => handleDelete(review.id)}
-                          className="p-2 text-slate-600 hover:text-red-400 hover:bg-red-500/10 rounded-xl transition-all"
+                          className="p-2 text-faint hover:text-danger hover:bg-danger/10 rounded-xl transition-all"
                           title="Review löschen"
                         >
                           <Trash2 size={16} />
@@ -243,20 +243,20 @@ export default function ReviewSection({
                   {/* SPOILER HANDLING — kein innerHTML, XSS-sicher */}
                   {review.is_spoiler && !spoilerRevealed ? (
                     <div className="relative">
-                      <p className="text-slate-300 font-medium leading-relaxed italic blur-md select-none pointer-events-none">
+                      <p className="text-muted font-medium leading-relaxed italic blur-md select-none pointer-events-none">
                         {review.content}
                       </p>
                       <button
                         onClick={() => toggleSpoiler(review.id)}
                         className="absolute inset-0 flex items-center justify-center"
                       >
-                        <span className="bg-red-500/90 text-white font-bold px-4 py-2 rounded-xl text-sm backdrop-blur-sm">
+                        <span className="bg-danger/90 text-white font-bold px-4 py-2 rounded-xl text-sm backdrop-blur-sm">
                           ⚠ Spoiler anzeigen
                         </span>
                       </button>
                     </div>
                   ) : (
-                    <p className="text-slate-300 font-medium leading-relaxed italic">
+                    <p className="text-muted font-medium leading-relaxed italic">
                       &ldquo;{review.content}&rdquo;
                     </p>
                   )}
@@ -265,7 +265,7 @@ export default function ReviewSection({
             })}
           </div>
         ) : (
-          <div className="text-center py-20 opacity-40 italic font-medium text-slate-500">
+          <div className="text-center py-20 opacity-40 italic font-medium text-faint">
             Noch keine Reviews vorhanden. Sei der Erste!
           </div>
         )}

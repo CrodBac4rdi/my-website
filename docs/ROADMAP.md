@@ -25,9 +25,9 @@ Status: ⬜ offen · 🟡 in Arbeit · ✅ fertig
 
 | # | Feature | Aufwand | AI? | Notiz |
 |---|---------|---------|-----|-------|
-| 2.1 | **Genre/Filter-Seite `/discover`** | M | nein | Chips: Genre, Jahr, Sortierung (Popularität/Rating/Datum), optional Streaming-Provider. Nutzt `/api/discover` (TMDB discover) + Infinite-Scroll (wie Home). |
-| 2.2 | **„Weil du X auf der Watchlist hast"-Rail** | M | nein | Für die Top-Watchlist-Titel `/tv/{id}/recommendations` ziehen, aggregieren, deduplizieren, bereits-Vorhandenes rausfiltern. Nur eingeloggt. Caching beachten (TMDB-Ratelimit). |
-| 2.3 | **Personalisierte Empfehlungen** | M | nein* | Content-basiert: Genre-Affinität aus der Watchlist + gewichtete TMDB-Recommendations. *Kein generatives AI; reicht für solide Vorschläge. Echte ML später optional. |
+| 2.1 | **Genre/Filter-Seite `/discover`** | ✅ | Chips Genre/Jahr/Sortierung + Infinite-Scroll (`DiscoverExplorer`), Nav-Link „Entdecken". |
+| 2.2 | **„Weil du X auf der Watchlist hast"-Rail** | ✅ | `RecommendationsRail` + `/api/recommendations` (aggregierte TMDB-Recs, gewichtet, Vorhandenes gefiltert). |
+| 2.3 | **Personalisierte Empfehlungen** | ✅ | Durch dieselbe content-basierte Aggregation (Häufigkeit + Popularität) abgedeckt. |
 
 ---
 
@@ -36,7 +36,7 @@ Status: ⬜ offen · 🟡 in Arbeit · ✅ fertig
 | # | Feature | Aufwand | AI? | Notiz |
 |---|---------|---------|-----|-------|
 | 3.1 | **Profil-Layout neu arrangieren** | ✅ erledigt (siehe M1) | — |
-| 3.2 | **Chibi-Anime-Avatare** | M | nein | **Entschieden:** `nekos.best` als Quelle, **alle SFW-Kategorien** anbieten, nach Kategorie sortiert. Host `nekos.best`/CDN in die Bild-Allowlist aufnehmen. (Ergänzt/ersetzt den DiceBear-Picker.) |
+| 3.2 | **Chibi-Anime-Avatare** | ✅ | `AvatarPicker` mit Kategorie-Tabs: nekos.best (Neko/Waifu/Husbando/Kitsune) + „Generiert" (DiceBear). Host `nekos.best` in der Allowlist. |
 
 ---
 

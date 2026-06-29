@@ -2,6 +2,7 @@ import { TrendingUp } from "lucide-react";
 import Hero from "@/components/Hero";
 import AnimeCard from "@/components/AnimeCard";
 import DiscoverFilters from "@/components/DiscoverFilters";
+import RecommendationsRail from "@/components/RecommendationsRail";
 import { getAllProviders, getDiscoverMedia, getTrendingAnime, getTrendingWeek } from "@/lib/tmdb";
 
 export default async function LandingPage({ searchParams }: { searchParams: Promise<{ genre?: string }> }) {
@@ -30,6 +31,9 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
     <div className="space-y-16 md:space-y-24 pb-24 md:pb-32 pt-4 md:pt-8 text-fg min-h-screen max-w-[1800px] mx-auto">
 
       <Hero highlights={heroHighlights} />
+
+      {/* PERSONALISIERT (nur eingeloggt mit Watchlist) */}
+      <RecommendationsRail />
 
       {/* TRENDING DIESE WOCHE */}
       {trendingWeek.length > 0 && (

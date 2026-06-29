@@ -1,6 +1,6 @@
 'use client';
 
-import { LogIn, LogOut, Bookmark, User, Search, Image as ImageIcon, Shield, Menu, X } from "lucide-react";
+import { LogIn, LogOut, Bookmark, User, Search, Image as ImageIcon, Shield, Menu, X, Compass } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
@@ -49,6 +49,10 @@ export default function Header() {
         <div className="hidden lg:flex items-center gap-1 bg-white/5 p-1 rounded-2xl border border-white/5">
           <Link href="/" className="px-5 py-2.5 rounded-xl text-sm font-semibold text-muted hover:text-fg hover:bg-white/[.06] transition-all">
             {t('nav.home')}
+          </Link>
+          <Link href="/discover" className="px-5 py-2.5 rounded-xl text-sm font-semibold text-muted hover:text-fg hover:bg-white/[.06] transition-all flex items-center gap-2">
+            <Compass size={16} />
+            <span className="hidden md:block">Entdecken</span>
           </Link>
           {user && (
             <Link href="/watchlist" className="px-5 py-2.5 rounded-xl text-sm font-semibold text-muted hover:text-fg hover:bg-white/[.06] transition-all flex items-center gap-2">
@@ -123,6 +127,7 @@ export default function Header() {
         <div className="lg:hidden absolute top-[80px] left-0 w-full px-4 pointer-events-auto">
           <div className="bg-elev/95 backdrop-blur-2xl border border-white/10 p-5 rounded-3xl shadow-2xl flex flex-col gap-3">
             <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="px-4 py-3 rounded-xl text-lg font-bold text-white hover:bg-white/10 transition-colors">{t('nav.home')}</Link>
+            <Link href="/discover" onClick={() => setIsMobileMenuOpen(false)} className="px-4 py-3 rounded-xl text-lg font-bold text-white hover:bg-white/10 flex items-center gap-3 transition-colors"><Compass size={20} />Entdecken</Link>
             {user && <Link href="/watchlist" onClick={() => setIsMobileMenuOpen(false)} className="px-4 py-3 rounded-xl text-lg font-bold text-white hover:bg-white/10 flex items-center gap-3 transition-colors"><Bookmark size={20} />{t('nav.watchlist')}</Link>}
             <Link href="/search" onClick={() => setIsMobileMenuOpen(false)} className="px-4 py-3 rounded-xl text-lg font-bold text-white hover:bg-white/10 flex items-center gap-3 transition-colors"><Search size={20} />{t('nav.search')}</Link>
             <Link href="/backgrounds" onClick={() => setIsMobileMenuOpen(false)} className="px-4 py-3 rounded-xl text-lg font-bold text-white hover:bg-white/10 flex items-center gap-3 transition-colors"><ImageIcon size={20} />Hintergründe</Link>

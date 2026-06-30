@@ -34,7 +34,7 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "CrodBac4rdi" }],
   creator: "CrodBac4rdi",
-  manifest: "/manifest.json",
+  manifest: "/manifest.webmanifest",
   alternates: { canonical: "/" },
   appleWebApp: {
     capable: true,
@@ -67,6 +67,7 @@ export const viewport: Viewport = {
 
 import { BackgroundProvider } from "../components/BackgroundProvider";
 import ToastContainer from "../components/Toast";
+import PWAManager from "../components/PWAManager";
 
 export default function RootLayout({
   children,
@@ -86,6 +87,7 @@ export default function RootLayout({
           </main>
 
           <ToastContainer />
+          <PWAManager />
           <Analytics />
         </BackgroundProvider>
         </I18nProvider>

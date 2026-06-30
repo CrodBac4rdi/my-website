@@ -56,7 +56,7 @@ Status: ⬜ offen · 🟡 in Arbeit · ✅ fertig
 | # | Feature | Aufwand | AI? | Notiz |
 |---|---------|---------|-----|-------|
 | 5.1 | **Command-Palette (⌘K)** | ✅ | Eigenes Modal (keine Dependency). ⌘/Ctrl+K + Header-Button öffnen; Fuzzy-Navigation (auth-gated) + debounced TMDB-Live-Suche mit Postern; ↑↓/↵/esc, Backdrop-Close. `components/CommandPalette.tsx`. |
-| 5.2 | **PWA scharf schalten** | S–M | nein | `next-pwa` ist drin (evtl. Wechsel zu gepflegtem `@ducanh2912/next-pwa`), Manifest existiert. Fehlt: Icons (mehrere Größen), Offline-Strategie, Install-Prompt. |
+| 5.2 | **PWA scharf schalten** | ✅ | `next-pwa` (Webpack) lief unter Next 16 + **Turbopack** nicht mehr → entfernt. Jetzt manuell laut Next-PWA-Guide: `app/manifest.ts` (/manifest.webmanifest), echte Icons (192/512/maskable + app/icon + apple-icon, generiert via sharp), handgeschriebener `public/sw.js` (Navigation network-first + `/offline`-Fallback, Bilder cache-first, Assets SWR; API/Auth nie gecacht), `components/PWAManager.tsx` (SW-Registrierung nur Prod + Install-Banner Android/Desktop/iOS), Security- & `/sw.js`-No-Cache-Header in `next.config.ts`. Interaktiv verifiziert: SW active, Precache + Offline-Fallback. |
 
 ---
 

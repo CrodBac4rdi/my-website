@@ -76,47 +76,47 @@ export default async function PublicProfilePage({
   const lists = (listsRes?.data ?? []) as any[];
 
   return (
-    <div className="space-y-10 pb-20 max-w-5xl mx-auto">
+    <div className="space-y-14 pb-24 max-w-5xl mx-auto">
       {/* HEADER */}
       <div>
-        <div className="relative h-48 md:h-64 rounded-3xl overflow-hidden border border-line bg-elev">
+        <div className="relative aspect-[16/5] max-h-[320px] w-full rounded-3xl overflow-hidden border border-line-strong bg-elev shadow-card">
           {profile.banner_url ? (
-            <img src={profile.banner_url} alt="" className="w-full h-full object-cover" />
+            <img src={profile.banner_url} alt="" className="w-full h-full object-cover object-center" />
           ) : (
-            <div className="w-full h-full bg-gradient-to-tr from-primary-700/40 to-primary-500/10" />
+            <div className="w-full h-full bg-gradient-to-tr from-primary-700/50 via-primary-600/20 to-primary-500/10" />
           )}
-          <div className="absolute inset-0 bg-gradient-to-t from-bg/80 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/40 to-transparent" />
         </div>
-        <div className="px-4 md:px-10 -mt-14 relative z-10 flex items-end gap-5">
-          <div className="w-28 h-28 md:w-32 md:h-32 rounded-full border-4 border-bg bg-surface-3 overflow-hidden shrink-0 shadow-2xl">
+        <div className="px-4 md:px-10 -mt-20 relative z-10 flex flex-col md:flex-row md:items-end gap-6">
+          <div className="w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-bg bg-surface-3 overflow-hidden shrink-0 shadow-pop">
             {profile.avatar_url ? (
               <img src={profile.avatar_url} alt={username} className="w-full h-full object-cover" />
             ) : (
-              <div className="w-full h-full flex items-center justify-center text-faint text-4xl font-black uppercase">
+              <div className="w-full h-full flex items-center justify-center text-faint text-5xl font-black uppercase">
                 {username.charAt(0)}
               </div>
             )}
           </div>
-          <div className="pb-2 flex-1">
-            <h1 className="font-display text-3xl font-bold text-fg">{username}</h1>
-            {pf.bio && profile.bio && <p className="text-muted mt-1 max-w-xl leading-relaxed">{profile.bio}</p>}
+          <div className="md:pb-3 flex-1">
+            <h1 className="font-display text-4xl font-bold text-fg leading-none">{username}</h1>
+            {pf.bio && profile.bio && <p className="text-muted mt-3 max-w-xl leading-relaxed">{profile.bio}</p>}
           </div>
-        </div>
-        <div className="px-4 md:px-10 mt-4">
-          <FollowSection
-            targetId={profile.id}
-            isOwn={isOwn}
-            isAuthed={!!viewer}
-            initialIsFollowing={viewerFollows}
-            followers={counts.followers}
-            following={counts.following}
-          />
+          <div className="md:pb-3">
+            <FollowSection
+              targetId={profile.id}
+              isOwn={isOwn}
+              isAuthed={!!viewer}
+              initialIsFollowing={viewerFollows}
+              followers={counts.followers}
+              following={counts.following}
+            />
+          </div>
         </div>
       </div>
 
       {/* STATS (optional) */}
       {pf.stats && stats && (stats.total_count ?? 0) > 0 && (
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
           <StatTile icon={<ListChecks size={16} />} accent="text-primary-400" value={stats.total_count ?? 0} label="Titel gesamt" />
           <StatTile icon={<CheckCircle2 size={16} />} accent="text-success" value={stats.completed_count ?? 0} label="Abgeschlossen" />
           <StatTile icon={<Play size={16} />} accent="text-primary-400" value={stats.watching_count ?? 0} label="Schaut" />

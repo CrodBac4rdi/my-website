@@ -28,10 +28,10 @@ function Chip({ active, onClick, children }: { active: boolean; onClick: () => v
   return (
     <button
       onClick={onClick}
-      className={`px-3.5 py-1.5 rounded-full text-[13px] font-semibold border transition ${
+      className={`px-4 py-2 rounded-full text-[13px] font-semibold border transition ${
         active
-          ? 'bg-primary-500/15 border-primary-500 text-primary-400'
-          : 'bg-white/[.06] border-line text-muted hover:text-fg'
+          ? 'bg-primary-600 border-primary-500 text-white shadow-glow'
+          : 'bg-surface-3 border-line-strong text-muted hover:text-fg hover:border-primary-500/50'
       }`}
     >
       {children}

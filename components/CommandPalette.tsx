@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Search, Home, Compass, Bookmark, Image as ImageIcon, Shield,
-  Calendar, List as ListIcon, User, Download, CornerDownLeft, Loader2, Users,
+  Calendar, List as ListIcon, User, Download, CornerDownLeft, Loader2, Users, HelpCircle, Sparkles,
 } from 'lucide-react';
 import { getImageUrl } from '@/lib/tmdb';
 
@@ -31,11 +31,13 @@ const NAV_COMMANDS: NavCommand[] = [
   { id: 'search', label: 'Suche', href: '/search', icon: <Search size={18} />, keywords: 'search suche finden' },
   { id: 'watchlist', label: 'Watchlist', href: '/watchlist', icon: <Bookmark size={18} />, keywords: 'watchlist merkliste liste', authed: true },
   { id: 'feed', label: 'Feed', href: '/feed', icon: <Users size={18} />, keywords: 'feed social follower aktivität freunde', authed: true },
+  { id: 'recommendations', label: 'Empfehlungen', href: '/recommendations', icon: <Sparkles size={18} />, keywords: 'empfehlungen recommendations für dich watchlist vorschläge', authed: true },
   { id: 'lists', label: 'Meine Listen', href: '/lists', icon: <ListIcon size={18} />, keywords: 'listen lists sammlungen', authed: true },
   { id: 'profile', label: 'Profil', href: '/profile', icon: <User size={18} />, keywords: 'profil profile account konto einstellungen', authed: true },
   { id: 'calendar', label: 'Kalender', href: '/calendar', icon: <Calendar size={18} />, keywords: 'kalender calendar airing simulcast' },
   { id: 'import', label: 'Import', href: '/import', icon: <Download size={18} />, keywords: 'import mal anilist csv', authed: true },
   { id: 'backgrounds', label: 'Hintergründe', href: '/backgrounds', icon: <ImageIcon size={18} />, keywords: 'hintergründe backgrounds wallpaper themes' },
+  { id: 'faq', label: 'FAQ', href: '/faq', icon: <HelpCircle size={18} />, keywords: 'faq hilfe fragen help installieren app' },
   { id: 'legal', label: 'Legal & Privacy', href: '/legal', icon: <Shield size={18} />, keywords: 'legal privacy datenschutz impressum' },
 ];
 

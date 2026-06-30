@@ -68,6 +68,7 @@ export const viewport: Viewport = {
 import { BackgroundProvider } from "../components/BackgroundProvider";
 import ToastContainer from "../components/Toast";
 import PWAManager from "../components/PWAManager";
+import Footer from "../components/Footer";
 
 export default function RootLayout({
   children,
@@ -86,6 +87,7 @@ export default function RootLayout({
             {children}
           </main>
 
+          <Footer />
           <ToastContainer />
           <PWAManager />
           <Analytics />

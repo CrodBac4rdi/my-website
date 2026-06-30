@@ -1,6 +1,6 @@
 'use client';
 
-import { LogIn, LogOut, Bookmark, User, Search, Image as ImageIcon, Shield, Menu, X, Compass } from "lucide-react";
+import { LogIn, LogOut, Bookmark, User, Search, Image as ImageIcon, Shield, Menu, X, Compass, Command } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
@@ -10,6 +10,11 @@ import LanguageToggle from "./LanguageToggle";
 import { useI18n } from "@/lib/i18n";
 import HeaderGenreFilter from "./HeaderGenreFilter";
 import NotificationBell from "./NotificationBell";
+import CommandPalette from "./CommandPalette";
+
+function openCommandPalette() {
+  window.dispatchEvent(new Event('open-command-palette'));
+}
 
 export default function Header() {
   const [user, setUser] = useState<any>(null);
@@ -76,6 +81,14 @@ export default function Header() {
 
         {/* DESKTOP ACTIONS & AUTH */}
         <div className="hidden lg:flex px-2 items-center gap-4">
+          <button
+            onClick={openCommandPalette}
+            className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/[.04] border border-line text-faint hover:text-fg hover:border-line-strong transition-colors"
+            title="Schnellsuche (⌘K)"
+          >
+            <Search size={15} />
+            <kbd className="text-[10px] font-bold flex items-center gap-0.5"><Command size={10} />K</kbd>
+          </button>
           <HeaderGenreFilter />
           <div className="flex items-center gap-2 border-l border-white/10 pl-4">
             <LanguageToggle />
@@ -127,6 +140,7 @@ export default function Header() {
         <div className="lg:hidden absolute top-[80px] left-0 w-full px-4 pointer-events-auto">
           <div className="bg-elev/95 backdrop-blur-2xl border border-white/10 p-5 rounded-3xl shadow-2xl flex flex-col gap-3">
             <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="px-4 py-3 rounded-xl text-lg font-bold text-white hover:bg-white/10 transition-colors">{t('nav.home')}</Link>
+            <button onClick={() => { setIsMobileMenuOpen(false); openCommandPalette(); }} className="px-4 py-3 rounded-xl text-lg font-bold text-white hover:bg-white/10 flex items-center gap-3 transition-colors text-left"><Search size={20} />Schnellsuche</button>
             <Link href="/discover" onClick={() => setIsMobileMenuOpen(false)} className="px-4 py-3 rounded-xl text-lg font-bold text-white hover:bg-white/10 flex items-center gap-3 transition-colors"><Compass size={20} />Entdecken</Link>
             {user && <Link href="/watchlist" onClick={() => setIsMobileMenuOpen(false)} className="px-4 py-3 rounded-xl text-lg font-bold text-white hover:bg-white/10 flex items-center gap-3 transition-colors"><Bookmark size={20} />{t('nav.watchlist')}</Link>}
             <Link href="/search" onClick={() => setIsMobileMenuOpen(false)} className="px-4 py-3 rounded-xl text-lg font-bold text-white hover:bg-white/10 flex items-center gap-3 transition-colors"><Search size={20} />{t('nav.search')}</Link>
@@ -166,6 +180,7 @@ export default function Header() {
         </div>
       )}
 
+      <CommandPalette authed={!!user} />
     </header>
   );
 }

@@ -55,7 +55,7 @@ Status: ⬜ offen · 🟡 in Arbeit · ✅ fertig
 
 | # | Feature | Aufwand | AI? | Notiz |
 |---|---------|---------|-----|-------|
-| 5.1 | **Command-Palette (⌘K)** | M | nein | Schnelle Suche (TMDB) + Navigation. `cmdk` oder eigenes Modal. Fuzzy über Routen + Live-Suche. |
+| 5.1 | **Command-Palette (⌘K)** | ✅ | Eigenes Modal (keine Dependency). ⌘/Ctrl+K + Header-Button öffnen; Fuzzy-Navigation (auth-gated) + debounced TMDB-Live-Suche mit Postern; ↑↓/↵/esc, Backdrop-Close. `components/CommandPalette.tsx`. |
 | 5.2 | **PWA scharf schalten** | S–M | nein | `next-pwa` ist drin (evtl. Wechsel zu gepflegtem `@ducanh2912/next-pwa`), Manifest existiert. Fehlt: Icons (mehrere Größen), Offline-Strategie, Install-Prompt. |
 
 ---

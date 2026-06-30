@@ -3,6 +3,7 @@
 import { Star, Plus, Play, Trash2, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect, useRef } from 'react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { getImageUrl } from '@/lib/tmdb';
@@ -73,7 +74,9 @@ export default function AnimeCard({
 
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
-    if (isHovered && !fetchAttempted && media.media_type !== 'person') {
+    const reduceMotion =
+      typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (isHovered && !fetchAttempted && !reduceMotion && media.media_type !== 'person') {
       timeoutId = setTimeout(async () => {
         setFetchAttempted(true);
         const key = await fetchTrailerKey(mediaId, media.media_type || 'tv');
@@ -145,11 +148,19 @@ export default function AnimeCard({
     >
       {/* IMAGE AREA */}
       <div className="aspect-[2/3] w-full relative overflow-hidden">
-        <img
-          src={getImageUrl(media.poster_path)}
-          alt={media.name || media.title}
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-        />
+        {getImageUrl(media.poster_path) === '/file.svg' ? (
+          <div className="w-full h-full bg-surface-3 flex items-center justify-center text-faint text-xs font-semibold">
+            Kein Bild
+          </div>
+        ) : (
+          <Image
+            src={getImageUrl(media.poster_path)}
+            alt={media.name || media.title || ''}
+            fill
+            sizes="(max-width: 768px) 50vw, (max-width: 1280px) 25vw, 200px"
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
+          />
+        )}
 
         {/* RATING TAG */}
         {media.vote_average > 0 && (

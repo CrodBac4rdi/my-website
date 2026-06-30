@@ -8,6 +8,7 @@ import { followUserAction, unfollowUserAction } from '@/lib/actions/follows';
 
 type Props = {
   targetId: string;
+  username: string;
   isOwn: boolean;
   isAuthed: boolean;
   initialIsFollowing: boolean;
@@ -15,16 +16,16 @@ type Props = {
   following: number;
 };
 
-function Stat({ value, label }: { value: number; label: string }) {
+function Stat({ value, label, href }: { value: number; label: string; href: string }) {
   return (
-    <div className="text-center">
-      <div className="text-xl font-display font-bold text-fg leading-none">{value}</div>
-      <div className="text-[10px] font-bold text-faint uppercase tracking-wider mt-1">{label}</div>
-    </div>
+    <Link href={href} className="text-center group">
+      <div className="text-xl font-display font-bold text-fg leading-none group-hover:text-primary-400 transition-colors">{value}</div>
+      <div className="text-[10px] font-bold text-faint uppercase tracking-wider mt-1 group-hover:text-muted transition-colors">{label}</div>
+    </Link>
   );
 }
 
-export default function FollowSection({ targetId, isOwn, isAuthed, initialIsFollowing, followers, following }: Props) {
+export default function FollowSection({ targetId, username, isOwn, isAuthed, initialIsFollowing, followers, following }: Props) {
   const [isFollowing, setIsFollowing] = useState(initialIsFollowing);
   const [followerCount, setFollowerCount] = useState(followers);
   const [loading, setLoading] = useState(false);
@@ -60,8 +61,8 @@ export default function FollowSection({ targetId, isOwn, isAuthed, initialIsFoll
 
   return (
     <div className="flex items-center gap-5">
-      <Stat value={followerCount} label="Follower" />
-      <Stat value={following} label="Folgt" />
+      <Stat value={followerCount} label="Follower" href={`/u/${username}/followers`} />
+      <Stat value={following} label="Folgt" href={`/u/${username}/following`} />
 
       {!isOwn &&
         (isAuthed ? (

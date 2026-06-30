@@ -29,6 +29,7 @@ type MediaResult = {
 const NAV_COMMANDS: NavCommand[] = [
   { id: 'home', label: 'Startseite', href: '/', icon: <Home size={18} />, keywords: 'home start trending' },
   { id: 'discover', label: 'Entdecken', href: '/discover', icon: <Compass size={18} />, keywords: 'discover filter genre entdecken' },
+  { id: 'community', label: 'Community', href: '/community', icon: <Users size={18} />, keywords: 'community profile entdecken leute öffentlich listen' },
   { id: 'search', label: 'Suche', href: '/search', icon: <Search size={18} />, keywords: 'search suche finden' },
   { id: 'watchlist', label: 'Watchlist', href: '/watchlist', icon: <Bookmark size={18} />, keywords: 'watchlist merkliste liste', authed: true },
   { id: 'feed', label: 'Feed', href: '/feed', icon: <Users size={18} />, keywords: 'feed social follower aktivität freunde', authed: true },

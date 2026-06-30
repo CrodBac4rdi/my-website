@@ -4,7 +4,7 @@ import { useState, useRef } from 'react';
 import { supabase } from '@/lib/supabase';
 import {
   Loader2, LogOut, CheckCircle2, Activity, Trash2, AlertTriangle,
-  Pencil, Star, Bookmark, Play, Clock, ListChecks, Globe, Lock, Copy,
+  Pencil, Star, Bookmark, Play, Clock, ListChecks, Globe, Lock, Copy, Bell,
 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -13,6 +13,7 @@ import ActivityFeed from '@/components/ActivityFeed';
 import AvatarPicker from '@/components/AvatarPicker';
 import BannerPicker from '@/components/BannerPicker';
 import ConfirmModal from '@/components/ConfirmModal';
+import PushToggle from '@/components/PushToggle';
 import { toast } from '@/lib/toast';
 import { updateProfileAction, updateVisibilityAction } from '@/lib/actions/profile';
 import { deleteAccountAction } from '@/lib/actions/account';
@@ -286,6 +287,20 @@ export default function ProfileClient({
             )}
           </>
         )}
+      </section>
+
+      {/* ===== BENACHRICHTIGUNGEN ===== */}
+      <section className="glass rounded-2xl p-6 md:p-8 space-y-4">
+        <div className="flex items-center gap-3">
+          <div className="p-2.5 rounded-xl border bg-surface-2 border-line-strong text-primary-400">
+            <Bell size={20} />
+          </div>
+          <div>
+            <h2 className="font-display text-lg font-bold text-fg">Benachrichtigungen</h2>
+            <p className="text-muted text-sm">Push-Hinweise zu neuen Episoden – auch wenn HORIZON nicht offen ist.</p>
+          </div>
+        </div>
+        <PushToggle />
       </section>
 
       {/* ===== EDIT FORM (ausklappbar) ===== */}

@@ -28,6 +28,45 @@ export async function isFollowing(supabase: Client, userId: string, targetId: st
   return !!data;
 }
 
+type ProfileLite = {
+  id: string;
+  username: string | null;
+  avatar_url: string | null;
+  bio: string | null;
+  is_public: boolean | null;
+};
+
+async function profilesByIds(supabase: Client, ids: string[]): Promise<ProfileLite[]> {
+  if (ids.length === 0) return [];
+  const { data } = await supabase
+    .from('profiles')
+    .select('id, username, avatar_url, bio, is_public')
+    .in('id', ids);
+  const map = new Map((data ?? []).map((p) => [p.id, p as ProfileLite]));
+  // Reihenfolge der follows beibehalten (neueste zuerst).
+  return ids.map((id) => map.get(id)).filter(Boolean) as ProfileLite[];
+}
+
+/** Profile, die diesem Profil folgen. */
+export async function getFollowers(supabase: Client, profileId: string): Promise<ProfileLite[]> {
+  const { data: rows } = await supabase
+    .from('follows')
+    .select('follower_id')
+    .eq('following_id', profileId)
+    .order('created_at', { ascending: false });
+  return profilesByIds(supabase, (rows ?? []).map((r) => r.follower_id));
+}
+
+/** Profile, denen dieses Profil folgt. */
+export async function getFollowingProfiles(supabase: Client, profileId: string): Promise<ProfileLite[]> {
+  const { data: rows } = await supabase
+    .from('follows')
+    .select('following_id')
+    .eq('follower_id', profileId)
+    .order('created_at', { ascending: false });
+  return profilesByIds(supabase, (rows ?? []).map((r) => r.following_id));
+}
+
 /** Follower- und Following-Zähler eines Profils (Follow-Graph ist öffentlich lesbar). */
 export async function getFollowCounts(supabase: Client, profileId: string) {
   const [followers, following] = await Promise.all([

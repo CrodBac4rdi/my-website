@@ -5,6 +5,18 @@ import type { NextConfig } from "next";
 // app/manifest.ts + components/PWAManager.tsx umgesetzt (siehe Next-PWA-Guide).
 const nextConfig: NextConfig = {
   turbopack: {},
+  images: {
+    // Nur die tatsächlich genutzten Bild-Hosts erlauben (= Moderations-Allowlist).
+    remotePatterns: [
+      { protocol: 'https', hostname: 'image.tmdb.org', pathname: '/t/p/**' },
+      { protocol: 'https', hostname: 'phrpjjuhwvanqfzcfxxg.supabase.co', pathname: '/storage/**' },
+      { protocol: 'https', hostname: 'nekos.best', pathname: '/**' },
+      { protocol: 'https', hostname: 'api.dicebear.com', pathname: '/**' },
+      { protocol: 'https', hostname: 'gravatar.com', pathname: '/**' },
+      { protocol: 'https', hostname: 'www.gravatar.com', pathname: '/**' },
+      { protocol: 'https', hostname: 'avatars.githubusercontent.com', pathname: '/**' },
+    ],
+  },
   async headers() {
     return [
       {

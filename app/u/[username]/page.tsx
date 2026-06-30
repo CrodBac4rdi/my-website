@@ -104,6 +104,7 @@ export default async function PublicProfilePage({
           <div className="md:pb-3">
             <FollowSection
               targetId={profile.id}
+              username={username}
               isOwn={isOwn}
               isAuthed={!!viewer}
               initialIsFollowing={viewerFollows}

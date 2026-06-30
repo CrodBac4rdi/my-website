@@ -14,6 +14,17 @@ export default function RecommendationsCarousel() {
   const scroller = useRef<HTMLDivElement>(null);
   const dir = useRef(0); // -1 links, 1 rechts, 0 idle
   const raf = useRef(0);
+  const reduceMotion = useRef(false);
+
+  useEffect(() => {
+    reduceMotion.current =
+      typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  }, []);
+
+  const startScroll = (d: number) => {
+    if (!reduceMotion.current) dir.current = d;
+  };
+  const stopScroll = () => (dir.current = 0);
 
   useEffect(() => {
     fetch('/api/recommendations')
@@ -79,8 +90,8 @@ export default function RecommendationsCarousel() {
       <div className="relative group/carousel">
         {/* Linke Hover-Zone */}
         <div
-          onMouseEnter={() => (dir.current = -1)}
-          onMouseLeave={() => (dir.current = 0)}
+          onMouseEnter={() => startScroll(-1)}
+          onMouseLeave={stopScroll}
           className="absolute left-0 top-0 bottom-4 w-14 md:w-20 z-20 flex items-center justify-start pl-2 bg-gradient-to-r from-bg via-bg/70 to-transparent opacity-0 group-hover/carousel:opacity-100 transition-opacity"
         >
           <button
@@ -94,8 +105,8 @@ export default function RecommendationsCarousel() {
 
         {/* Rechte Hover-Zone */}
         <div
-          onMouseEnter={() => (dir.current = 1)}
-          onMouseLeave={() => (dir.current = 0)}
+          onMouseEnter={() => startScroll(1)}
+          onMouseLeave={stopScroll}
           className="absolute right-0 top-0 bottom-4 w-14 md:w-20 z-20 flex items-center justify-end pr-2 bg-gradient-to-l from-bg via-bg/70 to-transparent opacity-0 group-hover/carousel:opacity-100 transition-opacity"
         >
           <button

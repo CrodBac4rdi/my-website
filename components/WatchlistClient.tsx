@@ -94,12 +94,20 @@ export default function WatchlistClient({ initialItems }: { initialItems: Watchl
             Entdecke neue Inhalte und füge sie deiner persönlichen Watchlist hinzu.
           </p>
         </div>
-        <Link
-          href="/"
-          className="bg-primary-600 hover:bg-primary-500 text-white font-bold py-4 px-12 rounded-2xl transition-all shadow-xl shadow-primary-500/20 flex items-center gap-3"
-        >
-          <Plus size={20} /> Entdecken starten
-        </Link>
+        <div className="flex flex-wrap items-center justify-center gap-3">
+          <Link
+            href="/discover"
+            className="bg-primary-600 hover:bg-primary-500 text-white font-bold py-4 px-10 rounded-2xl transition-all shadow-xl shadow-primary-500/20 flex items-center gap-3"
+          >
+            <Plus size={20} /> Entdecken starten
+          </Link>
+          <Link
+            href="/community"
+            className="bg-surface-3 border border-line-strong hover:border-primary-500/50 text-fg font-bold py-4 px-10 rounded-2xl transition-all flex items-center gap-3"
+          >
+            Community ansehen
+          </Link>
+        </div>
       </div>
     );
   }

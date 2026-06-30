@@ -55,8 +55,8 @@ export default async function FeedPage() {
           <p className="text-muted max-w-sm">
             Folge öffentlichen Profilen, um ihre Aktivitäten hier zu sehen.
           </p>
-          <Link href="/discover" className="text-primary-400 hover:underline font-semibold">
-            Profile entdecken
+          <Link href="/community" className="inline-flex items-center gap-2 bg-primary-600 hover:bg-primary-500 text-white font-semibold px-5 h-11 rounded-lg transition-colors shadow-glow">
+            <Users size={16} /> Profile entdecken
           </Link>
         </div>
       ) : items.length === 0 ? (

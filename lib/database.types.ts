@@ -283,6 +283,51 @@ export type Database = {
           },
         ]
       }
+      push_subscriptions: {
+        Row: {
+          created_at: string
+          endpoint: string
+          id: number
+          subscription: Json
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          endpoint: string
+          id?: number
+          subscription: Json
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          endpoint?: string
+          id?: number
+          subscription?: Json
+          user_id?: string
+        }
+        Relationships: []
+      }
+      rate_limit_events: {
+        Row: {
+          action: string
+          created_at: string
+          id: number
+          user_id: string
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          id?: number
+          user_id: string
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          id?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       follows: {
         Row: {
           created_at: string
@@ -491,6 +536,16 @@ export type Database = {
         }
         Relationships: []
       }
+      popular_public_profiles: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          followers: number | null
+          id: string | null
+          username: string | null
+        }
+        Relationships: []
+      }
       public_lists_view: {
         Row: {
           author_avatar: string | null
@@ -605,6 +660,10 @@ export type Database = {
       }
     }
     Functions: {
+      check_rate_limit: {
+        Args: { p_action: string; p_max: number; p_window_seconds: number }
+        Returns: boolean
+      }
       delete_user: {
         Args: Record<PropertyKey, never>
         Returns: undefined

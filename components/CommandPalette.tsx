@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import { useRouter } from 'next/navigation';
 import {
   Search, Home, Compass, Bookmark, Image as ImageIcon, Shield,
@@ -67,6 +68,9 @@ export default function CommandPalette({ authed }: { authed: boolean }) {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
         setOpen((o) => !o);
+      } else if (e.key === 'Escape') {
+        // Robust schließen, unabhängig vom Fokus (Input-Fokus reicht nicht immer).
+        setOpen(false);
       }
     };
     const onOpen = () => setOpen(true);
@@ -78,14 +82,18 @@ export default function CommandPalette({ authed }: { authed: boolean }) {
     };
   }, []);
 
-  // Beim Öffnen: zurücksetzen + fokussieren.
+  // Beim Öffnen: zurücksetzen, fokussieren, Body-Scroll sperren (Handy/PWA).
   useEffect(() => {
     if (open) {
       setQuery('');
       setResults([]);
       setActive(0);
-      // Fokus nach dem Mount-Frame setzen.
       requestAnimationFrame(() => inputRef.current?.focus());
+      const prev = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = prev;
+      };
     }
   }, [open]);
 
@@ -193,9 +201,11 @@ export default function CommandPalette({ authed }: { authed: boolean }) {
 
   const navCount = navMatches.length;
 
-  return (
+  // Per Portal an document.body — sonst erbt die Palette pointer-events-none
+  // vom Header und Klicks gehen einfach durch (man kann nichts auswählen/schließen).
+  return createPortal(
     <div
-      className="fixed inset-0 z-[100] flex items-start justify-center px-4 pt-[12vh]"
+      className="fixed inset-0 z-[100] flex items-start justify-center px-4 pt-[12vh] pointer-events-auto"
       onMouseDown={() => setOpen(false)}
       role="dialog"
       aria-modal="true"
@@ -297,6 +307,7 @@ export default function CommandPalette({ authed }: { authed: boolean }) {
           <span className="flex items-center gap-1"><kbd className="px-1.5 py-0.5 rounded bg-surface-3 border border-line">esc</kbd> schließen</span>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

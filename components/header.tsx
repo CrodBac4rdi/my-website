@@ -1,6 +1,6 @@
 'use client';
 
-import { LogIn, LogOut, Bookmark, User, Search, Image as ImageIcon, Shield, Menu, X, Compass, Command, Users } from "lucide-react";
+import { LogIn, LogOut, Bookmark, User, Search, Image as ImageIcon, Shield, Menu, X, Compass, Command, Users, HelpCircle, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
@@ -71,25 +71,19 @@ export default function Header() {
               <span className="hidden md:block">Feed</span>
             </Link>
           )}
-          <Link href="/search" className="px-5 py-2.5 rounded-xl text-sm font-semibold text-muted hover:text-fg hover:bg-white/[.06] transition-all flex items-center gap-2">
-            <Search size={16} />
-            <span className="hidden md:block">{t('nav.search')}</span>
-          </Link>
-          <Link href="/backgrounds" className="px-5 py-2.5 rounded-xl text-sm font-semibold text-muted hover:text-fg hover:bg-white/[.06] transition-all flex items-center gap-2">
-            <ImageIcon size={16} />
-            <span className="hidden md:block">Hintergründe</span>
-          </Link>
-          <Link href="/legal" className="px-5 py-2.5 rounded-xl text-sm font-semibold text-muted hover:text-fg hover:bg-white/[.06] transition-all flex items-center gap-2">
-            <Shield size={16} />
-            <span className="hidden md:block">Legal & Privacy</span>
-          </Link>
+          {user && (
+            <Link href="/recommendations" className="px-5 py-2.5 rounded-xl text-sm font-semibold text-muted hover:text-fg hover:bg-white/[.06] transition-all flex items-center gap-2">
+              <Sparkles size={16} />
+              <span className="hidden md:block">Für dich</span>
+            </Link>
+          )}
         </div>
 
         {/* DESKTOP ACTIONS & AUTH */}
         <div className="hidden lg:flex px-2 items-center gap-4">
           <button
             onClick={openCommandPalette}
-            className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/[.04] border border-line text-faint hover:text-fg hover:border-line-strong transition-colors"
+            className="flex items-center gap-2 px-3 py-2 rounded-xl bg-surface-2 border border-line-strong text-muted hover:text-fg hover:border-primary-500/50 transition-colors"
             title="Schnellsuche (⌘K)"
           >
             <Search size={15} />
@@ -150,8 +144,10 @@ export default function Header() {
             <Link href="/discover" onClick={() => setIsMobileMenuOpen(false)} className="px-4 py-3 rounded-xl text-lg font-bold text-white hover:bg-white/10 flex items-center gap-3 transition-colors"><Compass size={20} />Entdecken</Link>
             {user && <Link href="/watchlist" onClick={() => setIsMobileMenuOpen(false)} className="px-4 py-3 rounded-xl text-lg font-bold text-white hover:bg-white/10 flex items-center gap-3 transition-colors"><Bookmark size={20} />{t('nav.watchlist')}</Link>}
             {user && <Link href="/feed" onClick={() => setIsMobileMenuOpen(false)} className="px-4 py-3 rounded-xl text-lg font-bold text-white hover:bg-white/10 flex items-center gap-3 transition-colors"><Users size={20} />Feed</Link>}
+            {user && <Link href="/recommendations" onClick={() => setIsMobileMenuOpen(false)} className="px-4 py-3 rounded-xl text-lg font-bold text-white hover:bg-white/10 flex items-center gap-3 transition-colors"><Sparkles size={20} />Für dich</Link>}
             <Link href="/search" onClick={() => setIsMobileMenuOpen(false)} className="px-4 py-3 rounded-xl text-lg font-bold text-white hover:bg-white/10 flex items-center gap-3 transition-colors"><Search size={20} />{t('nav.search')}</Link>
             <Link href="/backgrounds" onClick={() => setIsMobileMenuOpen(false)} className="px-4 py-3 rounded-xl text-lg font-bold text-white hover:bg-white/10 flex items-center gap-3 transition-colors"><ImageIcon size={20} />Hintergründe</Link>
+            <Link href="/faq" onClick={() => setIsMobileMenuOpen(false)} className="px-4 py-3 rounded-xl text-lg font-bold text-white hover:bg-white/10 flex items-center gap-3 transition-colors"><HelpCircle size={20} />FAQ</Link>
             <Link href="/legal" onClick={() => setIsMobileMenuOpen(false)} className="px-4 py-3 rounded-xl text-lg font-bold text-white hover:bg-white/10 flex items-center gap-3 transition-colors"><Shield size={20} />Legal & Privacy</Link>
             
             <hr className="border-white/10 my-2" />

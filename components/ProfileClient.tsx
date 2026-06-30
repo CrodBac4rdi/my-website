@@ -147,47 +147,53 @@ export default function ProfileClient({
     'w-full bg-white/[.04] border border-line rounded-md px-4 py-3 text-sm text-fg placeholder:text-faint focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/30 transition';
 
   return (
-    <div className="space-y-10 pb-20 max-w-5xl mx-auto">
+    <div className="space-y-14 pb-24 max-w-5xl mx-auto">
       {/* ===== IDENTITY HEADER ===== */}
       <div>
-        <div className="relative h-56 md:h-72 rounded-3xl overflow-hidden border border-line bg-elev">
+        <div className="relative aspect-[16/5] max-h-[320px] w-full rounded-3xl overflow-hidden border border-line-strong bg-elev shadow-card">
           {profile?.banner_url ? (
-            <img src={profile.banner_url} alt="Banner" className="w-full h-full object-cover" />
+            <img src={profile.banner_url} alt="Banner" className="w-full h-full object-cover object-center" />
           ) : (
-            <div className="w-full h-full bg-gradient-to-tr from-primary-700/40 to-primary-500/10" />
+            <div className="w-full h-full bg-gradient-to-tr from-primary-700/50 via-primary-600/20 to-primary-500/10" />
           )}
-          <div className="absolute inset-0 bg-gradient-to-t from-bg/80 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/40 to-transparent" />
         </div>
 
-        <div className="px-4 md:px-10 -mt-16 relative z-10 flex flex-col md:flex-row md:items-end gap-5">
-          <div className="w-32 h-32 md:w-36 md:h-36 rounded-full border-4 border-bg bg-surface-3 overflow-hidden shrink-0 shadow-2xl">
+        <div className="px-4 md:px-10 -mt-20 relative z-10 flex flex-col md:flex-row md:items-end gap-6">
+          <div className="w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-bg bg-surface-3 overflow-hidden shrink-0 shadow-pop">
             {profile?.avatar_url ? (
               <img src={profile.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
             ) : (
-              <div className="w-full h-full flex items-center justify-center text-faint text-4xl font-black uppercase">
+              <div className="w-full h-full flex items-center justify-center text-faint text-5xl font-black uppercase">
                 {profile?.username?.charAt(0) || '?'}
               </div>
             )}
           </div>
 
-          <div className="flex-1 md:pb-2">
-            <h1 className="font-display text-3xl font-bold text-fg">
-              {profile?.username || 'Unbenannt'}
-            </h1>
-            <p className="text-faint text-sm">{email}</p>
-            {profile?.bio && <p className="text-muted mt-2 max-w-xl leading-relaxed">{profile.bio}</p>}
+          <div className="flex-1 md:pb-3">
+            <div className="flex items-center gap-3 flex-wrap">
+              <h1 className="font-display text-4xl font-bold text-fg leading-none">
+                {profile?.username || 'Unbenannt'}
+              </h1>
+              <span className={`inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full border ${isPublic ? 'bg-success/15 border-success/40 text-success' : 'bg-surface-3 border-line-strong text-faint'}`}>
+                {isPublic ? <Globe size={12} /> : <Lock size={12} />}
+                {isPublic ? 'Öffentlich' : 'Privat'}
+              </span>
+            </div>
+            <p className="text-faint text-sm mt-1.5">{email}</p>
+            {profile?.bio && <p className="text-muted mt-3 max-w-xl leading-relaxed">{profile.bio}</p>}
           </div>
 
-          <div className="flex gap-2 md:pb-2">
+          <div className="flex gap-2 md:pb-3">
             <button
               onClick={() => setEditing((e) => !e)}
-              className="inline-flex items-center gap-2 h-10 px-4 rounded-md text-sm font-semibold bg-white/[.06] hover:bg-white/[.1] border border-line text-fg transition"
+              className="inline-flex items-center gap-2 h-10 px-4 rounded-lg text-sm font-semibold bg-surface-3 hover:bg-surface-3 hover:border-primary-500/50 border border-line-strong text-fg transition"
             >
               <Pencil size={15} /> {editing ? 'Schließen' : 'Bearbeiten'}
             </button>
             <button
               onClick={handleLogout}
-              className="inline-flex items-center gap-2 h-10 px-4 rounded-md text-sm font-semibold bg-danger/12 text-danger border border-line hover:bg-danger/20 transition"
+              className="inline-flex items-center gap-2 h-10 px-4 rounded-lg text-sm font-semibold bg-danger/15 text-danger border border-danger/40 hover:bg-danger/25 transition"
             >
               <LogOut size={15} /> Logout
             </button>
@@ -197,7 +203,7 @@ export default function ProfileClient({
 
       {/* ===== STATS ===== */}
       {total > 0 && (
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
           <StatTile icon={<ListChecks size={16} />} accent="text-primary-400" value={total} label="Titel gesamt" />
           <StatTile icon={<CheckCircle2 size={16} />} accent="text-success" value={stats?.completed_count ?? 0} label="Abgeschlossen" />
           <StatTile icon={<Play size={16} />} accent="text-primary-400" value={stats?.watching_count ?? 0} label="Schaut" />
@@ -250,10 +256,10 @@ export default function ProfileClient({
                 <button
                   key={key}
                   onClick={() => toggleField(key)}
-                  className={`px-3.5 py-1.5 rounded-full text-[13px] font-semibold border transition ${
+                  className={`px-4 py-2 rounded-full text-[13px] font-semibold border transition ${
                     publicFields[key]
-                      ? 'bg-primary-500/15 border-primary-500 text-primary-400'
-                      : 'bg-white/[.06] border-line text-muted hover:text-fg'
+                      ? 'bg-primary-600 border-primary-500 text-white shadow-glow'
+                      : 'bg-surface-3 border-line-strong text-muted hover:text-fg hover:border-primary-500/50'
                   }`}
                 >
                   {label}: {publicFields[key] ? 'an' : 'aus'}

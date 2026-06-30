@@ -10,8 +10,13 @@ type BeforeInstallPromptEvent = Event & {
   userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
 };
 
+declare global {
+  interface Window {
+    __horizonInstallPrompt?: BeforeInstallPromptEvent | null;
+  }
+}
+
 export default function PWAManager() {
-  const [deferred, setDeferred] = useState<BeforeInstallPromptEvent | null>(null);
   const [showIOS, setShowIOS] = useState(false);
   const [visible, setVisible] = useState(false);
 
@@ -25,29 +30,34 @@ export default function PWAManager() {
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    const dismissed = localStorage.getItem(DISMISS_KEY) === '1';
     const isStandalone =
       window.matchMedia('(display-mode: standalone)').matches ||
-      // iOS Safari
       (window.navigator as unknown as { standalone?: boolean }).standalone === true;
-    if (dismissed || isStandalone) return;
+    if (isStandalone) return;
 
-    // Android / Desktop Chrome: beforeinstallprompt abfangen.
+    const dismissed = () => localStorage.getItem(DISMISS_KEY) === '1';
+
+    // beforeinstallprompt IMMER für globale Install-Buttons (FAQ/Profil) merken,
+    // aber das Banner nur zeigen, wenn nicht zuvor weggeklickt.
     const onBeforeInstall = (e: Event) => {
       e.preventDefault();
-      setDeferred(e as BeforeInstallPromptEvent);
-      setVisible(true);
+      window.__horizonInstallPrompt = e as BeforeInstallPromptEvent;
+      window.dispatchEvent(new Event('horizon-install-available'));
+      if (!dismissed()) setVisible(true);
     };
     window.addEventListener('beforeinstallprompt', onBeforeInstall);
 
-    // iOS: kein beforeinstallprompt -> manuellen Hinweis zeigen.
+    // iOS: kein beforeinstallprompt -> manuellen Hinweis zeigen (sofern nicht weggeklickt).
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as unknown as { MSStream?: unknown }).MSStream;
-    if (isIOS) {
+    if (isIOS && !dismissed()) {
       setShowIOS(true);
       setVisible(true);
     }
 
-    const onInstalled = () => setVisible(false);
+    const onInstalled = () => {
+      window.__horizonInstallPrompt = null;
+      setVisible(false);
+    };
     window.addEventListener('appinstalled', onInstalled);
 
     return () => {
@@ -62,10 +72,11 @@ export default function PWAManager() {
   };
 
   const install = async () => {
+    const deferred = window.__horizonInstallPrompt;
     if (!deferred) return;
     await deferred.prompt();
     await deferred.userChoice;
-    setDeferred(null);
+    window.__horizonInstallPrompt = null;
     setVisible(false);
   };
 

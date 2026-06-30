@@ -9,14 +9,14 @@
    Fonts kommen über next/font Variablen (--font-grotesk/-inter/-jbmono).
    ============================================================ */
 :root {
-  /* base + surfaces (Dark) */
+  /* base + surfaces (Dark) — bewusst kräftiger, damit Panels/Chips Substanz haben */
   --bg: #060711;
-  --bg-elev: #0a0c16;
-  --surface-1: rgba(255, 255, 255, 0.035);
-  --surface-2: rgba(255, 255, 255, 0.06);
-  --surface-3: rgba(255, 255, 255, 0.09);
-  --border: rgba(255, 255, 255, 0.08);
-  --border-strong: rgba(255, 255, 255, 0.16);
+  --bg-elev: #11141f;
+  --surface-1: rgba(255, 255, 255, 0.05);
+  --surface-2: rgba(255, 255, 255, 0.085);
+  --surface-3: rgba(255, 255, 255, 0.14);
+  --border: rgba(255, 255, 255, 0.14);
+  --border-strong: rgba(255, 255, 255, 0.26);
 
   /* text */
   --text-1: #f3f5fb;
@@ -53,11 +53,11 @@
 .light {
   --bg: #edf0f7;
   --bg-elev: #ffffff;
-  --surface-1: rgba(15, 23, 42, 0.035);
-  --surface-2: rgba(15, 23, 42, 0.06);
-  --surface-3: rgba(15, 23, 42, 0.09);
-  --border: rgba(15, 23, 42, 0.1);
-  --border-strong: rgba(15, 23, 42, 0.18);
+  --surface-1: rgba(15, 23, 42, 0.05);
+  --surface-2: rgba(15, 23, 42, 0.085);
+  --surface-3: rgba(15, 23, 42, 0.13);
+  --border: rgba(15, 23, 42, 0.14);
+  --border-strong: rgba(15, 23, 42, 0.24);
   --text-1: #0e1320;
   --text-2: #4c546a;
   --text-3: #8a91a6;
@@ -129,12 +129,13 @@ body {
 }
 
 @layer components {
-  /* Glas-Rezept als Utility-Kombi (siehe Design-System §07). */
+  /* Glas-Rezept als Utility-Kombi (siehe Design-System §07).
+     Kräftiger als zuvor — Panels sollen klar lesbar sein, nicht durchscheinen. */
   .glass {
-    @apply bg-elev/55 backdrop-blur-xl border border-line shadow-card;
+    @apply bg-elev/85 backdrop-blur-xl border border-line shadow-card;
   }
   .light .glass {
-    @apply bg-white/70;
+    @apply bg-white/85;
   }
 }
 

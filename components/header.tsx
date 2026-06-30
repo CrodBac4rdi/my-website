@@ -1,6 +1,6 @@
 'use client';
 
-import { LogIn, LogOut, Bookmark, User, Search, Image as ImageIcon, Shield, Menu, X, Compass, Command } from "lucide-react";
+import { LogIn, LogOut, Bookmark, User, Search, Image as ImageIcon, Shield, Menu, X, Compass, Command, Users } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
@@ -63,6 +63,12 @@ export default function Header() {
             <Link href="/watchlist" className="px-5 py-2.5 rounded-xl text-sm font-semibold text-muted hover:text-fg hover:bg-white/[.06] transition-all flex items-center gap-2">
               <Bookmark size={16} />
               <span className="hidden md:block">{t('nav.watchlist')}</span>
+            </Link>
+          )}
+          {user && (
+            <Link href="/feed" className="px-5 py-2.5 rounded-xl text-sm font-semibold text-muted hover:text-fg hover:bg-white/[.06] transition-all flex items-center gap-2">
+              <Users size={16} />
+              <span className="hidden md:block">Feed</span>
             </Link>
           )}
           <Link href="/search" className="px-5 py-2.5 rounded-xl text-sm font-semibold text-muted hover:text-fg hover:bg-white/[.06] transition-all flex items-center gap-2">
@@ -143,6 +149,7 @@ export default function Header() {
             <button onClick={() => { setIsMobileMenuOpen(false); openCommandPalette(); }} className="px-4 py-3 rounded-xl text-lg font-bold text-white hover:bg-white/10 flex items-center gap-3 transition-colors text-left"><Search size={20} />Schnellsuche</button>
             <Link href="/discover" onClick={() => setIsMobileMenuOpen(false)} className="px-4 py-3 rounded-xl text-lg font-bold text-white hover:bg-white/10 flex items-center gap-3 transition-colors"><Compass size={20} />Entdecken</Link>
             {user && <Link href="/watchlist" onClick={() => setIsMobileMenuOpen(false)} className="px-4 py-3 rounded-xl text-lg font-bold text-white hover:bg-white/10 flex items-center gap-3 transition-colors"><Bookmark size={20} />{t('nav.watchlist')}</Link>}
+            {user && <Link href="/feed" onClick={() => setIsMobileMenuOpen(false)} className="px-4 py-3 rounded-xl text-lg font-bold text-white hover:bg-white/10 flex items-center gap-3 transition-colors"><Users size={20} />Feed</Link>}
             <Link href="/search" onClick={() => setIsMobileMenuOpen(false)} className="px-4 py-3 rounded-xl text-lg font-bold text-white hover:bg-white/10 flex items-center gap-3 transition-colors"><Search size={20} />{t('nav.search')}</Link>
             <Link href="/backgrounds" onClick={() => setIsMobileMenuOpen(false)} className="px-4 py-3 rounded-xl text-lg font-bold text-white hover:bg-white/10 flex items-center gap-3 transition-colors"><ImageIcon size={20} />Hintergründe</Link>
             <Link href="/legal" onClick={() => setIsMobileMenuOpen(false)} className="px-4 py-3 rounded-xl text-lg font-bold text-white hover:bg-white/10 flex items-center gap-3 transition-colors"><Shield size={20} />Legal & Privacy</Link>

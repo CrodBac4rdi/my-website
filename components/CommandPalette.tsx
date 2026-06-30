@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Search, Home, Compass, Bookmark, Image as ImageIcon, Shield,
-  Calendar, List as ListIcon, User, Download, CornerDownLeft, Loader2,
+  Calendar, List as ListIcon, User, Download, CornerDownLeft, Loader2, Users,
 } from 'lucide-react';
 import { getImageUrl } from '@/lib/tmdb';
 
@@ -30,6 +30,7 @@ const NAV_COMMANDS: NavCommand[] = [
   { id: 'discover', label: 'Entdecken', href: '/discover', icon: <Compass size={18} />, keywords: 'discover filter genre entdecken' },
   { id: 'search', label: 'Suche', href: '/search', icon: <Search size={18} />, keywords: 'search suche finden' },
   { id: 'watchlist', label: 'Watchlist', href: '/watchlist', icon: <Bookmark size={18} />, keywords: 'watchlist merkliste liste', authed: true },
+  { id: 'feed', label: 'Feed', href: '/feed', icon: <Users size={18} />, keywords: 'feed social follower aktivität freunde', authed: true },
   { id: 'lists', label: 'Meine Listen', href: '/lists', icon: <ListIcon size={18} />, keywords: 'listen lists sammlungen', authed: true },
   { id: 'profile', label: 'Profil', href: '/profile', icon: <User size={18} />, keywords: 'profil profile account konto einstellungen', authed: true },
   { id: 'calendar', label: 'Kalender', href: '/calendar', icon: <Calendar size={18} />, keywords: 'kalender calendar airing simulcast' },

@@ -6,7 +6,9 @@ import { createClient } from '@/lib/supabase/server';
 import { getProfileByUsername, getWatchlistStats } from '@/lib/services/profile';
 import { getWatchlist } from '@/lib/services/watchlist';
 import { getPublicListsByUser } from '@/lib/services/lists';
+import { getFollowCounts, isFollowing } from '@/lib/services/follows';
 import AnimeCard from '@/components/AnimeCard';
+import FollowSection from '@/components/FollowSection';
 
 export async function generateMetadata({
   params,
@@ -56,10 +58,17 @@ export default async function PublicProfilePage({
 
   const pf = (profile.public_fields ?? {}) as Record<string, boolean>;
 
-  const [{ data: watchlistData }, statsRes, listsRes] = await Promise.all([
+  const {
+    data: { user: viewer },
+  } = await supabase.auth.getUser();
+  const isOwn = viewer?.id === profile.id;
+
+  const [{ data: watchlistData }, statsRes, listsRes, counts, viewerFollows] = await Promise.all([
     getWatchlist(supabase, profile.id),
     pf.stats ? getWatchlistStats(supabase, profile.id) : Promise.resolve({ data: null } as { data: null }),
     getPublicListsByUser(supabase, profile.id),
+    getFollowCounts(supabase, profile.id),
+    viewer && !isOwn ? isFollowing(supabase, viewer.id, profile.id) : Promise.resolve(false),
   ]);
 
   const watchlist = (watchlistData ?? []) as any[];
@@ -88,10 +97,20 @@ export default async function PublicProfilePage({
               </div>
             )}
           </div>
-          <div className="pb-2">
+          <div className="pb-2 flex-1">
             <h1 className="font-display text-3xl font-bold text-fg">{username}</h1>
             {pf.bio && profile.bio && <p className="text-muted mt-1 max-w-xl leading-relaxed">{profile.bio}</p>}
           </div>
+        </div>
+        <div className="px-4 md:px-10 mt-4">
+          <FollowSection
+            targetId={profile.id}
+            isOwn={isOwn}
+            isAuthed={!!viewer}
+            initialIsFollowing={viewerFollows}
+            followers={counts.followers}
+            following={counts.following}
+          />
         </div>
       </div>
 

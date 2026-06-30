@@ -47,7 +47,7 @@ Status: ⬜ offen · 🟡 in Arbeit · ✅ fertig
 | 4.1 | **Profil-Sichtbarkeit (privat/öffentlich)** | ✅ | `profiles.is_public` (default privat) + `public_fields jsonb` + RLS (watchlist öffentlicher Profile lesbar, activity per Flag). Sichtbarkeits-Karte im Profil (sofort-Toggle, Feld-Flags, Link kopieren). |
 | 4.2 | **Öffentliche Profile `/u/[username]`** | ✅ | Gäste-Ansicht: Username+Avatar+Watchlist (Pflicht) + Stats/Bio/Listen je nach Flag. Privat → Hinweis statt Inhalt. |
 | 4.3 | **Listen öffentlich teilen** | ✅ | `setListVisibilityAction` + Toggle & Teilen-Button in `lists/[id]`, Sichtbarkeits-Badge in der Listen-Übersicht. |
-| 4.4 | **Follower + Social-Activity-Feed** | L | nein | `follows`-Tabelle (follower_id, following_id). Feed der Gefolgten — `user_activities` existiert (own-only), bräuchte Policy für Follower-Sichtbarkeit. Größtes Stück, noch offen. |
+| 4.4 | **Follower + Social-Activity-Feed** | ✅ | `follows`-Tabelle (PK follower/following, no-self-Check, Index) + RLS (öffentlich lesbar; Insert nur eigene Beziehung & nur öffentliche Profile; Delete nur eigene). `social_feed`-View (security_invoker, Akteur-Profil + Medien); Feed nutzt bestehende `user_activities`-RLS (öffentlich+activity-Flag). `FollowSection` (Counts + optimistischer Follow-Button) auf `/u/[username]`, Feed-Seite `/feed` + Nav/Palette-Eintrag. RLS in 4 Fällen verifiziert (public erlaubt; self/spoof/non-public blockiert). |
 
 ---
 

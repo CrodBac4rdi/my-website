@@ -4,8 +4,9 @@ import { useState, useRef } from 'react';
 import { supabase } from '@/lib/supabase';
 import {
   Loader2, LogOut, CheckCircle2, Activity, Trash2, AlertTriangle,
-  Pencil, Star, Bookmark, Play, Clock, ListChecks,
+  Pencil, Star, Bookmark, Play, Clock, ListChecks, Globe, Lock, Copy,
 } from 'lucide-react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import AnimeCard from '@/components/AnimeCard';
 import ActivityFeed from '@/components/ActivityFeed';
@@ -13,14 +14,18 @@ import AvatarPicker from '@/components/AvatarPicker';
 import BannerPicker from '@/components/BannerPicker';
 import ConfirmModal from '@/components/ConfirmModal';
 import { toast } from '@/lib/toast';
-import { updateProfileAction } from '@/lib/actions/profile';
+import { updateProfileAction, updateVisibilityAction } from '@/lib/actions/profile';
 import { deleteAccountAction } from '@/lib/actions/account';
+
+type PublicFields = { stats?: boolean; bio?: boolean; activity?: boolean };
 
 type Profile = {
   username: string | null;
   bio: string | null;
   avatar_url: string | null;
   banner_url: string | null;
+  is_public?: boolean;
+  public_fields?: PublicFields | null;
 };
 
 export type WatchlistStats = {
@@ -69,8 +74,31 @@ export default function ProfileClient({
   const [saving, setSaving] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [isPublic, setIsPublic] = useState<boolean>(initialProfile.is_public ?? false);
+  const [publicFields, setPublicFields] = useState<PublicFields>(initialProfile.public_fields ?? {});
   const savingRef = useRef(false);
   const router = useRouter();
+
+  // Sichtbarkeit speichert sofort (GitHub-artig, kein „bist du sicher?").
+  const saveVisibility = async (nextPublic: boolean, nextFields: PublicFields) => {
+    const prevPublic = isPublic;
+    const prevFields = publicFields;
+    setIsPublic(nextPublic);
+    setPublicFields(nextFields);
+    const res = await updateVisibilityAction({ isPublic: nextPublic, publicFields: nextFields });
+    if (!res.ok) {
+      toast.error(res.error);
+      setIsPublic(prevPublic);
+      setPublicFields(prevFields);
+    }
+  };
+
+  const toggleField = (key: keyof PublicFields) =>
+    saveVisibility(isPublic, { ...publicFields, [key]: !publicFields[key] });
+
+  const profileUrl = profile.username
+    ? (typeof window !== 'undefined' ? window.location.origin : '') + `/u/${profile.username}`
+    : '';
 
   const handleDeleteAccount = async () => {
     setDeleting(true);
@@ -182,6 +210,77 @@ export default function ProfileClient({
           />
         </div>
       )}
+
+      {/* ===== SICHTBARKEIT ===== */}
+      <section className="glass rounded-2xl p-6 md:p-8 space-y-5">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className={`p-2.5 rounded-xl border ${isPublic ? 'bg-success/10 border-success/30 text-success' : 'bg-surface-2 border-line text-faint'}`}>
+              {isPublic ? <Globe size={20} /> : <Lock size={20} />}
+            </div>
+            <div>
+              <h2 className="font-display text-lg font-bold text-fg">
+                Profil ist {isPublic ? 'öffentlich' : 'privat'}
+              </h2>
+              <p className="text-muted text-sm">
+                {isPublic
+                  ? 'Username, Profilbild und Watchlist sind für alle sichtbar.'
+                  : 'Nur du siehst dein Profil.'}
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={() => saveVisibility(!isPublic, publicFields)}
+            className={`inline-flex items-center gap-2 h-10 px-4 rounded-md text-sm font-semibold transition active:scale-[.98] ${
+              isPublic
+                ? 'bg-white/[.06] border border-line text-fg hover:bg-white/[.1]'
+                : 'bg-primary-600 hover:bg-primary-500 text-white shadow-glow'
+            }`}
+          >
+            {isPublic ? <><Lock size={15} /> Privat machen</> : <><Globe size={15} /> Öffentlich machen</>}
+          </button>
+        </div>
+
+        {isPublic && (
+          <>
+            {/* Optionale Felder */}
+            <div className="flex flex-wrap gap-2 pt-1">
+              <span className="text-[11px] font-bold text-faint uppercase tracking-wider w-full">Zusätzlich öffentlich zeigen</span>
+              {([['stats', 'Statistiken'], ['bio', 'Bio'], ['activity', 'Aktivität']] as const).map(([key, label]) => (
+                <button
+                  key={key}
+                  onClick={() => toggleField(key)}
+                  className={`px-3.5 py-1.5 rounded-full text-[13px] font-semibold border transition ${
+                    publicFields[key]
+                      ? 'bg-primary-500/15 border-primary-500 text-primary-400'
+                      : 'bg-white/[.06] border-line text-muted hover:text-fg'
+                  }`}
+                >
+                  {label}: {publicFields[key] ? 'an' : 'aus'}
+                </button>
+              ))}
+            </div>
+
+            {/* Öffentlicher Link */}
+            {profile.username && (
+              <div className="flex items-center gap-2 flex-wrap">
+                <Link href={`/u/${profile.username}`} className="text-primary-400 hover:underline text-sm font-medium break-all">
+                  /u/{profile.username}
+                </Link>
+                <button
+                  onClick={() => { if (profileUrl) { navigator.clipboard?.writeText(profileUrl); toast.success('Link kopiert.'); } }}
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted hover:text-fg transition"
+                >
+                  <Copy size={13} /> Link kopieren
+                </button>
+              </div>
+            )}
+            {!profile.username && (
+              <p className="text-warning text-sm">Setz zuerst einen Benutzernamen, damit dein Profil unter /u/… erreichbar ist.</p>
+            )}
+          </>
+        )}
+      </section>
 
       {/* ===== EDIT FORM (ausklappbar) ===== */}
       {editing && (

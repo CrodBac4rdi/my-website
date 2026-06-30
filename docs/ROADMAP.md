@@ -25,9 +25,9 @@ Status: ⬜ offen · 🟡 in Arbeit · ✅ fertig
 
 | # | Feature | Aufwand | AI? | Notiz |
 |---|---------|---------|-----|-------|
-| 2.1 | **Genre/Filter-Seite `/discover`** | M | nein | Chips: Genre, Jahr, Sortierung (Popularität/Rating/Datum), optional Streaming-Provider. Nutzt `/api/discover` (TMDB discover) + Infinite-Scroll (wie Home). |
-| 2.2 | **„Weil du X auf der Watchlist hast"-Rail** | M | nein | Für die Top-Watchlist-Titel `/tv/{id}/recommendations` ziehen, aggregieren, deduplizieren, bereits-Vorhandenes rausfiltern. Nur eingeloggt. Caching beachten (TMDB-Ratelimit). |
-| 2.3 | **Personalisierte Empfehlungen** | M | nein* | Content-basiert: Genre-Affinität aus der Watchlist + gewichtete TMDB-Recommendations. *Kein generatives AI; reicht für solide Vorschläge. Echte ML später optional. |
+| 2.1 | **Genre/Filter-Seite `/discover`** | ✅ | Chips Genre/Jahr/Sortierung + Infinite-Scroll (`DiscoverExplorer`), Nav-Link „Entdecken". |
+| 2.2 | **„Weil du X auf der Watchlist hast"-Rail** | ✅ | `RecommendationsRail` + `/api/recommendations` (aggregierte TMDB-Recs, gewichtet, Vorhandenes gefiltert). |
+| 2.3 | **Personalisierte Empfehlungen** | ✅ | Durch dieselbe content-basierte Aggregation (Häufigkeit + Popularität) abgedeckt. |
 
 ---
 
@@ -36,7 +36,7 @@ Status: ⬜ offen · 🟡 in Arbeit · ✅ fertig
 | # | Feature | Aufwand | AI? | Notiz |
 |---|---------|---------|-----|-------|
 | 3.1 | **Profil-Layout neu arrangieren** | ✅ erledigt (siehe M1) | — |
-| 3.2 | **Chibi-Anime-Avatare** | M | nein | **Entschieden:** `nekos.best` als Quelle, **alle SFW-Kategorien** anbieten, nach Kategorie sortiert. Host `nekos.best`/CDN in die Bild-Allowlist aufnehmen. (Ergänzt/ersetzt den DiceBear-Picker.) |
+| 3.2 | **Chibi-Anime-Avatare** | ✅ | `AvatarPicker` mit Kategorie-Tabs: nekos.best (Neko/Waifu/Husbando/Kitsune) + „Generiert" (DiceBear). Host `nekos.best` in der Allowlist. |
 
 ---
 
@@ -44,10 +44,10 @@ Status: ⬜ offen · 🟡 in Arbeit · ✅ fertig
 
 | # | Feature | Aufwand | AI? | Notiz |
 |---|---------|---------|-----|-------|
-| 4.1 | **Profil-Sichtbarkeit (privat/öffentlich)** | S–M | nein | Neue Spalte `profiles.is_public` (Default **false** = privat) + RLS. UX wie GitHub-Repos: klar sichtbarer Status + leichter Toggle, **ohne** schweres „bist du sicher?". **Entschieden:** ist das Profil öffentlich, sind **Username + Profilbild + Watchlist immer sichtbar** (Pflicht); alles andere (Stats, Bio, Listen, Aktivität) **pro Feld optional** umschaltbar → braucht Sichtbarkeits-Flags (z.B. `profiles.public_fields jsonb`). |
-| 4.2 | **Öffentliche Profile `/u/[username]`** | M | nein | Gäste-Ansicht; zeigt Pflicht-Felder + die optional freigegebenen. Greift auf `is_public` + `public_fields`. |
-| 4.3 | **Listen öffentlich teilen** | S–M | nein | `custom_lists.is_public` + `public_lists_view` existieren schon, RLS erlaubt öffentliche Listen bereits. Fehlt: Sichtbarkeits-Toggle in der Liste + Teilen-Button + Gäste-Ansicht von `/lists/[id]`. |
-| 4.4 | **Follower + Social-Activity-Feed** | L | nein | `follows`-Tabelle (follower_id, following_id). Feed der Gefolgten — `user_activities` existiert (aktuell own-only), bräuchte Policy für Follower-Sichtbarkeit. Größtes Stück. |
+| 4.1 | **Profil-Sichtbarkeit (privat/öffentlich)** | ✅ | `profiles.is_public` (default privat) + `public_fields jsonb` + RLS (watchlist öffentlicher Profile lesbar, activity per Flag). Sichtbarkeits-Karte im Profil (sofort-Toggle, Feld-Flags, Link kopieren). |
+| 4.2 | **Öffentliche Profile `/u/[username]`** | ✅ | Gäste-Ansicht: Username+Avatar+Watchlist (Pflicht) + Stats/Bio/Listen je nach Flag. Privat → Hinweis statt Inhalt. |
+| 4.3 | **Listen öffentlich teilen** | ✅ | `setListVisibilityAction` + Toggle & Teilen-Button in `lists/[id]`, Sichtbarkeits-Badge in der Listen-Übersicht. |
+| 4.4 | **Follower + Social-Activity-Feed** | ✅ | `follows`-Tabelle (PK follower/following, no-self-Check, Index) + RLS (öffentlich lesbar; Insert nur eigene Beziehung & nur öffentliche Profile; Delete nur eigene). `social_feed`-View (security_invoker, Akteur-Profil + Medien); Feed nutzt bestehende `user_activities`-RLS (öffentlich+activity-Flag). `FollowSection` (Counts + optimistischer Follow-Button) auf `/u/[username]`, Feed-Seite `/feed` + Nav/Palette-Eintrag. RLS in 4 Fällen verifiziert (public erlaubt; self/spoof/non-public blockiert). |
 
 ---
 
@@ -55,8 +55,8 @@ Status: ⬜ offen · 🟡 in Arbeit · ✅ fertig
 
 | # | Feature | Aufwand | AI? | Notiz |
 |---|---------|---------|-----|-------|
-| 5.1 | **Command-Palette (⌘K)** | M | nein | Schnelle Suche (TMDB) + Navigation. `cmdk` oder eigenes Modal. Fuzzy über Routen + Live-Suche. |
-| 5.2 | **PWA scharf schalten** | S–M | nein | `next-pwa` ist drin (evtl. Wechsel zu gepflegtem `@ducanh2912/next-pwa`), Manifest existiert. Fehlt: Icons (mehrere Größen), Offline-Strategie, Install-Prompt. |
+| 5.1 | **Command-Palette (⌘K)** | ✅ | Eigenes Modal (keine Dependency). ⌘/Ctrl+K + Header-Button öffnen; Fuzzy-Navigation (auth-gated) + debounced TMDB-Live-Suche mit Postern; ↑↓/↵/esc, Backdrop-Close. `components/CommandPalette.tsx`. |
+| 5.2 | **PWA scharf schalten** | ✅ | `next-pwa` (Webpack) lief unter Next 16 + **Turbopack** nicht mehr → entfernt. Jetzt manuell laut Next-PWA-Guide: `app/manifest.ts` (/manifest.webmanifest), echte Icons (192/512/maskable + app/icon + apple-icon, generiert via sharp), handgeschriebener `public/sw.js` (Navigation network-first + `/offline`-Fallback, Bilder cache-first, Assets SWR; API/Auth nie gecacht), `components/PWAManager.tsx` (SW-Registrierung nur Prod + Install-Banner Android/Desktop/iOS), Security- & `/sw.js`-No-Cache-Header in `next.config.ts`. Interaktiv verifiziert: SW active, Precache + Offline-Fallback. |
 
 ---
 

@@ -194,6 +194,8 @@ export type Database = {
           banner_url: string | null
           bio: string | null
           id: string
+          is_public: boolean
+          public_fields: Json
           updated_at: string
           username: string | null
         }
@@ -202,6 +204,8 @@ export type Database = {
           banner_url?: string | null
           bio?: string | null
           id: string
+          is_public?: boolean
+          public_fields?: Json
           updated_at?: string
           username?: string | null
         }
@@ -210,6 +214,8 @@ export type Database = {
           banner_url?: string | null
           bio?: string | null
           id?: string
+          is_public?: boolean
+          public_fields?: Json
           updated_at?: string
           username?: string | null
         }
@@ -276,6 +282,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      follows: {
+        Row: {
+          created_at: string
+          follower_id: string
+          following_id: string
+        }
+        Insert: {
+          created_at?: string
+          follower_id: string
+          following_id: string
+        }
+        Update: {
+          created_at?: string
+          follower_id?: string
+          following_id?: string
+        }
+        Relationships: []
       }
       user_activities: {
         Row: {
@@ -448,6 +472,22 @@ export type Database = {
           title: string | null
           type: string | null
           watchlist_count: number | null
+        }
+        Relationships: []
+      }
+      social_feed: {
+        Row: {
+          activity_type: string | null
+          actor_avatar: string | null
+          actor_username: string | null
+          created_at: string | null
+          id: string | null
+          media_cover: string | null
+          media_id: number | null
+          media_title: string | null
+          media_type: string | null
+          metadata: Json | null
+          user_id: string | null
         }
         Relationships: []
       }

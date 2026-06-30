@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { Loader2, Plus, List, Trash2 } from 'lucide-react';
+import { Loader2, Plus, List, Trash2, Globe, Lock } from 'lucide-react';
 import Link from 'next/link';
 import { toast } from '@/lib/toast';
 import { createListAction, deleteListAction } from '@/lib/actions/lists';
@@ -10,6 +10,7 @@ type CustomList = {
   id: string;
   name: string;
   description: string | null;
+  is_public?: boolean;
 };
 
 export default function ListsClient({ initialLists }: { initialLists: CustomList[] }) {
@@ -92,7 +93,19 @@ export default function ListsClient({ initialLists }: { initialLists: CustomList
               className="bg-elev border border-line rounded-3xl p-6 group hover:border-primary-500/50 transition-colors flex flex-col justify-between h-48"
             >
               <div>
-                <h3 className="text-xl font-bold mb-2">{list.name}</h3>
+                <div className="flex items-center gap-2 mb-2">
+                  <h3 className="text-xl font-bold truncate">{list.name}</h3>
+                  <span
+                    className={`shrink-0 inline-flex items-center gap-1 text-[10px] font-bold uppercase px-2 py-0.5 rounded-full border ${
+                      list.is_public
+                        ? 'bg-success/10 border-success/30 text-success'
+                        : 'bg-surface-3 border-line text-faint'
+                    }`}
+                    title={list.is_public ? 'Öffentlich' : 'Privat'}
+                  >
+                    {list.is_public ? <Globe size={10} /> : <Lock size={10} />}
+                  </span>
+                </div>
                 <p className="text-faint text-sm line-clamp-2">
                   {list.description || 'Keine Beschreibung'}
                 </p>

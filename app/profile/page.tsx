@@ -18,7 +18,14 @@ export default async function ProfilePage() {
 
   return (
     <ProfileClient
-      initialProfile={profile ?? { username: '', bio: '', avatar_url: '', banner_url: '' }}
+      initialProfile={{
+        username: profile?.username ?? '',
+        bio: profile?.bio ?? '',
+        avatar_url: profile?.avatar_url ?? null,
+        banner_url: profile?.banner_url ?? null,
+        is_public: profile?.is_public ?? false,
+        public_fields: (profile?.public_fields as { stats?: boolean; bio?: boolean; activity?: boolean } | null) ?? {},
+      }}
       initialWatchlist={watchlist ?? []}
       stats={(stats as WatchlistStats) ?? null}
       email={user.email ?? ''}

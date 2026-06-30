@@ -59,6 +59,12 @@ export async function getTrendingAnime(page = 1, genreId?: string) {
   return fetchTMDB('/discover/tv', params);
 }
 
+/** TMDB-Empfehlungen zu einem Titel. */
+export async function getRecommendations(id: number, type: 'tv' | 'movie' = 'tv') {
+  const data = await fetchTMDB(`/${type}/${id}/recommendations`, {});
+  return data?.results ?? [];
+}
+
 /** Diese Woche angesagte Anime (TMDB /trending/tv/week, gefiltert auf Anime). */
 export async function getTrendingWeek() {
   const data = await fetchTMDB('/trending/tv/week', {});
@@ -87,12 +93,20 @@ export async function getAiringAnime(page = 1) {
   });
 }
 
-export async function getDiscoverMedia(page = 1, providerId?: string, genreId?: string) {
+export async function getDiscoverMedia(
+  page = 1,
+  providerId?: string,
+  genreId?: string,
+  opts?: { year?: string; sort?: string }
+) {
   const params: Record<string, string> = {
     page: page.toString(),
     with_original_language: ORIGINAL_LANGUAGE,
-    sort_by: 'popularity.desc',
+    sort_by: opts?.sort || 'popularity.desc',
+    'vote_count.gte': opts?.sort === 'vote_average.desc' ? '100' : '10',
   };
+
+  if (opts?.year) params.first_air_date_year = opts.year;
 
   if (providerId) {
     params.with_watch_providers = providerId;

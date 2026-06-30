@@ -28,6 +28,7 @@ export function containsProfanity(text: string): boolean {
  */
 const ALLOWED_IMAGE_HOSTS = [
   'api.dicebear.com',
+  'nekos.best', // SFW-Anime-Avatare
   'image.tmdb.org',
   'phrpjjuhwvanqfzcfxxg.supabase.co',
   'gravatar.com',

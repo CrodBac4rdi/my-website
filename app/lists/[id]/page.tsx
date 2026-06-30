@@ -5,12 +5,12 @@ import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
   ArrowLeft, Loader2, Trash2, Search, Plus,
-  Globe, Lock, List, X,
+  Globe, Lock, List, X, Share2,
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { getImageUrl } from '@/lib/tmdb';
 import { toast } from '@/lib/toast';
-import { addListItemAction, removeListItemAction } from '@/lib/actions/lists';
+import { addListItemAction, removeListItemAction, setListVisibilityAction } from '@/lib/actions/lists';
 import AnimeCard from '@/components/AnimeCard';
 
 type ListItem = {
@@ -168,6 +168,26 @@ export default function ListDetailPage() {
 
   const isOwner = list?.user_id === userId;
 
+  const toggleVisibility = async () => {
+    if (!list) return;
+    const next = !list.is_public;
+    setList({ ...list, is_public: next });
+    const res = await setListVisibilityAction(list.id, next);
+    if (res.ok) {
+      toast.success(next ? 'Liste ist jetzt öffentlich.' : 'Liste ist jetzt privat.');
+    } else {
+      toast.error(res.error);
+      setList({ ...list, is_public: !next });
+    }
+  };
+
+  const shareList = () => {
+    if (!list) return;
+    const url = `${window.location.origin}/lists/${list.id}`;
+    navigator.clipboard?.writeText(url);
+    toast.success('Link kopiert.');
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center py-40">
@@ -208,18 +228,36 @@ export default function ListDetailPage() {
           </p>
         </div>
 
-        {/* ADD BUTTON (nur für Besitzer) */}
+        {/* AKTIONEN (nur für Besitzer) */}
         {isOwner && (
-          <button
-            onClick={() => setShowSearch(s => !s)}
-            className={`flex items-center gap-2 px-5 py-3 rounded-2xl font-bold text-sm transition-all border ${
-              showSearch
-                ? 'bg-surface-3 border-line-strong text-muted'
-                : 'bg-primary-600 border-primary-500 text-white hover:bg-primary-500 shadow-lg shadow-primary-500/20'
-            }`}
-          >
-            {showSearch ? <><X size={16} /> Schließen</> : <><Plus size={16} /> Hinzufügen</>}
-          </button>
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              onClick={toggleVisibility}
+              title={list.is_public ? 'Auf privat stellen' : 'Öffentlich machen'}
+              className="inline-flex items-center gap-2 px-4 py-3 rounded-2xl font-semibold text-sm border bg-white/[.06] border-line text-muted hover:text-fg transition-all"
+            >
+              {list.is_public ? <><Lock size={15} /> Privat</> : <><Globe size={15} /> Öffentlich</>}
+            </button>
+            {list.is_public && (
+              <button
+                onClick={shareList}
+                title="Link kopieren"
+                className="inline-flex items-center justify-center w-11 h-11 rounded-2xl border bg-white/[.06] border-line text-muted hover:text-fg transition-all"
+              >
+                <Share2 size={16} />
+              </button>
+            )}
+            <button
+              onClick={() => setShowSearch(s => !s)}
+              className={`flex items-center gap-2 px-5 py-3 rounded-2xl font-bold text-sm transition-all border ${
+                showSearch
+                  ? 'bg-surface-3 border-line-strong text-muted'
+                  : 'bg-primary-600 border-primary-500 text-white hover:bg-primary-500 shadow-lg shadow-primary-500/20'
+              }`}
+            >
+              {showSearch ? <><X size={16} /> Schließen</> : <><Plus size={16} /> Hinzufügen</>}
+            </button>
+          </div>
         )}
       </div>
 

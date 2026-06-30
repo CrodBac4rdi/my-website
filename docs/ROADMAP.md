@@ -44,10 +44,10 @@ Status: ⬜ offen · 🟡 in Arbeit · ✅ fertig
 
 | # | Feature | Aufwand | AI? | Notiz |
 |---|---------|---------|-----|-------|
-| 4.1 | **Profil-Sichtbarkeit (privat/öffentlich)** | S–M | nein | Neue Spalte `profiles.is_public` (Default **false** = privat) + RLS. UX wie GitHub-Repos: klar sichtbarer Status + leichter Toggle, **ohne** schweres „bist du sicher?". **Entschieden:** ist das Profil öffentlich, sind **Username + Profilbild + Watchlist immer sichtbar** (Pflicht); alles andere (Stats, Bio, Listen, Aktivität) **pro Feld optional** umschaltbar → braucht Sichtbarkeits-Flags (z.B. `profiles.public_fields jsonb`). |
-| 4.2 | **Öffentliche Profile `/u/[username]`** | M | nein | Gäste-Ansicht; zeigt Pflicht-Felder + die optional freigegebenen. Greift auf `is_public` + `public_fields`. |
-| 4.3 | **Listen öffentlich teilen** | S–M | nein | `custom_lists.is_public` + `public_lists_view` existieren schon, RLS erlaubt öffentliche Listen bereits. Fehlt: Sichtbarkeits-Toggle in der Liste + Teilen-Button + Gäste-Ansicht von `/lists/[id]`. |
-| 4.4 | **Follower + Social-Activity-Feed** | L | nein | `follows`-Tabelle (follower_id, following_id). Feed der Gefolgten — `user_activities` existiert (aktuell own-only), bräuchte Policy für Follower-Sichtbarkeit. Größtes Stück. |
+| 4.1 | **Profil-Sichtbarkeit (privat/öffentlich)** | ✅ | `profiles.is_public` (default privat) + `public_fields jsonb` + RLS (watchlist öffentlicher Profile lesbar, activity per Flag). Sichtbarkeits-Karte im Profil (sofort-Toggle, Feld-Flags, Link kopieren). |
+| 4.2 | **Öffentliche Profile `/u/[username]`** | ✅ | Gäste-Ansicht: Username+Avatar+Watchlist (Pflicht) + Stats/Bio/Listen je nach Flag. Privat → Hinweis statt Inhalt. |
+| 4.3 | **Listen öffentlich teilen** | ✅ | `setListVisibilityAction` + Toggle & Teilen-Button in `lists/[id]`, Sichtbarkeits-Badge in der Listen-Übersicht. |
+| 4.4 | **Follower + Social-Activity-Feed** | L | nein | `follows`-Tabelle (follower_id, following_id). Feed der Gefolgten — `user_activities` existiert (own-only), bräuchte Policy für Follower-Sichtbarkeit. Größtes Stück, noch offen. |
 
 ---
 

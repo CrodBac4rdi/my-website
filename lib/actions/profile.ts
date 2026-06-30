@@ -2,7 +2,7 @@
 
 import { getAuthedClient } from '@/lib/actions/auth';
 import * as profileService from '@/lib/services/profile';
-import { updateProfileSchema } from '@/lib/validation/profile';
+import { updateProfileSchema, updateVisibilitySchema } from '@/lib/validation/profile';
 import { type ActionResult, ok, fail } from '@/lib/actions/result';
 
 export async function updateProfileAction(input: unknown): Promise<ActionResult> {
@@ -23,5 +23,20 @@ export async function updateProfileAction(input: unknown): Promise<ActionResult>
     return fail('Fehler beim Speichern.');
   }
 
+  return ok(null);
+}
+
+export async function updateVisibilityAction(input: unknown): Promise<ActionResult> {
+  const parsed = updateVisibilitySchema.safeParse(input);
+  if (!parsed.success) return fail('Ungültige Eingabe.');
+
+  const { supabase, user } = await getAuthedClient();
+  if (!user) return fail('Bitte zuerst einloggen.');
+
+  const { error } = await profileService.updateVisibility(supabase, user.id, parsed.data);
+  if (error) {
+    console.error('updateVisibility error:', error);
+    return fail('Sichtbarkeit konnte nicht gespeichert werden.');
+  }
   return ok(null);
 }

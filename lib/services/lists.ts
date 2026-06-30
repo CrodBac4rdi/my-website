@@ -22,6 +22,30 @@ export async function createList(supabase: Client, userId: string, input: Create
     .single();
 }
 
+/** Listen-Sichtbarkeit (öffentlich/privat) umschalten. */
+export async function setListVisibility(
+  supabase: Client,
+  userId: string,
+  listId: string,
+  isPublic: boolean
+) {
+  const { error } = await supabase
+    .from('custom_lists')
+    .update({ is_public: isPublic })
+    .eq('id', listId)
+    .eq('user_id', userId);
+  return { error };
+}
+
+/** Öffentliche Listen eines Nutzers (für die öffentliche Profilseite). */
+export async function getPublicListsByUser(supabase: Client, userId: string) {
+  return await supabase
+    .from('public_lists_view')
+    .select('*')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false });
+}
+
 export async function deleteList(supabase: Client, userId: string, listId: string) {
   const { error } = await supabase
     .from('custom_lists')

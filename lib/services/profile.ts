@@ -9,6 +9,24 @@ export async function getProfile(supabase: Client, userId: string) {
   return await supabase.from('profiles').select('*').eq('id', userId).single();
 }
 
+/** Profil per Username (für öffentliche Profilseite /u/[username]). */
+export async function getProfileByUsername(supabase: Client, username: string) {
+  return await supabase.from('profiles').select('*').eq('username', username).maybeSingle();
+}
+
+/** Sichtbarkeit (is_public + optionale Feld-Flags) aktualisieren. */
+export async function updateVisibility(
+  supabase: Client,
+  userId: string,
+  input: { isPublic: boolean; publicFields: Record<string, boolean | undefined> }
+) {
+  const { error } = await supabase
+    .from('profiles')
+    .update({ is_public: input.isPublic, public_fields: input.publicFields })
+    .eq('id', userId);
+  return { error };
+}
+
 /** Aggregierte Watchlist-Statistiken (View user_watchlist_stats, own-only via RLS). */
 export async function getWatchlistStats(supabase: Client, userId: string) {
   return await supabase

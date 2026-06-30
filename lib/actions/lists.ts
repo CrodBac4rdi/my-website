@@ -10,6 +10,24 @@ import {
 } from '@/lib/validation/lists';
 import { type ActionResult, ok, fail } from '@/lib/actions/result';
 
+export async function setListVisibilityAction(
+  listId: unknown,
+  isPublic: unknown
+): Promise<ActionResult> {
+  const parsedId = listIdSchema.safeParse(listId);
+  if (!parsedId.success || typeof isPublic !== 'boolean') return fail('Ungültige Eingabe.');
+
+  const { supabase, user } = await getAuthedClient();
+  if (!user) return fail('Bitte zuerst einloggen.');
+
+  const { error } = await listsService.setListVisibility(supabase, user.id, parsedId.data, isPublic);
+  if (error) {
+    console.error('setListVisibility error:', error);
+    return fail('Sichtbarkeit konnte nicht geändert werden.');
+  }
+  return ok(null);
+}
+
 export async function createListAction(input: unknown): Promise<ActionResult<unknown>> {
   const parsed = createListSchema.safeParse(input);
   if (!parsed.success) return fail('Bitte einen gültigen Namen angeben.');

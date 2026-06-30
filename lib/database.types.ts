@@ -194,6 +194,8 @@ export type Database = {
           banner_url: string | null
           bio: string | null
           id: string
+          is_public: boolean
+          public_fields: Json
           updated_at: string
           username: string | null
         }
@@ -202,6 +204,8 @@ export type Database = {
           banner_url?: string | null
           bio?: string | null
           id: string
+          is_public?: boolean
+          public_fields?: Json
           updated_at?: string
           username?: string | null
         }
@@ -210,6 +214,8 @@ export type Database = {
           banner_url?: string | null
           bio?: string | null
           id?: string
+          is_public?: boolean
+          public_fields?: Json
           updated_at?: string
           username?: string | null
         }

@@ -30,3 +30,16 @@ export const updateProfileSchema = z.object({
 });
 
 export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
+
+/** Sichtbarkeits-Einstellungen. Pflicht-Felder (username/avatar/watchlist) sind immer
+ *  sichtbar wenn öffentlich; hier nur die optionalen Felder. */
+export const updateVisibilitySchema = z.object({
+  isPublic: z.boolean(),
+  publicFields: z.object({
+    stats: z.boolean().optional(),
+    bio: z.boolean().optional(),
+    activity: z.boolean().optional(),
+  }),
+});
+
+export type UpdateVisibilityInput = z.infer<typeof updateVisibilitySchema>;

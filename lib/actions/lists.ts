@@ -8,7 +8,7 @@ import {
   addListItemSchema,
   listItemIdSchema,
 } from '@/lib/validation/lists';
-import { rateLimit } from '@/lib/actions/rate-limit';
+import { rateLimit, formatRetryAfter } from '@/lib/actions/rate-limit';
 import { type ActionResult, ok, fail } from '@/lib/actions/result';
 
 export async function setListVisibilityAction(
@@ -36,8 +36,8 @@ export async function createListAction(input: unknown): Promise<ActionResult<unk
   const { supabase, user } = await getAuthedClient();
   if (!user) return fail('Bitte zuerst einloggen.');
 
-  if (!(await rateLimit(supabase, 'create_list', 15, 60)))
-    return fail('Zu viele Listen in kurzer Zeit. Warte einen Moment.');
+  const rl = await rateLimit(supabase, 'create_list', 15, 60);
+  if (!rl.allowed) return fail(`Zu viele Listen in kurzer Zeit. Versuch es ${formatRetryAfter(rl.retryAfterSeconds)} erneut.`);
 
   const { data, error } = await listsService.createList(supabase, user.id, parsed.data);
   if (error) {

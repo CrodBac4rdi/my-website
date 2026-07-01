@@ -3,7 +3,7 @@
 import { getAuthedClient } from '@/lib/actions/auth';
 import * as followsService from '@/lib/services/follows';
 import { followSchema } from '@/lib/validation/follows';
-import { rateLimit } from '@/lib/actions/rate-limit';
+import { rateLimit, formatRetryAfter } from '@/lib/actions/rate-limit';
 import { type ActionResult, ok, fail } from '@/lib/actions/result';
 
 export async function followUserAction(input: unknown): Promise<ActionResult> {
@@ -14,8 +14,8 @@ export async function followUserAction(input: unknown): Promise<ActionResult> {
   if (!user) return fail('Bitte zuerst einloggen.');
   if (user.id === parsed.data.targetId) return fail('Du kannst dir nicht selbst folgen.');
 
-  if (!(await rateLimit(supabase, 'follow', 40, 60)))
-    return fail('Zu viele Aktionen. Warte kurz und versuch es erneut.');
+  const rl = await rateLimit(supabase, 'follow', 40, 60);
+  if (!rl.allowed) return fail(`Zu viele Aktionen. Versuch es ${formatRetryAfter(rl.retryAfterSeconds)} erneut.`);
 
   const { error } = await followsService.followUser(supabase, user.id, parsed.data.targetId);
   if (error) {

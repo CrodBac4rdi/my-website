@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Users, List as ListIcon, Compass } from 'lucide-react';
+import { Users, List as ListIcon, Compass, Sparkles } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
-import { getPopularProfiles, getPublicLists } from '@/lib/services/community';
+import { getPopularProfiles, getPublicLists, getSimilarProfiles } from '@/lib/services/community';
 import ProfileCard from '@/components/ProfileCard';
 
 export const metadata: Metadata = {
@@ -12,9 +12,14 @@ export const metadata: Metadata = {
 
 export default async function CommunityPage() {
   const supabase = await createClient();
-  const [profiles, lists] = await Promise.all([
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const [profiles, lists, similar] = await Promise.all([
     getPopularProfiles(supabase, 24),
     getPublicLists(supabase, 18),
+    user ? getSimilarProfiles(supabase, 8) : Promise.resolve([]),
   ]);
 
   return (
@@ -26,6 +31,25 @@ export default async function CommunityPage() {
         <h1 className="font-display text-4xl md:text-5xl font-bold text-fg tracking-tight">Entdecke andere</h1>
         <p className="text-muted max-w-xl">Öffentliche Profile und geteilte Listen aus der HORIZON-Community.</p>
       </header>
+
+      {/* ÄHNLICHE NUTZER (personalisiert, basierend auf Watchlist-Overlap) */}
+      {similar.length > 0 && (
+        <section className="space-y-5">
+          <h2 className="font-display text-2xl font-bold flex items-center gap-3">
+            <Sparkles className="text-primary-500" size={24} /> Ähnliche Nutzer
+          </h2>
+          <p className="text-faint text-sm -mt-3">Basierend auf Überschneidungen mit deiner Watchlist.</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {similar.map((p) => (
+              <ProfileCard
+                key={p.profile_id as string}
+                profile={{ id: p.profile_id, username: p.username, avatar_url: p.avatar_url, bio: p.bio }}
+                metaLabel={`${p.shared_count} gemeinsame Titel`}
+              />
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* PROFILE */}
       <section className="space-y-5">

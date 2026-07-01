@@ -10,7 +10,7 @@ type ProfileLite = {
   followers?: number | null;
 };
 
-export default function ProfileCard({ profile }: { profile: ProfileLite }) {
+export default function ProfileCard({ profile, metaLabel }: { profile: ProfileLite; metaLabel?: string }) {
   const name = profile.username || 'Unbenannt';
   return (
     <Link
@@ -38,7 +38,11 @@ export default function ProfileCard({ profile }: { profile: ProfileLite }) {
         ) : (
           <p className="text-faint text-sm mt-0.5">Kein Bio</p>
         )}
-        {typeof profile.followers === 'number' && (
+        {metaLabel ? (
+          <p className="text-faint text-[11px] mt-1 flex items-center gap-1">
+            <Users size={11} /> {metaLabel}
+          </p>
+        ) : typeof profile.followers === 'number' && (
           <p className="text-faint text-[11px] mt-1 flex items-center gap-1">
             <Users size={11} /> {profile.followers} Follower
           </p>

@@ -1,10 +1,12 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { MessageSquare, Star, Send, Loader2, User, Trash2 } from 'lucide-react';
+import { MessageSquare, Star, Send, Loader2, User, Trash2, ThumbsUp } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { toast } from '@/lib/toast';
-import { createReviewAction, deleteReviewAction } from '@/lib/actions/reviews';
+import {
+  createReviewAction, deleteReviewAction, addReviewVoteAction, removeReviewVoteAction,
+} from '@/lib/actions/reviews';
 
 interface ReviewSectionProps {
   animeId: string;
@@ -27,6 +29,9 @@ export default function ReviewSection({
   const [submitting, setSubmitting] = useState(false);
   const [isSpoiler, setIsSpoiler] = useState(false);
   const [revealedSpoilers, setRevealedSpoilers] = useState<Set<string>>(new Set());
+  const [voteCounts, setVoteCounts] = useState<Record<string, number>>({});
+  const [votedIds, setVotedIds] = useState<Set<string>>(new Set());
+  const voteGuard = useRef<Set<string>>(new Set()); // verhindert Doppelklick pro Review
   const submittingRef = useRef(false); // synchroner Guard gegen Doppelklick
 
   useEffect(() => {
@@ -46,11 +51,66 @@ export default function ReviewSection({
         .eq('media_id', Number(animeId))
         .order('created_at', { ascending: false });
 
-      if (!error && data) setReviews(data);
+      if (!error && data) {
+        setReviews(data);
+
+        const ids = data.map((r: any) => r.id as string);
+        if (ids.length > 0) {
+          const { data: { user: current } } = await supabase.auth.getUser();
+          const [{ data: countsData }, ownRes] = await Promise.all([
+            supabase.from('review_vote_counts').select('*').in('review_id', ids),
+            current
+              ? supabase.from('review_votes').select('review_id').eq('user_id', current.id).in('review_id', ids)
+              : Promise.resolve({ data: [] as { review_id: string }[] }),
+          ]);
+          const counts: Record<string, number> = {};
+          for (const row of countsData ?? []) {
+            if (row.review_id) counts[row.review_id] = row.helpful_count ?? 0;
+          }
+          setVoteCounts(counts);
+          setVotedIds(new Set((ownRes.data ?? []).map((r: any) => r.review_id)));
+        } else {
+          setVoteCounts({});
+          setVotedIds(new Set());
+        }
+      }
     } catch (err) {
       console.error(err);
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function toggleVote(reviewId: string) {
+    if (!user) { toast.error('Bitte zuerst einloggen.'); return; }
+    if (voteGuard.current.has(reviewId)) return;
+    voteGuard.current.add(reviewId);
+
+    const wasVoted = votedIds.has(reviewId);
+    // Optimistisch umschalten.
+    setVotedIds(prev => {
+      const next = new Set(prev);
+      wasVoted ? next.delete(reviewId) : next.add(reviewId);
+      return next;
+    });
+    setVoteCounts(prev => ({ ...prev, [reviewId]: Math.max(0, (prev[reviewId] ?? 0) + (wasVoted ? -1 : 1)) }));
+
+    try {
+      const res = wasVoted
+        ? await removeReviewVoteAction({ reviewId })
+        : await addReviewVoteAction({ reviewId });
+      if (!res.ok) {
+        // Rollback bei Fehler.
+        setVotedIds(prev => {
+          const next = new Set(prev);
+          wasVoted ? next.add(reviewId) : next.delete(reviewId);
+          return next;
+        });
+        setVoteCounts(prev => ({ ...prev, [reviewId]: Math.max(0, (prev[reviewId] ?? 0) + (wasVoted ? 1 : -1)) }));
+        toast.error(res.error);
+      }
+    } finally {
+      voteGuard.current.delete(reviewId);
     }
   }
 
@@ -260,6 +320,21 @@ export default function ReviewSection({
                       &ldquo;{review.content}&rdquo;
                     </p>
                   )}
+
+                  {/* HILFREICH-VOTING */}
+                  <button
+                    onClick={() => toggleVote(review.id)}
+                    disabled={!user}
+                    title={user ? undefined : 'Bitte zuerst einloggen'}
+                    className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold border transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${
+                      votedIds.has(review.id)
+                        ? 'bg-primary-600 border-primary-500 text-white'
+                        : 'bg-surface-3 border-line-strong text-muted hover:text-fg hover:border-primary-500/50'
+                    }`}
+                  >
+                    <ThumbsUp size={13} className={votedIds.has(review.id) ? 'fill-white' : ''} />
+                    Hilfreich{voteCounts[review.id] ? ` (${voteCounts[review.id]})` : ''}
+                  </button>
                 </div>
               );
             })}

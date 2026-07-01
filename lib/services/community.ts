@@ -23,3 +23,17 @@ export async function getPublicLists(supabase: Client, limit = 24) {
     .limit(limit);
   return data ?? [];
 }
+
+/**
+ * "Ähnliche Nutzer" — öffentliche Profile mit Watchlist-Overlap zum
+ * eingeloggten Nutzer, sortiert nach Jaccard-Score (DB-Funktion, keine AI).
+ * Leer für ausgeloggte Nutzer oder wenn niemand überlappt.
+ */
+export async function getSimilarProfiles(supabase: Client, limit = 8) {
+  const { data, error } = await supabase.rpc('get_similar_profiles', { p_limit: limit });
+  if (error) {
+    console.error('getSimilarProfiles error:', error);
+    return [];
+  }
+  return data ?? [];
+}

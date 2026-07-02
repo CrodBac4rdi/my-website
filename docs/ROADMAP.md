@@ -77,3 +77,23 @@ Status: ⬜ offen · 🟡 in Arbeit · ✅ fertig
 - `profiles.is_public boolean default false` (+ RLS) — M4.1
 - `follows`-Tabelle (+ RLS, Indizes) — M4.4
 - ggf. Anpassung `user_activities`-Policy für Follower-Sichtbarkeit — M4.4
+
+---
+
+## Meilenstein 6 — Feedback-Runde 3 (Social-Tiefe, Sicherheit, Politur)
+
+| # | Feature | Aufwand | Status | Notiz |
+|---|---------|---------|--------|-------|
+| 6.1 | **Watchlist/Listen-Suche** | S | ✅ | Client-seitiges Filterfeld auf `/watchlist` und `/lists/[id]` (durchsucht Titel). |
+| 6.2 | **Watchlist-Sortierung** | S | ✅ | Zuletzt aktualisiert / Bewertung / Titel A–Z. |
+| 6.3 | **Watchlist Bulk-Actions** | M | ✅ | Auswahlmodus (Checkbox-Overlay) + Sammel-Status-Änderung/-Löschen. |
+| 6.4 | **Ähnliche Nutzer** | M | ✅ | DB-Funktion `get_similar_profiles` (Jaccard-Overlap der Watchlist gegen öffentliche Profile, kein AI), Sektion auf `/community`. |
+| 6.5 | **Reviews: Hilfreich-Voting** | S | ✅ | `review_votes` + `review_vote_counts`-View, 👍-Button mit Zähler auf `ReviewSection`. |
+| 6.6 | **Rate-Limit-Feedback** | S | ✅ | `check_rate_limit` liefert jetzt `retry_after_seconds`; Fehlermeldungen nennen konkrete Wartezeit statt generischem Text. |
+| 6.7 | **Skeletons Community/Follower** | S | ✅ | `SkeletonProfileCard`/-Grid + `loading.tsx` für `/community`, `/u/[username]/{followers,following}`. |
+| 6.8 | **⌘K „Zuletzt angesehen"** | S | ✅ | localStorage-Historie (`lib/recentHistory.ts`), ersetzt bei leerer Suche den generischen Nav-Wall-of-Links. |
+| 6.9 | **API-Rate-Limiting (öffentlich)** | S | ✅ | In-Memory-IP-Limit für `/api/search` (40/10s) + `/api/discover` (60/10s) — bewusst kein öffentlich aufrufbares RPC (Umgehungsrisiko). |
+| 6.10 | **Datenexport** | M | ✅ | „Deine Daten" im Profil: JSON-Download (Profil, Watchlist, Listen, Reviews, Follows, Notifications, Activities). Verlinkt von der Legal-Seite. |
+| 6.11 | **i18n-Lücken** | — | bewusst ausgelassen | i18n deckt nur 4 Nav-Strings ab, alles andere ist hart Deutsch. Vollständige Übersetzung wäre unverhältnismäßig für ein deutschsprachiges Solo-Projekt — bewusst nicht ausgebaut statt halbfertig. |
+
+**Kritischer Bugfix in derselben Runde:** Command-Palette war unbedienbar (lag im `pointer-events-none`-Header, Klicks/ESC gingen ins Leere) — behoben via `createPortal` an `document.body` + globalem ESC-Handler.

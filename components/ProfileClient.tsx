@@ -4,7 +4,7 @@ import { useState, useRef } from 'react';
 import { supabase } from '@/lib/supabase';
 import {
   Loader2, LogOut, CheckCircle2, Activity, Trash2, AlertTriangle,
-  Pencil, Star, Bookmark, Play, Clock, ListChecks, Globe, Lock, Copy,
+  Pencil, Star, Bookmark, Play, Clock, ListChecks, Globe, Lock, Copy, Bell, Download,
 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -13,9 +13,11 @@ import ActivityFeed from '@/components/ActivityFeed';
 import AvatarPicker from '@/components/AvatarPicker';
 import BannerPicker from '@/components/BannerPicker';
 import ConfirmModal from '@/components/ConfirmModal';
+import PushToggle from '@/components/PushToggle';
 import { toast } from '@/lib/toast';
 import { updateProfileAction, updateVisibilityAction } from '@/lib/actions/profile';
 import { deleteAccountAction } from '@/lib/actions/account';
+import { exportUserDataAction } from '@/lib/actions/export';
 
 type PublicFields = { stats?: boolean; bio?: boolean; activity?: boolean };
 
@@ -74,6 +76,7 @@ export default function ProfileClient({
   const [saving, setSaving] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [exporting, setExporting] = useState(false);
   const [isPublic, setIsPublic] = useState<boolean>(initialProfile.is_public ?? false);
   const [publicFields, setPublicFields] = useState<PublicFields>(initialProfile.public_fields ?? {});
   const savingRef = useRef(false);
@@ -110,6 +113,29 @@ export default function ProfileClient({
     } else {
       toast.error(res.error);
       setDeleting(false);
+    }
+  };
+
+  const handleExportData = async () => {
+    setExporting(true);
+    try {
+      const res = await exportUserDataAction();
+      if (!res.ok) {
+        toast.error(res.error);
+        return;
+      }
+      const blob = new Blob([JSON.stringify(res.data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `horizon-export-${new Date().toISOString().slice(0, 10)}.json`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      toast.success('Export heruntergeladen.');
+    } finally {
+      setExporting(false);
     }
   };
 
@@ -288,6 +314,20 @@ export default function ProfileClient({
         )}
       </section>
 
+      {/* ===== BENACHRICHTIGUNGEN ===== */}
+      <section className="glass rounded-2xl p-6 md:p-8 space-y-4">
+        <div className="flex items-center gap-3">
+          <div className="p-2.5 rounded-xl border bg-surface-2 border-line-strong text-primary-400">
+            <Bell size={20} />
+          </div>
+          <div>
+            <h2 className="font-display text-lg font-bold text-fg">Benachrichtigungen</h2>
+            <p className="text-muted text-sm">Push-Hinweise zu neuen Episoden – auch wenn HORIZON nicht offen ist.</p>
+          </div>
+        </div>
+        <PushToggle />
+      </section>
+
       {/* ===== EDIT FORM (ausklappbar) ===== */}
       {editing && (
         <section className="glass rounded-2xl p-6 md:p-8 space-y-6">
@@ -398,6 +438,29 @@ export default function ProfileClient({
         </h3>
         <ActivityFeed />
       </div>
+
+      {/* ===== DATENEXPORT ===== */}
+      <section className="glass rounded-2xl p-6 md:p-8 space-y-4">
+        <div className="flex items-center gap-3">
+          <div className="p-2.5 rounded-xl border bg-surface-2 border-line-strong text-primary-400">
+            <Download size={20} />
+          </div>
+          <div>
+            <h2 className="font-display text-lg font-bold text-fg">Deine Daten</h2>
+            <p className="text-muted text-sm">
+              Profil, Watchlist, Listen, Reviews, Follower und Benachrichtigungen als JSON-Datei herunterladen.
+            </p>
+          </div>
+        </div>
+        <button
+          onClick={handleExportData}
+          disabled={exporting}
+          className="inline-flex items-center gap-2 h-10 px-4 rounded-lg text-sm font-semibold bg-surface-3 hover:bg-surface-3 hover:border-primary-500/50 border border-line-strong text-fg transition disabled:opacity-60"
+        >
+          {exporting ? <Loader2 size={15} className="animate-spin" /> : <Download size={15} />}
+          Daten exportieren
+        </button>
+      </section>
 
       {/* ===== DANGER ZONE ===== */}
       <div className="border border-danger/30 bg-danger/[.04] rounded-2xl p-6 md:p-8 space-y-4">

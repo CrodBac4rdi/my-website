@@ -55,6 +55,7 @@ export default function ListDetailPage() {
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [searching, setSearching] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
+  const [filterQuery, setFilterQuery] = useState(''); // durchsucht die bestehenden Listen-Items
 
   const searchTimeout = useRef<NodeJS.Timeout | null>(null);
   const deletingRef = useRef<Set<number>>(new Set());
@@ -167,6 +168,14 @@ export default function ListDetailPage() {
   };
 
   const isOwner = list?.user_id === userId;
+
+  const fq = filterQuery.trim().toLowerCase();
+  const visibleItems = fq
+    ? items.filter(i => {
+        const m = Array.isArray(i.media) ? i.media[0] : i.media;
+        return m?.title?.toLowerCase().includes(fq);
+      })
+    : items;
 
   const toggleVisibility = async () => {
     if (!list) return;
@@ -330,6 +339,20 @@ export default function ListDetailPage() {
         </div>
       )}
 
+      {/* FILTER (bestehende Items durchsuchen) */}
+      {items.length > 0 && (
+        <div className="relative max-w-md">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-faint" size={16} />
+          <input
+            type="text"
+            value={filterQuery}
+            onChange={e => setFilterQuery(e.target.value)}
+            placeholder="In dieser Liste suchen…"
+            className="w-full bg-surface-2 border border-line-strong rounded-xl pl-11 pr-4 py-2.5 text-sm text-fg placeholder:text-faint focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/30 transition"
+          />
+        </div>
+      )}
+
       {/* ITEMS GRID */}
       {items.length === 0 ? (
         <div className="text-center py-24 space-y-4">
@@ -344,9 +367,13 @@ export default function ListDetailPage() {
             </button>
           )}
         </div>
+      ) : visibleItems.length === 0 ? (
+        <div className="text-center py-16 text-faint italic font-medium">
+          Keine Treffer für „{filterQuery}".
+        </div>
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-          {items.map((item, index) => {
+          {visibleItems.map((item, index) => {
             const mediaObj = Array.isArray(item.media) ? item.media[0] : item.media;
             if (!mediaObj) return null;
 

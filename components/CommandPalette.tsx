@@ -8,6 +8,7 @@ import {
   Calendar, List as ListIcon, User, Download, CornerDownLeft, Loader2, Users, HelpCircle, Sparkles,
 } from 'lucide-react';
 import { getImageUrl } from '@/lib/tmdb';
+import { getRecentMedia, type RecentItem } from '@/lib/recentHistory';
 
 type NavCommand = {
   id: string;
@@ -29,6 +30,7 @@ type MediaResult = {
 const NAV_COMMANDS: NavCommand[] = [
   { id: 'home', label: 'Startseite', href: '/', icon: <Home size={18} />, keywords: 'home start trending' },
   { id: 'discover', label: 'Entdecken', href: '/discover', icon: <Compass size={18} />, keywords: 'discover filter genre entdecken' },
+  { id: 'community', label: 'Community', href: '/community', icon: <Users size={18} />, keywords: 'community profile entdecken leute öffentlich listen' },
   { id: 'search', label: 'Suche', href: '/search', icon: <Search size={18} />, keywords: 'search suche finden' },
   { id: 'watchlist', label: 'Watchlist', href: '/watchlist', icon: <Bookmark size={18} />, keywords: 'watchlist merkliste liste', authed: true },
   { id: 'feed', label: 'Feed', href: '/feed', icon: <Users size={18} />, keywords: 'feed social follower aktivität freunde', authed: true },
@@ -56,6 +58,7 @@ export default function CommandPalette({ authed }: { authed: boolean }) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<MediaResult[]>([]);
+  const [recent, setRecent] = useState<RecentItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [active, setActive] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -87,6 +90,7 @@ export default function CommandPalette({ authed }: { authed: boolean }) {
     if (open) {
       setQuery('');
       setResults([]);
+      setRecent(getRecentMedia());
       setActive(0);
       requestAnimationFrame(() => inputRef.current?.focus());
       const prev = document.body.style.overflow;
@@ -143,13 +147,24 @@ export default function CommandPalette({ authed }: { authed: boolean }) {
     };
   }, [query]);
 
+  const isEmptyQuery = query.trim().length === 0;
+  const showRecent = isEmptyQuery && recent.length > 0;
+
   // Flache Liste aller auswählbaren Einträge für Tastatur-Navigation.
+  // Bei leerer Suche: zuletzt angesehene Titel zuerst (nützlicher als die
+  // immer gleiche Nav-Liste), sonst Navigation + Live-Suchtreffer.
   const flatItems = useMemo(
-    () => [
-      ...navMatches.map((c) => ({ kind: 'nav' as const, nav: c })),
-      ...results.map((m) => ({ kind: 'media' as const, media: m })),
-    ],
-    [navMatches, results],
+    () =>
+      showRecent
+        ? [
+            ...recent.map((m) => ({ kind: 'recent' as const, media: m })),
+            ...navMatches.map((c) => ({ kind: 'nav' as const, nav: c })),
+          ]
+        : [
+            ...navMatches.map((c) => ({ kind: 'nav' as const, nav: c })),
+            ...results.map((m) => ({ kind: 'media' as const, media: m })),
+          ],
+    [showRecent, recent, navMatches, results],
   );
 
   useEffect(() => {
@@ -169,7 +184,7 @@ export default function CommandPalette({ authed }: { authed: boolean }) {
       const item = flatItems[index];
       if (!item) return;
       if (item.kind === 'nav') go(item.nav.href);
-      else go(`/media/${item.media.id}?type=${item.media.media_type}`);
+      else go(`/media/${item.media.id}?type=${item.media.media_type}`); // 'recent' | 'media' teilen sich die Form
     },
     [flatItems, go],
   );
@@ -199,6 +214,7 @@ export default function CommandPalette({ authed }: { authed: boolean }) {
 
   if (!open) return null;
 
+  const recentCount = showRecent ? recent.length : 0;
   const navCount = navMatches.length;
 
   // Per Portal an document.body — sonst erbt die Palette pointer-events-none
@@ -242,11 +258,44 @@ export default function CommandPalette({ authed }: { authed: boolean }) {
             </p>
           )}
 
-          {navCount > 0 && (
+          {recentCount > 0 && (
             <div className="px-2">
+              <p className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-faint">Zuletzt angesehen</p>
+              {recent.map((m, i) => {
+                const idx = i;
+                return (
+                  <button
+                    key={`recent-${m.id}`}
+                    data-idx={idx}
+                    onMouseMove={() => setActive(idx)}
+                    onClick={() => activate(idx)}
+                    className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-colors ${
+                      active === idx ? 'bg-primary-600/20 text-fg' : 'text-muted hover:bg-white/[.04]'
+                    }`}
+                  >
+                    <img
+                      src={getImageUrl(m.poster_path)}
+                      alt=""
+                      className="w-8 h-12 object-cover rounded shrink-0 border border-line"
+                    />
+                    <span className="flex-1 min-w-0">
+                      <span className="block text-sm font-medium truncate">{m.title}</span>
+                      <span className="block text-xs text-faint">
+                        {m.year || 'TBA'} · {m.media_type === 'movie' ? 'Film' : 'TV'}
+                      </span>
+                    </span>
+                    {active === idx && <CornerDownLeft size={14} className="text-faint shrink-0" />}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
+          {navCount > 0 && (
+            <div className="px-2 mt-1">
               <p className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-faint">Navigation</p>
               {navMatches.map((c, i) => {
-                const idx = i;
+                const idx = recentCount + i;
                 return (
                   <button
                     key={c.id}

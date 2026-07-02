@@ -4,6 +4,7 @@ import WatchlistButton from '@/components/WatchListButton';
 import SetBackgroundButton from '@/components/SetBackgroundButton';
 import Recommendations from '@/components/Recommendations';
 import ReviewSection from '@/components/ReviewSection';
+import RecordRecentView from '@/components/RecordRecentView';
 import { getMediaDetailWithFallback, getImageUrl } from '@/lib/tmdb';
 import type { Metadata } from 'next';
 
@@ -73,6 +74,16 @@ export default async function MediaDetail({
 
   return (
     <div className="space-y-16 pb-32 text-fg relative min-h-screen">
+
+      <RecordRecentView
+        item={{
+          id: Number(resolvedParams.id),
+          title: media.name || media.title || 'Unbekannt',
+          media_type: media._fetchedType === 'movie' ? 'movie' : 'tv',
+          poster_path: media.poster_path ?? null,
+          year: (media.first_air_date || media.release_date || '').split('-')[0] || '',
+        }}
+      />
 
       {/* IMMERSIVE FULLSCREEN BACKGROUND */}
       <div className="fixed inset-0 z-[-1] pointer-events-none">

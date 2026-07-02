@@ -221,6 +221,32 @@ export type Database = {
         }
         Relationships: []
       }
+      review_votes: {
+        Row: {
+          created_at: string
+          review_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          review_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          review_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "review_votes_review_id_fkey"
+            columns: ["review_id"]
+            isOneToOne: false
+            referencedRelation: "reviews"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       reviews: {
         Row: {
           content: string
@@ -282,6 +308,51 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      push_subscriptions: {
+        Row: {
+          created_at: string
+          endpoint: string
+          id: number
+          subscription: Json
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          endpoint: string
+          id?: number
+          subscription: Json
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          endpoint?: string
+          id?: number
+          subscription?: Json
+          user_id?: string
+        }
+        Relationships: []
+      }
+      rate_limit_events: {
+        Row: {
+          action: string
+          created_at: string
+          id: number
+          user_id: string
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          id?: number
+          user_id: string
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          id?: number
+          user_id?: string
+        }
+        Relationships: []
       }
       follows: {
         Row: {
@@ -491,6 +562,16 @@ export type Database = {
         }
         Relationships: []
       }
+      popular_public_profiles: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          followers: number | null
+          id: string | null
+          username: string | null
+        }
+        Relationships: []
+      }
       public_lists_view: {
         Row: {
           author_avatar: string | null
@@ -513,6 +594,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      review_vote_counts: {
+        Row: {
+          review_id: string | null
+          helpful_count: number | null
+        }
+        Relationships: []
       }
       reviews_with_author: {
         Row: {
@@ -605,9 +693,24 @@ export type Database = {
       }
     }
     Functions: {
+      check_rate_limit: {
+        Args: { p_action: string; p_max: number; p_window_seconds: number }
+        Returns: { allowed: boolean; retry_after_seconds: number }[]
+      }
       delete_user: {
         Args: Record<PropertyKey, never>
         Returns: undefined
+      }
+      get_similar_profiles: {
+        Args: { p_limit?: number }
+        Returns: {
+          profile_id: string
+          username: string | null
+          avatar_url: string | null
+          bio: string | null
+          shared_count: number
+          score: number
+        }[]
       }
       get_media_stats: {
         Args: { p_media_id: number }

@@ -1,9 +1,18 @@
 import { getDiscoverMedia } from "@/lib/tmdb";
 import { NextResponse } from "next/server";
+import { checkMemoryRateLimit, ipFromRequest } from "@/lib/rate-limit-memory";
 
 const ALLOWED_SORTS = new Set(['popularity.desc', 'vote_average.desc', 'first_air_date.desc']);
 
 export async function GET(request: Request) {
+  const rl = checkMemoryRateLimit(`discover:${ipFromRequest(request)}`, 60, 10_000);
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { error: "Zu viele Anfragen." },
+      { status: 429, headers: { "Retry-After": String(rl.retryAfterSeconds) } }
+    );
+  }
+
   const { searchParams } = new URL(request.url);
   const page = searchParams.get('page') || '1';
   const provider = searchParams.get('provider') || undefined;

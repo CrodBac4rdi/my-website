@@ -6,6 +6,8 @@ import {
   addToWatchlistSchema,
   updateWatchlistSchema,
   mediaIdSchema,
+  bulkUpdateStatusSchema,
+  bulkDeleteSchema,
 } from '@/lib/validation/watchlist';
 import { type ActionResult, ok, fail } from '@/lib/actions/result';
 
@@ -75,6 +77,41 @@ export async function updateWatchlistAction(input: unknown): Promise<ActionResul
     return fail('Aktualisierung fehlgeschlagen.');
   }
 
+  return ok(null);
+}
+
+export async function bulkUpdateStatusAction(input: unknown): Promise<ActionResult> {
+  const parsed = bulkUpdateStatusSchema.safeParse(input);
+  if (!parsed.success) return fail('Ungültige Eingabe.');
+
+  const { supabase, user } = await getAuthedClient();
+  if (!user) return fail('Bitte zuerst einloggen.');
+
+  const { error } = await watchlistService.bulkUpdateStatus(
+    supabase,
+    user.id,
+    parsed.data.watchlistIds,
+    parsed.data.status
+  );
+  if (error) {
+    console.error('bulkUpdateStatus error:', error);
+    return fail('Aktualisierung fehlgeschlagen.');
+  }
+  return ok(null);
+}
+
+export async function bulkDeleteAction(input: unknown): Promise<ActionResult> {
+  const parsed = bulkDeleteSchema.safeParse(input);
+  if (!parsed.success) return fail('Ungültige Eingabe.');
+
+  const { supabase, user } = await getAuthedClient();
+  if (!user) return fail('Bitte zuerst einloggen.');
+
+  const { error } = await watchlistService.bulkDelete(supabase, user.id, parsed.data.watchlistIds);
+  if (error) {
+    console.error('bulkDelete error:', error);
+    return fail('Löschen fehlgeschlagen.');
+  }
   return ok(null);
 }
 

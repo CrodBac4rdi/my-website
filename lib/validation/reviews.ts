@@ -22,3 +22,6 @@ export type CreateReviewInput = z.infer<typeof createReviewSchema>;
 
 /** Review-ID (uuid) zum Löschen. */
 export const reviewIdSchema = z.string().uuid();
+
+/** Review-ID (uuid) zum Voten/Entvoten. */
+export const reviewVoteSchema = z.object({ reviewId: z.string().uuid() });

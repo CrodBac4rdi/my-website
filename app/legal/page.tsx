@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 import { Shield, FileText, Code2, AlertTriangle, Database, Sparkles } from "lucide-react";
 
 export const metadata = {
@@ -99,6 +100,18 @@ export default function LegalPage() {
                   Es werden lediglich <strong className="text-fg font-semibold">technisch notwendige
                   Session-Tokens</strong> verwendet, um dich eingeloggt zu halten und deine Watchlist
                   abzurufen. Gemäß DSGVO ist hierfür kein Cookie-Opt-In-Banner erforderlich.
+                </p>
+              </div>
+              <div className="space-y-2">
+                <h3 className="text-lg font-semibold text-fg">3. Deine Daten, dein Recht</h3>
+                <p>
+                  Du kannst jederzeit alle bei uns gespeicherten Daten (Profil, Watchlist, Listen,
+                  Reviews, Follower, Benachrichtigungen) als JSON-Datei herunterladen — in deinem{' '}
+                  <Link href="/profile" className="text-primary-400 hover:underline font-semibold">
+                    Profil
+                  </Link>{' '}
+                  unter „Deine Daten". Dort kannst du deinen Account auch vollständig und
+                  unwiderruflich löschen.
                 </p>
               </div>
             </div>

@@ -3,6 +3,7 @@ import InstallButton from '@/components/InstallButton';
 
 const LINKS: { href: string; label: string }[] = [
   { href: '/discover', label: 'Entdecken' },
+  { href: '/community', label: 'Community' },
   { href: '/calendar', label: 'Kalender' },
   { href: '/backgrounds', label: 'Hintergründe' },
   { href: '/faq', label: 'FAQ' },

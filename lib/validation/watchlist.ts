@@ -30,3 +30,15 @@ export type UpdateWatchlistInput = z.infer<typeof updateWatchlistSchema>;
 
 /** Reine media_id (zum Entfernen). */
 export const mediaIdSchema = z.number().int().positive();
+
+/** Liste von Watchlist-IDs für Bulk-Actions (auf sinnvolle Größe begrenzt). */
+const watchlistIdsSchema = z.array(z.number().int().positive()).min(1).max(500);
+
+export const bulkUpdateStatusSchema = z.object({
+  watchlistIds: watchlistIdsSchema,
+  status: watchlistStatusSchema,
+});
+
+export const bulkDeleteSchema = z.object({
+  watchlistIds: watchlistIdsSchema,
+});
